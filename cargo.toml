@@ -1,0 +1,34 @@
+[package]
+name = "cqt-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["Artiom Tofan <artiomtofancv@gmailcom>"]
+description = "Blazingly fast Rust Constant-Q Transform"
+license = "MIT"
+repository = "https://github.com/F0rty-Tw0/cqt-rs"
+readme = "README.md"
+keywords = ["cqt", "signal-processing", "dsp", "audio", "fft"]
+categories = ["audio", "science", "mathematics"]
+
+[lib]
+name = "cqt_rs"
+path = "src/lib.rs"
+crate-type = ["lib"]
+
+[dependencies]
+lazy_static = "1.4"
+rustfft = "6.1"
+hann-rs = "0.1.0"
+ndarray = { version = "0.15.6", features = [
+  "rayon",
+  "matrixmultiply-threading",
+] }
+
+
+[dev-dependencies]
+criterion = "0.4"
+approx = "0.5.1"
+
+[[bench]]
+name = "bench"
+harness = false
