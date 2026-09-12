@@ -7,7 +7,7 @@
 //! ```
 
 use std::collections::VecDeque;
-use std::io::{BufWriter, Write};
+use std::io::{BufWriter, Read, Write};
 use std::process::exit;
 use std::time::Instant;
 
@@ -19,9 +19,16 @@ use cqt_rs::{Cqt, CqtParams, CqtStream};
 
 const USAGE: &str = "usage:
   monitor --watch NAME=FILE.wav [--watch ...] --stream FILE.wav [options]
+  monitor --watch NAME=FILE.wav [--watch ...] --stream - [--rate HZ] [options]
   monitor fingerprint FILE.wav [options]
 
+With `--stream -` the monitor reads signed 16-bit little-endian mono PCM
+from stdin as it arrives (for example from `ffmpeg -i URL -f s16le -ac 1
+-ar 44100 -`) and flushes every report, so it can sit behind a live
+stream decoder.
+
 options (defaults in brackets):
+  --rate HZ            sample rate of the stdin stream [the watched songs']
   --hop N              hop size in samples [256]
   --min-freq HZ        lowest bin [55]        --max-freq HZ      highest bin [7040]
   --bins-per-octave N  [24]                   --gamma HZ         variable-Q offset [0]
@@ -42,6 +49,9 @@ options (defaults in brackets):
   --verify-hold A      alignment that keeps a play going at half the
                        threshold, 0..1 [0.3]
   --release S          seconds below threshold that end a detection [3]
+  --jump S             song-position jump that counts as a new play of the
+                       same song (a repeated section flips the vote by a
+                       few seconds, a restarted track by much more) [10]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
 
@@ -68,8 +78,10 @@ struct Options {
     verify_start: f64,
     verify_hold: f64,
     release: f64,
+    jump: f64,
     report: f64,
     block: usize,
+    rate: Option<u32>,
     watch: Vec<(String, String)>,
     stream: Option<String>,
     fingerprint: Option<String>,
@@ -99,8 +111,10 @@ impl Default for Options {
             verify_start: 0.4,
             verify_hold: 0.3,
             release: 3.0,
+            jump: 10.0,
             report: 0.25,
             block: 4096,
+            rate: None,
             watch: Vec::new(),
             stream: None,
             fingerprint: None,
@@ -156,8 +170,10 @@ fn parse_args() -> Options {
             "--verify-start" => opts.verify_start = value(&arg, args.next()),
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
             "--release" => opts.release = value(&arg, args.next()),
+            "--jump" => opts.jump = value(&arg, args.next()),
             "--report" => opts.report = value(&arg, args.next()),
             "--block" => opts.block = value(&arg, args.next()),
+            "--rate" => opts.rate = Some(value(&arg, args.next())),
             "-h" | "--help" => {
                 println!("{USAGE}");
                 exit(0)
@@ -293,9 +309,14 @@ fn main() {
     )
     .unwrap();
 
-    // Stream.
+    // Stream: a WAV file, or PCM from stdin as it arrives.
     let stream_path = opts.stream.as_ref().unwrap();
-    let (samples, stream_rate) = read_wav(stream_path);
+    let live = stream_path == "-";
+    let (samples, stream_rate) = if live {
+        (Vec::new(), opts.rate.unwrap_or(sample_rate))
+    } else {
+        read_wav(stream_path)
+    };
     if stream_rate != sample_rate {
         eprintln!(
             "{stream_path}: sample rate {stream_rate} differs from the watched songs ({sample_rate})"
@@ -317,7 +338,7 @@ fn main() {
             confirm_frames: frames_per_second.round() as u64,
             jump_shift: 2,
             jump_tempo: 0.05,
-            jump_frames: 3.0 * frames_per_second,
+            jump_frames: opts.jump * frames_per_second,
             start_alignment: opts.verify_start,
             hold_alignment: opts.verify_hold,
             hold_confidence: 0.5 * opts.threshold,
@@ -334,7 +355,11 @@ fn main() {
         out,
         "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
         json_string(stream_path),
-        samples.len() as f64 / f64::from(sample_rate),
+        if live {
+            "null".to_owned()
+        } else {
+            format!("{:.2}", samples.len() as f64 / f64::from(sample_rate))
+        },
         cqt.latency_samples() as f64 / f64::from(sample_rate),
         delay as f64 / frames_per_second,
         opts.window,
@@ -363,9 +388,9 @@ fn main() {
     // Query peaks not older than the evidence window, for verification.
     let mut recent: VecDeque<Peak> = VecDeque::new();
     let started = Instant::now();
-    let mut pending_report = false;
-    for block in samples.chunks(opts.block) {
+    let mut process_block = |block: &[f32], out: &mut Out| {
         consumed += block.len() as u64;
+        let mut pending_report = false;
         let (matcher_ref, fp_ref, frames_ref, delays_ref, recent_ref) =
             (&mut matcher, &mut fp, &mut frames, &mut delays, &mut recent);
         stream.push(&cqt, block, |magnitudes| {
@@ -389,10 +414,52 @@ fn main() {
                 &mut recent,
                 frames,
                 consumed,
-                &mut out,
+                out,
                 false,
             );
-            pending_report = false;
+            if live {
+                out.flush().unwrap();
+            }
+        }
+    };
+    if live {
+        let stdin = std::io::stdin();
+        let mut input = stdin.lock();
+        let mut bytes = vec![0u8; opts.block.max(1) * 2];
+        let mut block = Vec::with_capacity(opts.block);
+        loop {
+            // Fill a block, or take what is left at the end of the stream.
+            let mut filled = 0;
+            while filled < bytes.len() {
+                match input.read(&mut bytes[filled..]) {
+                    Ok(0) => break,
+                    Ok(n) => filled += n,
+                    Err(e) if e.kind() == std::io::ErrorKind::Interrupted => {}
+                    Err(e) => {
+                        eprintln!("stdin: {e}");
+                        exit(1)
+                    }
+                }
+            }
+            if filled == 0 {
+                break;
+            }
+            block.clear();
+            block.extend(
+                bytes[..filled]
+                    .as_chunks::<2>()
+                    .0
+                    .iter()
+                    .map(|&b| f32::from(i16::from_le_bytes(b)) / 32768.0),
+            );
+            process_block(&block, &mut out);
+            if filled < bytes.len() {
+                break;
+            }
+        }
+    } else {
+        for block in samples.chunks(opts.block.max(1)) {
+            process_block(block, &mut out);
         }
     }
     {
@@ -424,7 +491,7 @@ fn main() {
         true,
     );
     let cpu = started.elapsed().as_secs_f64();
-    let audio = samples.len() as f64 / ctx.sample_rate;
+    let audio = consumed as f64 / ctx.sample_rate;
     writeln!(
         out,
         "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",

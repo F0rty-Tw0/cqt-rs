@@ -56,7 +56,12 @@ Breaking rewrite of the transform.
   end-to-end detection test on synthetic audio.
   `scripts/radio_negatives.py` builds a held-out null stream and hard
   negatives (same artist, reversed, out-of-range speed, loops) that
-  `scripts/radio_eval.py --negatives` scores per family.
+  `scripts/radio_eval.py --negatives` scores per family;
+  `scripts/radio_dj.py` a continuous DJ set with BPM change, key change
+  and talk-over at once (`radio_eval.py --programme stream_dj`), and
+  the evaluation draws one confidence/alignment panel per play.
+  `monitor --stream -` reads live PCM from stdin; `--jump` sets the
+  position jump that counts as a new play (10 s).
 - CI runs separate gates for the library (`cargo publish --dry-run`,
   CHANGELOG heading check) and the monitor crate.
 - `CqtStream::params`, `CqtStream::padding_samples`,

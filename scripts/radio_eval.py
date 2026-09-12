@@ -139,13 +139,62 @@ def print_negatives(name: str, neg: dict) -> None:
               f"{fam['max_confidence']:.1f} | {fam['verify_q_at_max']:.2f} / {fam['max_verify_q']:.2f} | {fam['false_starts']} | {worst_text} |")
 
 
+def plot_plays(rows: list[dict], plays: list[dict], reports: list[dict], starts: list[dict], ends: dict,
+               colours: dict, threshold: float, path: Path) -> None:
+    """One panel per watched play: the song's confidence and alignment
+    against time from the first sample of the play, with the talk-over and
+    crossfade spans, the threshold and the start/end events."""
+    n = len(plays)
+    cols = 4
+    nrows = (n + cols - 1) // cols
+    fig, axes = plt.subplots(nrows, cols, figsize=(16, 2.9 * nrows), constrained_layout=True, sharey=True)
+    axes = np.atleast_1d(axes).ravel()
+    for ax, seg, row in zip(axes, plays, rows):
+        t0, t1 = seg["start"], seg["end"]
+        colour = colours.get(seg["source"], "tab:green")
+        span = [r for r in reports if t0 - 3 <= r["consumed"] <= t1 + 12]
+        t = np.array([r["consumed"] - t0 for r in span])
+        conf = np.array([r["confidence"] if r["song"] == seg["source"] else 0.0 for r in span])
+        align = np.array([100 * r.get("verify_q", 0.0) if r["song"] == seg["source"] else 0.0 for r in span])
+        ax.axvspan(0, t1 - t0, color=colour, alpha=0.12, lw=0)
+        if seg.get("talkover_duration"):
+            ax.axvspan(0, seg["talkover_duration"], color="k", alpha=0.10, lw=0, hatch="//")
+        if seg.get("crossfade_in") or seg["treatment"] == "crossfade":
+            ax.axvspan(0, 6.0, color="tab:purple", alpha=0.10, lw=0)
+        ax.plot(t, conf, color=colour, lw=1.4, label="confidence")
+        ax.plot(t, align, color="tab:grey", lw=1.0, ls=":", label="alignment × 100")
+        ax.axhline(threshold, color="k", ls="--", lw=0.8)
+        for st in starts:
+            if st["song"] == seg["source"] and t0 <= st["consumed"] <= t1 + 3:
+                ax.axvline(st["consumed"] - t0, color="green", lw=1.2)
+                end = ends.get((st["song"], st["t"]))
+                if end:
+                    ax.axvline(end["consumed"] - t0, color="red", lw=1.2)
+        status = f"detected after {row['latency']:.1f} s, confidence {row['confidence']:.0f}" if row["detected"] else "MISSED"
+        ax.set_title(f"{seg['source']}: {seg['treatment']}\n{status}", fontsize=8)
+        ax.set_xlim(-3, t1 - t0 + 12)
+        ax.set_ylim(0, 105)
+        ax.grid(alpha=0.25)
+        ax.tick_params(labelsize=7)
+    for ax in axes[n:]:
+        ax.axis("off")
+    axes[0].legend(fontsize=7, loc="lower right")
+    fig.supxlabel("seconds from the first sample of the play (shaded: the play; hatched: DJ talk-over; purple: 6 s crossfade in; "
+                  "green line: start event; red line: end event)", fontsize=9)
+    fig.supylabel("confidence / alignment × 100", fontsize=9)
+    fig.savefig(path, dpi=90)
+    plt.close(fig)
+
+
 def evaluate(args) -> dict:
     extra = ["--half", str(args.half), "--threshold", str(args.threshold), "--window", str(args.window)]
     extra += [a for spec in args.arg for a in spec.split()]
+    programme = args.programme
+    suffix = "" if programme == "stream_eval" else "_" + programme.removeprefix("stream_")
     null_events = run_monitor(WORK / "stream_null.wav", extra, args.monitor)
-    eval_events = run_monitor(WORK / "stream_eval.wav", extra, args.monitor)
+    eval_events = run_monitor(WORK / f"{programme}.wav", extra, args.monitor)
     null_truth = load_truth("stream_null")
-    eval_truth = load_truth("stream_eval")
+    eval_truth = load_truth(programme)
 
     # --- null stream: what does a false match look like? --------------------
     null_reports = [e for e in null_events if e["event"] == "report"]
@@ -194,6 +243,7 @@ def evaluate(args) -> dict:
     false_starts = [s for s in starts if id(s) not in used]
     # A false start inside a play of the *other* song or in filler music.
     summary = dict(
+        programme=programme,
         half=args.half, threshold=args.threshold, window=args.window, args=extra,
         commit=git_commit(),
         label=args.label or git_commit()[:7],
@@ -225,7 +275,7 @@ def evaluate(args) -> dict:
           f"max confidence {null_conf.max():.1f}; verify_q max {null_verify.max():.2f}, 99.9 % {np.percentile(null_verify, 99.9):.2f}; "
           f"false alarms at {args.threshold}: {len(null_starts)}; "
           f"CPU {100 * null_done['realtime_fraction']:.2f} % of one core")
-    print(f"eval stream: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
+    print(f"{programme}: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
           f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %"
           + (f"; hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s"
              if "hash_delay_median_seconds" in done else ""))
@@ -268,10 +318,15 @@ def evaluate(args) -> dict:
     ax.axhline(null_conf.max(), color="r", ls=":", lw=1, label=f"highest confidence on {null_done['audio_seconds'] / 60:.0f} min without the songs")
     for s in starts:
         ax.plot(s["consumed"], s["confidence"], "v", color=colours[s["song"]], ms=7, mec="k")
-    ax.set_ylim(0, 140)
+    for e in ends.values():
+        ax.plot(e["consumed"], args.threshold, "^", color=colours[e["song"]], ms=6, mec="k", alpha=0.7)
+    # Room for the rotated treatment labels above the curves.
+    longest = max((len(seg["treatment"]) for seg in eval_truth["segments"] if seg.get("watched")), default=0)
+    ax.set_ylim(0, max(140, 105 + 1.8 * longest))
     ax.set_ylabel("confidence")
-    ax.set_title("Watch-list monitor on a simulated radio programme (shaded: watched plays with their DJ treatment, "
-                 "grey: other music and speech, triangles: detections)", fontsize=10)
+    kind = "DJ set" if programme == "stream_dj" else "radio programme"
+    ax.set_title(f"Watch-list monitor on a simulated {kind} (shaded: watched plays with their DJ treatment, "
+                 "grey: other music and speech, down triangles: start events, up triangles: end events)", fontsize=10)
     ax.legend(loc="upper left", fontsize=7, ncol=4)
     ax = axes[1]
     for song, colour in colours.items():
@@ -283,8 +338,9 @@ def evaluate(args) -> dict:
     ax.set_xlabel("stream time (s)")
     ax.axhline(null_evidence.max(), color="r", ls=":", lw=1)
     ax.grid(alpha=0.3, which="both")
-    fig.savefig(PLOTS / "radio_timeline.png", dpi=90)
+    fig.savefig(PLOTS / f"radio_timeline{suffix}.png", dpi=90)
     plt.close(fig)
+    plot_plays(rows, plays, reports, starts, ends, colours, args.threshold, PLOTS / f"radio_plays{suffix}.png")
 
     # --- figure: null distribution and latencies -----------------------------
     fig, axes = plt.subplots(1, 2, figsize=(14, 5), constrained_layout=True)
@@ -314,7 +370,7 @@ def evaluate(args) -> dict:
     ax.set_xlabel("seconds from the start of the play to the detection (pipeline delay included)")
     ax.set_title("Time to detection per play", fontsize=10)
     ax.set_xlim(0, max(lat) + 4)
-    fig.savefig(PLOTS / "radio_detection.png", dpi=90)
+    fig.savefig(PLOTS / f"radio_detection{suffix}.png", dpi=90)
     plt.close(fig)
     return summary
 
@@ -328,6 +384,8 @@ def main() -> None:
     parser.add_argument("--out", default="eval_summary", help="summary name under target/radio (default eval_summary)")
     parser.add_argument("--no-plots", action="store_true", help="skip the figures (for comparison runs)")
     parser.add_argument("--label", help="name of this run in comparisons (default: the short commit of the tree)")
+    parser.add_argument("--programme", default="stream_eval",
+                        help="programme stream to evaluate under target/radio (default stream_eval; stream_dj for the DJ set)")
     parser.add_argument("--negatives", action="store_true",
                         help="also run the held-out null stream and the hard negatives (scripts/radio_negatives.py)")
     parser.add_argument("--arg", action="append", default=[],

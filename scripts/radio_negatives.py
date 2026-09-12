@@ -113,11 +113,15 @@ def build_hard_plan(rng: np.random.Generator) -> List[rs.Rendered]:
     return out
 
 
-def build_rendered_stream(name: str, rendered: List[rs.Rendered], seed: int):
+def build_rendered_stream(name: str, rendered: List[rs.Rendered], seed: int, watched: bool = False):
+    """Assembles, applies the FM chain and writes the stream with its ground
+    truth. Without `watched` no segment counts as a play of a watched song
+    (hard negatives are the songs' audio but not plays)."""
     t0 = time.time()
     stream, segments = rs.assemble(rendered)
-    for seg in segments:
-        seg["watched"] = False  # nothing here is a play of a watched song
+    if not watched:
+        for seg in segments:
+            seg["watched"] = False
     stream = rs.fm_chain(stream)
     wav = os.path.join(rs.RADIO_DIR, f"{name}.wav")
     sf.write(wav, stream, rs.SR, subtype="PCM_16")

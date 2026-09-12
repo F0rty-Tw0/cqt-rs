@@ -238,6 +238,21 @@ python3 scripts/fingerprint_demo.py
 
 ## Radio monitoring with a watch list
 
+**TL;DR.** Give the monitor the songs you care about and a stream, and it
+tells you when one of them is playing, with a confidence score from 0 to
+100 in which anything under 70 is not a match. On simulated radio it
+found every play of the watched songs (16 of 16 on a 15 min programme,
+45 of 45 with eight songs watched, 9 of 9 in a continuous DJ set) with no
+false alarm in 76 minutes of audio without the songs: a pitch fader of
+±8 %, a key-locked BPM change of ±12 %, a key change of ±2 semitones, a
+bass cut, an FM chain and a 128k MP3 are each recognised within about
+2 s of the song becoming audible, with the pitch shift, the tempo and
+the position in the song reported. A DJ who changes the BPM *and* the
+key *and* talks over the intro is recognised 1 to 6 s after the talking
+stops (the worst case, everything at once through FM and MP3, takes
+15 s). The whole chain costs 0.4 % of one core, and `--stream -` reads
+live PCM from a decoder.
+
 The `cqt-monitor` crate in [`monitor/`](./monitor) turns the transform into
 a real-time watch-list monitor: given the songs you want to catch, it
 listens to a stream and reports when one of them is playing, how the DJ
@@ -270,7 +285,13 @@ binary prints one JSON line per report interval plus those events.
 
 ```console
 cargo run --release -p cqt-monitor -- --watch song=song.wav --watch other=other.wav --stream radio.wav
+ffmpeg -i https://radio.example/stream -f s16le -ac 1 -ar 44100 - | monitor --watch song=song.wav --stream -
 ```
+
+With `--stream -` the monitor reads signed 16-bit mono PCM from stdin as
+it arrives and flushes every report line, so it sits behind any decoder;
+the events are the same as for a file (verified on the same audio both
+ways).
 
 ### Simulated radio programme
 
@@ -331,8 +352,8 @@ does not:
 | watched songs played backwards | 3.9 | 82 | 67 | 0 |
 | watched songs at 0.6× and 1.5× speed (outside the 0.7–1.4 tempo range) | 3.1 | 58 | 59 | 0 |
 | a 0.5 s sample of a watched song looped, alone or under another track | 2.0 | 122 | 75 | 0 |
-| a 1 s loop | 2.0 | 397 | 91 | 2 |
-| a 2 s loop | 1.9 | 1 089 | 97 | 8 |
+| a 1 s loop | 2.0 | 397 | 91 | 0 |
+| a 2 s loop | 1.9 | 1 089 | 97 | 3 |
 
 A reversed copy shares the song's peaks and, in its symmetric passages,
 enough hash votes to reach confidence 67; with fan-out 6 and no
@@ -347,6 +368,51 @@ policy would use.
 </p>
 <p align="center">
   <img src="./plots/radio_detection.png" width="98%" />
+</p>
+
+One panel per play, with the confidence, the alignment and the
+`start`/`end` events against time from the first sample of the play:
+
+<p align="center">
+  <img src="./plots/radio_plays.png" width="98%" />
+</p>
+
+### A DJ set: BPM change, key change and talk-over at once
+
+`scripts/radio_dj.py` renders the case the monitor is for: a continuous
+8.7 min mix with no silence, every item crossfaded into the previous one
+over 6 s, and the watched songs played with a key-locked BPM change *and*
+a key change *and* 12 s of DJ talk-over over the incoming track at the
+same time, in some plays through the FM chain and a 128k MP3 round trip
+as well (`radio_eval.py --programme stream_dj`). All nine plays are
+found with no false start:
+
+| Song | BPM (key lock) | Pitch fader | Key | Talk-over | FM + MP3 | Detected after | after the talking / fade | Confidence at detection / max | Shift expected / detected | Tempo expected / detected |
+| --- | ---: | ---: | ---: | :-: | :-: | ---: | ---: | ---: | ---: | ---: |
+| vibe_ace | +12 % | | +2 | | | 7.0 s | 1.0 s | 71 / 86 | +4 / +4 | ×1.120 / ×1.101 |
+| vibe_ace | | +5 % | −2 | | | 7.5 s | 1.5 s | 71 / 89 | −2 / −2 | ×1.050 / ×1.038 |
+| sweet_waltz | | +5 % | −2 | | | 10.2 s | 4.2 s | 75 / 91 | −2 / −2 | ×1.050 / ×1.037 |
+| vibe_ace | | −7 % | | ✓ | ✓ | 13.2 s | 1.2 s | 77 / 97 | −3 / −2 | ×0.930 / ×0.936 |
+| vibe_ace | −6 % | | +1 | ✓ | | 14.2 s | 2.2 s | 70 / 90 | +2 / +2 | ×0.940 / ×0.939 |
+| sweet_waltz | +8 % | | −1 | ✓ | ✓ | 15.9 s | 3.9 s | 70 / 83 | −2 / −2 | ×1.080 / ×1.086 |
+| sweet_waltz | +8 % | | −1 | ✓ | | 17.6 s | 5.6 s | 71 / 88 | −2 / −2 | ×1.080 / ×1.080 |
+| vibe_ace | +8 % | | −1 | ✓ | | 20.4 s | 8.4 s | 71 / 84 | −2 / −2 | ×1.080 / ×1.079 |
+| vibe_ace | +8 % | | −1 | ✓ | ✓ | 26.5 s | 14.5 s | 72 / 81 | −2 / −2 | ×1.080 / ×1.100 |
+
+"Detected after" counts from the first sample of the 6 s fade-in; the
+next column counts from the moment the song is at full level, or from
+the end of the 12 s talk-over when there is one. Two phase-vocoder
+passes (key lock, then key change) keep fewer peaks than one, so these
+plays sit at confidence 80–90 instead of 98, and the one play that adds
+FM and MP3 on top of that hovers at 40–60 for ten seconds after the
+talking before it crosses 70. The position is right within 0.1 s in
+every play.
+
+<p align="center">
+  <img src="./plots/radio_timeline_dj.png" width="98%" />
+</p>
+<p align="center">
+  <img src="./plots/radio_plays_dj.png" width="98%" />
 </p>
 
 The evaluation records the commit, the monitor configuration and the

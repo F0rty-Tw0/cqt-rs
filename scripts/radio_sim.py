@@ -125,6 +125,7 @@ class PlanItem:
     kind: str                     # "music" | "speech"
     talkover_source: Optional[str] = None
     talkover_start: float = 0.0
+    crossfade: bool = False       # DJ mix: crossfade into the previous item whatever it is
 
 
 @dataclass
@@ -522,7 +523,8 @@ def assemble(rendered: List[Rendered]):
     for r in rendered:
         n = len(r.audio)
         overlap = prev is not None and (
-            (r.item.treatment == "crossfade" and prev.item.kind == "music")
+            (r.item.crossfade and prev.item.crossfade)
+            or (r.item.treatment == "crossfade" and prev.item.kind == "music")
             or (prev.item.treatment == "crossfade" and r.item.kind == "music"))
         if prev is None:
             start = 0
@@ -542,7 +544,8 @@ def assemble(rendered: List[Rendered]):
         seg = dict(start=start / SR, end=end / SR, source=r.item.source,
                    watched=r.item.source in WATCHED, treatment=r.item.treatment,
                    excerpt_start=float(r.item.excerpt_start), excerpt_duration=float(r.item.duration),
-                   speed=r.speed, tempo=r.tempo, semitones=r.semitones)
+                   speed=r.speed, tempo=r.tempo, semitones=r.semitones,
+                   crossfade_in=bool(overlap and start == prev_end - xf if prev is not None else False))
         seg.update(r.extra)
         segments.append(seg)
         prev, prev_end = r, end

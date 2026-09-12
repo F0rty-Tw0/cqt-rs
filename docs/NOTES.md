@@ -244,6 +244,21 @@ brackets):
 | CPU | 0.36 % of one core (0.86 %) | 0.40 % (0.94 %) |
 | Index | 73 k hashes (540 dropped by the per-song cap), 2.7 MB for 111 s of songs (169 k, 5.7 MB) | |
 
+DJ set (`scripts/radio_dj.py`, `radio_eval.py --programme stream_dj`):
+8.7 min, no silence, every item crossfaded over 6 s, nine plays of the
+watched songs with a key-locked BPM change and a key change and 12 s of
+talk-over at once, three of them through FM and MP3 as well. 9/9
+detected, 0 false starts, position within 0.1 s; from the end of the
+talk-over (or of the fade-in when there is none) 1.0, 1.5, 4.2 s
+without talk-over and 1.2, 2.2, 3.9, 5.6, 8.4, 14.5 s with it; peak
+confidence 81–97. The two restarts this stream first produced were the
+song's own repeated section flipping the vote to the equivalent
+position 4 s away, so the position-jump tolerance of the tracker is now
+10 s (`--jump`, was 3 s): a restarted track jumps by far more, a
+repeated bar by far less. The programme, the eight-song run and the
+negatives are unchanged by it except that looped samples restart less
+(7 starts on the hard stream instead of 14).
+
 Held-out material (`scripts/radio_negatives.py`, threshold calibrated on
 the stream above and never touched afterwards):
 
@@ -254,16 +269,16 @@ the stream above and never touched afterwards):
 | Hard negatives, watched songs reversed | 3.9 | 82 (254) | 67.2 (71.8) | 0.29 | 0 (2) |
 | Hard negatives, watched songs at 0.6× and 1.5× speed | 3.1 | 58 (197) | 59.2 (66.3) | 0.30 | 0 |
 | Hard negatives, 0.5 s loop of a watched song | 2.0 | 122 | 75.3 | 0.33 | 0 |
-| Hard negatives, 1 s loop | 2.0 | 397 | 90.8 | 0.62 | 2 |
-| Hard negatives, 2 s loop | 1.9 | 1 089 | 96.5 | 0.88 | 8 |
+| Hard negatives, 1 s loop | 2.0 | 397 | 90.8 | 0.62 | 0 |
+| Hard negatives, 2 s loop | 1.9 | 1 089 | 96.5 | 0.88 | 3 |
 | Hard negatives, speech between them | 1.7 | 10 | 20.0 | 0.25 | 0 |
 
 A report or start is charged to a segment only when its whole evidence
 window lies inside the segment. The held-out null stream reproduces the
 calibration ceiling exactly at fan-out 4 (at fan-out 6 it exceeded it,
 58 against 50, still at confidence 37). Loops of one second and more
-are the song's own audio repeated; the matcher finds them (with fewer
-restarts than without the gate, 14 starts against 38) and the reported
+are the song's own audio repeated; the matcher finds them (7 starts on
+the stream against 38 before the gate and the 10 s jump tolerance) and the reported
 position jumps back once per loop, which is the cue a policy that
 excludes sampled loops would use.
 
@@ -298,7 +313,11 @@ Known limits:
   alignment gate waits until the song is audible in the last 2 s.
 - A looped sample of a second or more of a watched song is reported as
   the song (see the hard negatives above).
-- `end` events lag the real end by window + delay (~7 s).
+- `end` events lag the real end by window + release + delay (8–9 s).
+- Two phase-vocoder passes (key-locked BPM change, then a key change)
+  leave confidence 80–90 instead of 98; with FM and MP3 on top, the
+  talk-over intro of such a play is followed by ten seconds at 40–60
+  before the threshold (DJ set below).
 - Only tested at 44.1 kHz mono; the binary refuses mismatched rates.
 
 Next steps for monitoring, in order:
@@ -446,6 +465,17 @@ margin (`half` at 2× the ceiling, threshold at 4.9× it) rather than at
 the ceiling. The Poisson bound of §8 (at most 5.8 alarms per hour at
 95 %) now rests on 31 minutes of null material that the threshold never
 saw, instead of the stream it was tuned on.
+
+### After the experiments: live input, per-play figures, a DJ set
+
+`monitor --stream -` reads signed 16-bit mono PCM from stdin block by
+block and flushes every report, so the binary sits behind
+`ffmpeg -f s16le`; on the same 90 s of audio the events are identical
+to the file path's. `radio_eval.py` takes `--programme` and draws
+`plots/radio_plays*.png`, one panel per play with confidence, alignment
+and the start/end events, which is the figure that shows what each
+status looks like. `scripts/radio_dj.py` is the combined-treatment DJ
+set reported in §7.
 
 ### Separate release gates (kept)
 
