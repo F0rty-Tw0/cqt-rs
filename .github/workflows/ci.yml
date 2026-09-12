@@ -1,5 +1,13 @@
 name: CI
 
+# Two release gates share this workflow. The `library-*` jobs are the
+# acceptance list of the published `cqt-rs` crate: a release is cut only
+# when they pass on the tagged commit, and `library-package` proves the
+# crate packages as it will be published. The `monitor-*` jobs gate the
+# unpublished `cqt-monitor` crate on its own unit tests and an end-to-end
+# detection on synthetic audio; they may fail without blocking a library
+# release, and the library jobs never build the monitor.
+
 on:
   push:
     branches: [main, master]
@@ -10,8 +18,8 @@ env:
   RUSTFLAGS: -D warnings
 
 jobs:
-  check:
-    name: Format, lint, docs
+  library-check:
+    name: Library format, lint, docs
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,15 +27,15 @@ jobs:
         with:
           components: rustfmt, clippy
       - uses: Swatinem/rust-cache@v2
-      - run: cargo fmt --all --check
-      - run: cargo clippy --workspace --all-targets --all-features
-      - run: cargo clippy --workspace --all-targets --no-default-features
-      - run: cargo doc --workspace --no-deps
+      - run: cargo fmt --package cqt-rs --check
+      - run: cargo clippy --package cqt-rs --all-targets --all-features
+      - run: cargo clippy --package cqt-rs --all-targets --no-default-features
+      - run: cargo doc --package cqt-rs --no-deps
         env:
           RUSTDOCFLAGS: -D warnings
 
-  test:
-    name: Test (${{ matrix.toolchain }}, ${{ matrix.features }})
+  library-test:
+    name: Library test (${{ matrix.toolchain }}, ${{ matrix.features }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -40,13 +48,46 @@ jobs:
         with:
           toolchain: ${{ matrix.toolchain }}
       - uses: Swatinem/rust-cache@v2
-      - run: cargo test --workspace --release ${{ matrix.features }}
+      - run: cargo test --package cqt-rs --release ${{ matrix.features }}
 
-  bench-build:
-    name: Benchmarks compile
+  library-package:
+    name: Library packages for crates.io
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@stable
       - uses: Swatinem/rust-cache@v2
-      - run: cargo bench --no-run
+      - run: cargo bench --package cqt-rs --no-run
+      # The packaged crate must build on its own, without the workspace.
+      - run: cargo publish --package cqt-rs --dry-run
+      - name: CHANGELOG covers the crate version
+        run: |
+          version=$(cargo pkgid --package cqt-rs | sed 's/.*[#@]//')
+          grep -q "^# $version " CHANGELOG.md || {
+            echo "CHANGELOG.md has no '# $version' heading"; exit 1; }
+
+  monitor-check:
+    name: Monitor format, lint, docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --package cqt-monitor --check
+      - run: cargo clippy --package cqt-monitor --all-targets --all-features
+      - run: cargo clippy --package cqt-monitor --all-targets --no-default-features
+      - run: cargo doc --package cqt-monitor --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+      - run: cargo bench --package cqt-monitor --no-run
+
+  monitor-test:
+    name: Monitor test and end-to-end detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --package cqt-monitor --release
