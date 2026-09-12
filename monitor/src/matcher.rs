@@ -66,7 +66,12 @@ pub struct Candidate {
 struct Cell {
     count: u32,
     tempo_sum: f64,
+    /// Sum of the votes' offsets, each computed with the cell's quantized
+    /// tempo against the current origin.
     offset_sum: f64,
+    /// Sum of the votes' query frames relative to the current origin, so
+    /// that the offsets can be refitted with another tempo.
+    query_sum: f64,
 }
 
 /// One match inside the window, kept so that its exact contribution can
@@ -169,6 +174,7 @@ impl Matcher {
             cell.count += 1;
             cell.tempo_sum += tempo;
             cell.offset_sum += offset;
+            cell.query_sum += query_frame;
             self.votes.push_back(Vote {
                 frame: hash.frame,
                 key,
@@ -215,6 +221,7 @@ impl Matcher {
             target.count += cell.count;
             target.tempo_sum += cell.tempo_sum;
             target.offset_sum += cell.offset_sum + delta * f64::from(cell.count);
+            target.query_sum += cell.query_sum - shift_frames * f64::from(cell.count);
         }
         for vote in &mut self.votes {
             let (new_key, delta) = mapping[&vote.key];
@@ -247,6 +254,7 @@ impl Matcher {
                     cell.count -= 1;
                     cell.tempo_sum -= vote.tempo;
                     cell.offset_sum -= vote.offset;
+                    cell.query_sum -= vote.frame as f64 - self.origin as f64;
                 }
             }
         }
@@ -353,23 +361,37 @@ impl Matcher {
             .into_iter()
             .filter(|(_, (evidence, _, _))| *evidence > 0)
             .map(|(song, (evidence, _, key))| {
-                let (mut n, mut shift_sum, mut tempo_sum, mut offset_sum) = (0u32, 0i64, 0.0, 0.0);
-                for (shift, cell) in self.neighbourhood_with_shift(key) {
+                let cfg = &self.config;
+                let (mut n, mut shift_sum) = (0u32, 0i64);
+                let (mut tempo_sum, mut offset_sum, mut query_sum, mut quantized) =
+                    (0.0, 0.0, 0.0, 0.0);
+                for (shift, tempo_idx, cell) in self.neighbourhood_with_shift(key) {
                     n += cell.count;
                     shift_sum += i64::from(shift) * i64::from(cell.count);
                     tempo_sum += cell.tempo_sum;
                     offset_sum += cell.offset_sum;
+                    query_sum += cell.query_sum;
+                    let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
+                    quantized += cell_tempo * cell.query_sum;
                 }
-                let tempo = tempo_sum / f64::from(n.max(1));
-                let shift = (shift_sum as f64 / f64::from(n.max(1))).round() as i32;
+                let n_f = f64::from(n.max(1));
+                let tempo = tempo_sum / n_f;
+                let shift = (shift_sum as f64 / n_f).round() as i32;
+                // Each vote's offset is `ref − cell_tempo · q` for its own
+                // cell's quantized tempo. The reported tempo is the votes'
+                // mean, so the offset is refitted through the same
+                // correspondences with that tempo: the mean of
+                // `ref − tempo · q` is the mean offset plus the mean of
+                // `(cell_tempo − tempo) · q`. Both describe one line,
+                // which is what the verifier and the position rely on.
+                let offset_rel = (offset_sum + quantized - tempo * query_sum) / n_f;
                 Candidate {
                     song,
                     evidence,
                     shift,
                     tempo,
-                    // Offsets are relative to the origin and were computed
-                    // with the cell tempo; express them against frame 0.
-                    offset: offset_sum / f64::from(n.max(1)) - tempo * self.origin as f64,
+                    // Relative to the origin so far; express against frame 0.
+                    offset: offset_rel - tempo * self.origin as f64,
                 }
             })
             .collect();
@@ -378,27 +400,30 @@ impl Matcher {
     }
 
     fn neighbourhood(&self, key: u64) -> impl Iterator<Item = &Cell> {
-        self.neighbourhood_with_shift(key).map(|(_, cell)| cell)
+        self.neighbourhood_with_shift(key).map(|(_, _, cell)| cell)
     }
 
-    /// The occupied cells among the 27 around `key`, with their shift.
-    fn neighbourhood_with_shift(&self, key: u64) -> impl Iterator<Item = (i32, &Cell)> {
+    /// The occupied cells among the 27 around `key`, with their shift and
+    /// tempo index.
+    fn neighbourhood_with_shift(&self, key: u64) -> impl Iterator<Item = (i32, i32, &Cell)> {
         let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
-        let mut keys = [(0i32, 0u64); 27];
+        let mut keys = [(0i32, 0i32, 0u64); 27];
         let mut i = 0;
         for ds in -1..=1 {
             for dt in -1..=1 {
                 for doff in -1..=1 {
                     keys[i] = (
                         shift + ds,
+                        tempo_idx + dt,
                         encode_cell_raw(song, shift + ds, tempo_idx + dt, offset_idx + doff),
                     );
                     i += 1;
                 }
             }
         }
-        keys.into_iter()
-            .filter_map(|(shift, k)| self.cells.get(&k).map(|cell| (shift, cell)))
+        keys.into_iter().filter_map(|(shift, tempo_idx, k)| {
+            self.cells.get(&k).map(|cell| (shift, tempo_idx, cell))
+        })
     }
 
     /// Maps an evidence count to a confidence in `0..=100`:
@@ -589,6 +614,7 @@ mod tests {
         cell.count += 1;
         cell.tempo_sum += tempo;
         cell.offset_sum += offset;
+        cell.query_sum += frame as f64 - matcher.origin as f64;
         matcher.votes.push_back(Vote {
             frame,
             key,
@@ -630,8 +656,11 @@ mod tests {
     #[test]
     fn expiring_votes_removes_their_own_contribution() {
         // Two early votes at (tempo 0.9, offset −40) and two late ones at
-        // (1.1, +40) share a cell. Once the early ones expire the estimate
-        // must be the late votes' mean, not the cell's old mean.
+        // (1.1, +40) share a cell whose quantized tempo is 1.0. Once the
+        // early ones expire the estimate must come from the late votes
+        // only, not from the cell's old mean: tempo 1.1, and the offset
+        // of the line with that tempo through their correspondence
+        // (frame 150 maps to 190), 190 − 1.1 · 150 = 25.
         let mut matcher = Matcher::new(MatcherConfig {
             window_frames: 100,
             ..MatcherConfig::default()
@@ -651,7 +680,7 @@ mod tests {
         assert_eq!(after.evidence, 2);
         assert!((after.tempo - 1.1).abs() < 1e-9, "tempo {}", after.tempo);
         assert!(
-            (after.offset - 40.0).abs() < 1e-9,
+            (after.offset - 25.0).abs() < 1e-9,
             "offset {}",
             after.offset
         );
@@ -712,6 +741,72 @@ mod tests {
                 matcher.best_per_song_full_scan(),
                 "trial {trial}"
             );
+        }
+    }
+
+    /// The reported tempo and offset must describe one alignment line
+    /// through the matched peaks: `frame_ref = tempo · frame_query +
+    /// offset` within the verifier's tolerance. Tempos between the
+    /// quantization centres (cells are 0.02 wide) and plays that start
+    /// just before and after a rebase of the origin are the cases in
+    /// which a mean tempo combined with offsets computed from the cells'
+    /// quantized tempos drifts apart from the votes.
+    #[test]
+    fn reported_tempo_and_offset_predict_the_matched_peaks() {
+        use crate::verify::PeakTrack;
+        let song = pseudo_peaks(21, 40_000);
+        let mut builder = IndexBuilder::new();
+        builder.add_song("s", 40_000, hashes(&song));
+        let index = builder.build(8);
+        let track = PeakTrack::new(song.clone());
+        let window = MatcherConfig::default().window_frames;
+        for &tempo in &[0.985, 0.995, 1.005, 1.01, 1.015, 1.03, 1.05, 1.1] {
+            // Rebases happen when the stream is five windows past the
+            // origin; a play of 3000 / tempo frames from 1300 ends just
+            // before the first one (the largest origin-relative frames),
+            // from 4200 it straddles it, from 8700 the second.
+            for &start in &[0u64, 1300, 3500, 4200, 4400, 8700] {
+                let query: Vec<Peak> = song
+                    .iter()
+                    .filter(|p| p.frame >= 6000 && p.frame < 9000)
+                    .map(|p| Peak {
+                        frame: start + ((p.frame - 6000) as f64 / tempo).round() as u64,
+                        bin: p.bin + 2,
+                    })
+                    .collect();
+                let mut matcher = Matcher::new(MatcherConfig::default());
+                for h in hashes(&query) {
+                    matcher.push(&index, &h);
+                }
+                let best = matcher.best().expect("evidence");
+                let latest = query.last().unwrap().frame;
+                let recent: Vec<Peak> = query
+                    .iter()
+                    .filter(|p| p.frame + window >= latest)
+                    .copied()
+                    .collect();
+                let v = track.verify(&recent, best.shift, best.tempo, best.offset, 4, 0);
+                let worst = recent
+                    .iter()
+                    .zip(song.iter().filter(|p| {
+                        p.frame >= 6000
+                            && p.frame < 9000
+                            && start + ((p.frame - 6000) as f64 / tempo).round() as u64 + window
+                                >= latest
+                    }))
+                    .map(|(q, r)| {
+                        (best.tempo * q.frame as f64 + best.offset - r.frame as f64).abs()
+                    })
+                    .fold(0.0f64, f64::max);
+                assert!(
+                    v.query_fraction() > 0.9 && worst < 4.0,
+                    "tempo {tempo} start {start}: reported tempo {:.4} offset {:.1}, \
+                     alignment {:.2}, worst prediction error {worst:.1} frames",
+                    best.tempo,
+                    best.offset,
+                    v.query_fraction()
+                );
+            }
         }
     }
 

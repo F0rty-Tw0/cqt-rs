@@ -60,9 +60,26 @@ pub struct Active {
     pub frame: u64,
     /// Query frame of the last update at or above the threshold.
     pub last_above: u64,
-    /// Query frame since which the reported hypothesis has disagreed with
-    /// this play, if it does.
-    pub disagreeing_since: Option<u64>,
+    /// A hypothesis that disagrees with this play and is waiting to be
+    /// confirmed as a new play.
+    pub pending: Option<Pending>,
+}
+
+/// A disagreeing hypothesis under confirmation: it becomes a new play
+/// once reports have supported it, without interruption, for
+/// `confirm_frames`.
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub struct Pending {
+    /// Query frame of the first report that supported it.
+    pub since: u64,
+    /// Pitch shift in bins.
+    pub shift: i32,
+    /// Tempo factor.
+    pub tempo: f64,
+    /// Song position in reference frames at `frame`.
+    pub position: f64,
+    /// Query frame of the last report that supported it.
+    pub frame: u64,
 }
 
 /// What the tracker reports.
@@ -127,8 +144,12 @@ impl Tracker {
     /// stays at the threshold, or while the candidate still aligns
     /// (`hold_alignment`) with at least `hold_confidence`; it ends after
     /// `release_frames` without either. A hypothesis that disagrees with
-    /// the play for `confirm_frames` ends it, and starts a new play if it
-    /// qualifies for a start itself.
+    /// the play (a jump in shift, tempo or position) is kept as pending;
+    /// it ends the play, and starts a new one if it qualifies for a start
+    /// itself, once every report for `confirm_frames` has supported that
+    /// same hypothesis. A report that supports the play again, a report
+    /// without strong or held evidence, or a jump to yet another
+    /// hypothesis restarts the confirmation.
     pub fn update<F: FnMut(Event)>(&mut self, frame: u64, scored: &[Scored], mut on_event: F) {
         let cfg = &self.config;
         for song in 0..self.active.len() {
@@ -145,20 +166,36 @@ impl Tracker {
                 (Some(mut a), Some(s)) if above || held => {
                     let (c, confidence) = (s.candidate, s.confidence);
                     let position = c.tempo * frame as f64 + c.offset;
-                    let predicted = a.position + a.tempo * (frame - a.frame) as f64;
-                    let jumped = (c.shift - a.shift).abs() > cfg.jump_shift
-                        || (c.tempo - a.tempo).abs() > cfg.jump_tempo
-                        || (position - predicted).abs() > cfg.jump_frames;
+                    let jumps = |shift: i32, tempo: f64, at: f64, at_frame: u64| {
+                        let predicted = at + tempo * (frame - at_frame) as f64;
+                        (c.shift - shift).abs() > cfg.jump_shift
+                            || (c.tempo - tempo).abs() > cfg.jump_tempo
+                            || (position - predicted).abs() > cfg.jump_frames
+                    };
                     a.last_above = frame;
-                    if !jumped {
-                        a.disagreeing_since = None;
+                    if !jumps(a.shift, a.tempo, a.position, a.frame) {
+                        a.pending = None;
                         a.position = position;
                         a.frame = frame;
                         self.active[song] = Some(a);
                         continue;
                     }
-                    let since = *a.disagreeing_since.get_or_insert(frame);
-                    if frame - since < cfg.confirm_frames {
+                    let pending = match a.pending {
+                        Some(p) if !jumps(p.shift, p.tempo, p.position, p.frame) => Pending {
+                            position,
+                            frame,
+                            ..p
+                        },
+                        _ => Pending {
+                            since: frame,
+                            shift: c.shift,
+                            tempo: c.tempo,
+                            position,
+                            frame,
+                        },
+                    };
+                    if frame - pending.since < cfg.confirm_frames {
+                        a.pending = Some(pending);
                         self.active[song] = Some(a);
                         continue;
                     }
@@ -174,13 +211,20 @@ impl Tracker {
                     self.active[song] =
                         Some(Self::start(frame, s.candidate, s.confidence, &mut on_event));
                 }
-                (Some(a), _) if frame - a.last_above >= cfg.release_frames => {
-                    on_event(Event::End {
-                        song: song as u16,
-                        frame,
-                        start_frame: a.start_frame,
-                    });
-                    self.active[song] = None;
+                (Some(mut a), _) => {
+                    // Neither strong nor held evidence: whatever hypothesis
+                    // was under confirmation has lost its support.
+                    a.pending = None;
+                    if frame - a.last_above >= cfg.release_frames {
+                        on_event(Event::End {
+                            song: song as u16,
+                            frame,
+                            start_frame: a.start_frame,
+                        });
+                        self.active[song] = None;
+                    } else {
+                        self.active[song] = Some(a);
+                    }
                 }
                 _ => {}
             }
@@ -221,7 +265,7 @@ impl Tracker {
             position,
             frame,
             last_above: frame,
-            disagreeing_since: None,
+            pending: None,
         }
     }
 }
@@ -389,7 +433,7 @@ mod tests {
         assert!(run(&mut tracker, 12, &[(riff, 90.0)]).is_empty());
         // Back to the original hypothesis: no new play, disagreement reset.
         assert!(run(&mut tracker, 13, &[(c, 90.0)]).is_empty());
-        assert_eq!(tracker.active(0).unwrap().disagreeing_since, None);
+        assert_eq!(tracker.active(0).unwrap().pending, None);
         // Now a persistent jump: the song restarted from the top.
         let restart = candidate(0, 0, 1.0, -20.0);
         assert!(run(&mut tracker, 20, &[(restart, 90.0)]).is_empty());
@@ -403,6 +447,61 @@ mod tests {
             ] if position == 10.0
         ));
         assert_eq!(tracker.active(0).unwrap().start_frame, 30);
+    }
+
+    #[test]
+    fn confirmation_needs_uninterrupted_support_for_one_hypothesis() {
+        // Reports every 43 frames, confirmation after 10 frames of
+        // support, a release long enough not to interfere. One strong
+        // jump, three weak reports, a different strong jump: neither
+        // hypothesis was supported for 10 frames in a row, so nothing
+        // ends.
+        let mut tracker = Tracker::new(
+            1,
+            TrackerConfig {
+                release_frames: 600,
+                ..config()
+            },
+        );
+        let c = candidate(0, 0, 1.0, 500.0);
+        run(&mut tracker, 0, &[(c, 90.0)]);
+        let jump_a = candidate(0, 0, 1.0, -300.0);
+        let jump_b = candidate(0, 0, 1.0, -900.0);
+        assert!(run(&mut tracker, 43, &[(jump_a, 90.0)]).is_empty());
+        for frame in [86, 129, 172] {
+            let weak = Scored {
+                candidate: jump_a,
+                confidence: 40.0,
+                alignment: 0.1,
+            };
+            assert!(run_scored(&mut tracker, frame, &[weak]).is_empty());
+            assert_eq!(tracker.active(0).unwrap().pending, None);
+        }
+        assert!(run(&mut tracker, 215, &[(jump_b, 90.0)]).is_empty());
+        assert_eq!(tracker.active(0).unwrap().start_frame, 0);
+        // Alternating between two disagreeing hypotheses never confirms
+        // either.
+        for frame in 216..=240 {
+            let which = if frame % 2 == 0 { jump_a } else { jump_b };
+            assert!(run(&mut tracker, frame, &[(which, 90.0)]).is_empty());
+        }
+        assert_eq!(tracker.active(0).unwrap().start_frame, 0);
+        // Ten frames of the same jump confirm it, and the new play carries
+        // its position.
+        for frame in 241..=250 {
+            assert!(run(&mut tracker, frame, &[(jump_b, 90.0)]).is_empty());
+        }
+        let events = run(&mut tracker, 251, &[(jump_b, 90.0)]);
+        assert!(
+            matches!(
+                events[..],
+                [
+                    Event::End { song: 0, frame: 251, start_frame: 0 },
+                    Event::Start { song: 0, frame: 251, position, .. }
+                ] if position == -649.0
+            ),
+            "{events:?}"
+        );
     }
 
     #[test]

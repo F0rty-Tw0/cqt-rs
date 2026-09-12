@@ -98,14 +98,17 @@ def negatives(stream: str, extra: list[str], monitor: str | None, threshold: flo
     def inside(seg: dict, consumed: float) -> bool:
         return seg["start"] <= consumed - delay - window and consumed - delay <= seg["end"]
 
+    def new_family() -> dict:
+        return dict(segments=0, seconds=0.0, max_evidence=0, max_confidence=0.0,
+                    max_verify_q=0.0, verify_q_at_max=0.0, false_starts=0, worst=None)
+
     families: dict[str, dict] = {}
     for seg in truth["segments"]:
         if seg["source"] == "silence":
             continue
         family = seg.get("family", "other")
         within = [r for r in reports if inside(seg, r["consumed"])]
-        fam = families.setdefault(family, dict(segments=0, seconds=0.0, max_evidence=0, max_confidence=0.0,
-                                               max_verify_q=0.0, verify_q_at_max=0.0, false_starts=0, worst=None))
+        fam = families.setdefault(family, new_family())
         fam["segments"] += 1
         fam["seconds"] += seg["end"] - seg["start"]
         if within:
@@ -115,7 +118,30 @@ def negatives(stream: str, extra: list[str], monitor: str | None, threshold: flo
                 fam.update(max_evidence=top["evidence"], max_confidence=top["confidence"],
                            verify_q_at_max=top.get("verify_q", 0.0),
                            worst=dict(treatment=seg["treatment"], source=seg["source"], song=top["song"], t=top["consumed"]))
-        fam["false_starts"] += sum(inside(seg, st["consumed"]) for st in starts)
+    # Every start is accounted for: it belongs to the family of the
+    # segment its whole evidence window lies in, otherwise to the
+    # "transition" family, which names the segments the window spans.
+    def segment_at(t: float) -> dict | None:
+        return next((s for s in truth["segments"] if s["start"] <= t < s["end"]), None)
+
+    def family_of(seg: dict | None) -> str:
+        if seg is None:
+            return "outside"
+        return "silence" if seg["source"] == "silence" else seg.get("family", "other")
+
+    transitions: list[str] = []
+    for st in starts:
+        newest = segment_at(st["consumed"] - delay)
+        oldest = segment_at(st["consumed"] - delay - window)
+        if newest is not None and newest is oldest and newest["source"] != "silence":
+            families[family_of(newest)]["false_starts"] += 1
+        else:
+            fam = families.setdefault("transition", new_family())
+            fam["false_starts"] += 1
+            transitions.append(f"{family_of(oldest)} → {family_of(newest)} at {st['consumed']:.0f} s as {st['song']}")
+    if transitions:
+        families["transition"]["worst"] = dict(treatment="; ".join(transitions), source="", song="")
+    assert sum(f["false_starts"] for f in families.values()) == len(starts)
     evidence = np.array([r["evidence"] for r in reports]) if reports else np.zeros(1)
     verify_q = np.array([r.get("verify_q", 0.0) for r in reports]) if reports else np.zeros(1)
     return dict(seconds=done["audio_seconds"], max_evidence=int(evidence.max()),
@@ -134,7 +160,10 @@ def print_negatives(name: str, neg: dict) -> None:
     print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
     for family, fam in sorted(neg["families"].items()):
         worst = fam["worst"]
-        worst_text = f"{worst['source']} {worst['treatment']} as {worst['song']}" if worst else "—"
+        if family == "transition":
+            worst_text = worst["treatment"] if worst else "—"
+        else:
+            worst_text = f"{worst['source']} {worst['treatment']} as {worst['song']}" if worst else "—"
         print(f"| {family} | {fam['segments']} | {fam['seconds'] / 60:.1f} | {fam['max_evidence']} | "
               f"{fam['max_confidence']:.1f} | {fam['verify_q_at_max']:.2f} / {fam['max_verify_q']:.2f} | {fam['false_starts']} | {worst_text} |")
 

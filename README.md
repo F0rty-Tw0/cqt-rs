@@ -254,15 +254,18 @@ tells you when one of them is playing, with a confidence score from 0 to
 100 in which anything under 70 is not a match. On simulated radio it
 found every play of the watched songs (16 of 16 on a 15 min programme,
 45 of 45 with eight songs watched, 9 of 9 in a continuous DJ set) with no
-false alarm in 76 minutes of audio without the songs: a pitch fader of
+false alarm in 76 minutes of audio without the songs, drawn from the
+same eight tracks and three speech recordings as everything else here,
+so this is development validation rather than an independent test: a
+pitch fader of
 ±8 %, a key-locked BPM change of ±12 %, a key change of ±2 semitones, a
 bass cut, an FM chain and a 128k MP3 are each recognised within about
 2 s of the song becoming audible, with the pitch shift, the tempo and
 the position in the song reported. A DJ who changes the BPM *and* the
-key *and* talks over the intro is recognised 1 to 6 s after the talking
-stops (the worst case, everything at once through FM and MP3, takes
-15 s). The whole chain costs 0.4 % of one core, and `--stream -` reads
-live PCM from a decoder.
+key *and* talks over the intro is recognised 1 to 8 s after the talking
+stops, once during it (the worst case, everything at once through FM
+and MP3, takes 18 s). The whole chain costs 0.4 % of one core, and
+`--stream -` reads live PCM from a decoder.
 
 The `cqt-monitor` crate in [`monitor/`](./monitor) turns the transform into
 a real-time watch-list monitor: given the songs you want to catch, it
@@ -350,12 +353,20 @@ talk-over play, where speech sits 3 dB above the ducked music for 12 s,
 holds a confidence of 30–40 during the talking and is detected 1.3 s
 after the speech stops.
 
-The threshold is calibrated on one null stream and tested on two others
-that `scripts/radio_negatives.py` builds: a second 31 min null programme
-with another seed, and 21 min of hard negatives. On the held-out null
-stream the evidence again peaks at 20 with no false alarm. The hard
-negatives sort into what the monitor rejects and what it, by design,
-does not:
+The evidence threshold is calibrated on one null stream and checked on
+two others that `scripts/radio_negatives.py` builds: a second 31 min null
+programme with another seed, and 21 min of hard negatives. On the second
+null stream the evidence again peaks at 20 with no false alarm. Two
+caveats keep this honest: the streams are drawn from the same eight
+tracks and three speech recordings by the same generator, so a new seed
+reshuffles the playlist rather than supplying new material; and the
+alignment thresholds of the tracker (0.4 to start, 0.3 to hold) were
+chosen after looking at the alignment scores of all three negative
+streams. This is development validation. An independent estimate of the
+false-alarm rate needs the configuration frozen (it is, with these
+defaults) and recordings that were used nowhere in development, which
+is the first item on the list of next steps. The hard negatives sort into
+what the monitor rejects and what it, by design, does not:
 
 | Family | Minutes | Max evidence | Max confidence | Starts |
 | --- | ---: | ---: | ---: | ---: |
@@ -364,7 +375,7 @@ does not:
 | watched songs at 0.6× and 1.5× speed (outside the 0.7–1.4 tempo range) | 3.1 | 58 | 59 | 0 |
 | a 0.5 s sample of a watched song looped, alone or under another track | 2.0 | 122 | 75 | 0 |
 | a 1 s loop | 2.0 | 397 | 91 | 0 |
-| a 2 s loop | 1.9 | 1 089 | 97 | 3 |
+| a 2 s loop | 1.9 | 1 089 | 97 | 3 (+4 on transitions between loop segments) |
 
 A reversed copy shares the song's peaks and, in its symmetric passages,
 enough hash votes to reach confidence 67; with fan-out 6 and no
@@ -403,19 +414,19 @@ found with no false start:
 | vibe_ace | +12 % | | +2 | | | 7.0 s | 1.0 s | 71 / 86 | +4 / +4 | ×1.120 / ×1.101 |
 | vibe_ace | | +5 % | −2 | | | 7.5 s | 1.5 s | 71 / 89 | −2 / −2 | ×1.050 / ×1.038 |
 | sweet_waltz | | +5 % | −2 | | | 10.2 s | 4.2 s | 75 / 91 | −2 / −2 | ×1.050 / ×1.037 |
-| vibe_ace | | −7 % | | ✓ | ✓ | 13.2 s | 1.2 s | 77 / 97 | −3 / −2 | ×0.930 / ×0.936 |
+| vibe_ace | | −7 % | | ✓ | ✓ | 8.0 s | −4.0 s (during the talking) | 71 / 97 | −3 / −2 | ×0.930 / ×0.936 |
 | vibe_ace | −6 % | | +1 | ✓ | | 14.2 s | 2.2 s | 70 / 90 | +2 / +2 | ×0.940 / ×0.939 |
 | sweet_waltz | +8 % | | −1 | ✓ | ✓ | 15.9 s | 3.9 s | 70 / 83 | −2 / −2 | ×1.080 / ×1.086 |
 | sweet_waltz | +8 % | | −1 | ✓ | | 17.6 s | 5.6 s | 71 / 88 | −2 / −2 | ×1.080 / ×1.080 |
 | vibe_ace | +8 % | | −1 | ✓ | | 20.4 s | 8.4 s | 71 / 84 | −2 / −2 | ×1.080 / ×1.079 |
-| vibe_ace | +8 % | | −1 | ✓ | ✓ | 26.5 s | 14.5 s | 72 / 81 | −2 / −2 | ×1.080 / ×1.100 |
+| vibe_ace | +8 % | | −1 | ✓ | ✓ | 29.6 s | 17.6 s | 80 / 81 | −2 / −2 | ×1.080 / ×1.082 |
 
 "Detected after" counts from the first sample of the 6 s fade-in; the
 next column counts from the moment the song is at full level, or from
 the end of the 12 s talk-over when there is one. Two phase-vocoder
 passes (key lock, then key change) keep fewer peaks than one, so these
 plays sit at confidence 80–90 instead of 98, and the one play that adds
-FM and MP3 on top of that hovers at 40–60 for ten seconds after the
+FM and MP3 on top of that hovers at 40–60 for fifteen seconds after the
 talking before it crosses 70. The position is right within 0.1 s in
 every play.
 

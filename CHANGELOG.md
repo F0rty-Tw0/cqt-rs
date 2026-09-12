@@ -54,7 +54,7 @@ Breaking rewrite of the transform.
   default (same evidence margin as fan-out 6, half the index and CPU).
   `Fingerprinter` (dB → peaks → hashes) is a library type, with an
   end-to-end detection test on synthetic audio.
-  `scripts/radio_negatives.py` builds a held-out null stream and hard
+  `scripts/radio_negatives.py` builds a second null stream and hard
   negatives (same artist, reversed, out-of-range speed, loops) that
   `scripts/radio_eval.py --negatives` scores per family;
   `scripts/radio_dj.py` a continuous DJ set with BPM change, key change

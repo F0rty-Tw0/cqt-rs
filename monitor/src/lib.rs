@@ -29,5 +29,5 @@ pub use hashes::{Hash, HashKey, TripletHasher, decode_key, encode_key};
 pub use index::{Entry, FastMap, Index, IndexBuilder, KeyHasher};
 pub use matcher::{Candidate, Matcher, MatcherConfig};
 pub use peaks::{Peak, PeakPicker};
-pub use tracker::{Active, Event, Scored, Tracker, TrackerConfig};
+pub use tracker::{Active, Event, Pending, Scored, Tracker, TrackerConfig};
 pub use verify::{PeakTrack, Verification};

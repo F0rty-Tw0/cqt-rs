@@ -250,8 +250,8 @@ watched songs with a key-locked BPM change and a key change and 12 s of
 talk-over at once, three of them through FM and MP3 as well. 9/9
 detected, 0 false starts, position within 0.1 s; from the end of the
 talk-over (or of the fade-in when there is none) 1.0, 1.5, 4.2 s
-without talk-over and 1.2, 2.2, 3.9, 5.6, 8.4, 14.5 s with it; peak
-confidence 81–97. The two restarts this stream first produced were the
+without talk-over and −4.0 (during the talking), 2.2, 3.9, 5.6, 8.4,
+17.6 s with it; peak confidence 81–97. The two restarts this stream first produced were the
 song's own repeated section flipping the vote to the equivalent
 position 4 s away, so the position-jump tolerance of the tracker is now
 10 s (`--jump`, was 3 s): a restarted track jumps by far more, a
@@ -259,8 +259,11 @@ repeated bar by far less. The programme, the eight-song run and the
 negatives are unchanged by it except that looped samples restart less
 (7 starts on the hard stream instead of 14).
 
-Held-out material (`scripts/radio_negatives.py`, threshold calibrated on
-the stream above and never touched afterwards):
+Second null stream and hard negatives (`scripts/radio_negatives.py`;
+the evidence threshold was calibrated on the stream above only, the
+alignment thresholds were chosen after looking at all three; every
+stream draws on the same eight tracks and three speech recordings, so
+none of this is independent material):
 
 | Stream | Minutes | Max evidence | Max confidence | Max alignment | Starts |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -271,12 +274,15 @@ the stream above and never touched afterwards):
 | Hard negatives, 0.5 s loop of a watched song | 2.0 | 122 | 75.3 | 0.33 | 0 |
 | Hard negatives, 1 s loop | 2.0 | 397 | 90.8 | 0.62 | 0 |
 | Hard negatives, 2 s loop | 1.9 | 1 089 | 96.5 | 0.88 | 3 |
+| Hard negatives, starts whose window spans two segments | | | | | 4 (loop → silence, loop → loop) |
 | Hard negatives, speech between them | 1.7 | 10 | 20.0 | 0.25 | 0 |
 
-A report or start is charged to a segment only when its whole evidence
-window lies inside the segment. The held-out null stream reproduces the
-calibration ceiling exactly at fan-out 4 (at fan-out 6 it exceeded it,
-58 against 50, still at confidence 37). Loops of one second and more
+A report is charged to a segment only when its whole evidence window
+lies inside the segment; a start whose window spans two segments is
+counted under "transition" with the segments named, so every alarm is
+accounted for. The second null stream reproduces the calibration
+ceiling exactly at fan-out 4 (at fan-out 6 it exceeded it, 58 against
+50, still at confidence 37). Loops of one second and more
 are the song's own audio repeated; the matcher finds them (7 starts on
 the stream against 38 before the gate and the 10 s jump tolerance) and the reported
 position jumps back once per loop, which is the cue a policy that
@@ -321,6 +327,10 @@ Known limits:
 - Only tested at 44.1 kHz mono; the binary refuses mismatched rates.
 
 Next steps for monitoring, in order:
+0. Independent evaluation: with the configuration frozen, run the
+   monitor on CC-licensed recordings that were used nowhere in
+   development (other artists, real broadcast or DJ recordings) and
+   report the false-alarm bound and the recall from that.
 1. Speech-robust evidence: down-weight peaks in 100–1000 Hz during talk
    (or two windows, 5 s and 15 s, and report the better confidence) to
    catch the talk-over intro; measure on `pitch_fader_+4_talkover`.
@@ -399,7 +409,7 @@ optimization if CPU matters.
 ## 9. Experiments after review round 1
 
 The four items at the top of the previous next-steps list, each run
-against the calibration null stream, the programme, the held-out null
+against the calibration null stream, the programme, the second null
 stream and the hard negatives (`scripts/radio_negatives.py`,
 `scripts/radio_eval.py --negatives`), with `--arg` passing the variant's
 monitor flags. Kept: what improved a measured number without costing
@@ -432,8 +442,8 @@ Step 1, observation only: `--fan-out 4` with `half` 40 against the
 fan-out 6 default. Every number moved the same way or stayed: null
 ceiling 50 → 20, median play evidence 4 445 → 1 752 (margin 89× → 88×),
 detections 0.1–0.7 s earlier (the anchors' `3·fan_out` candidates
-complete sooner), CPU 0.9 → 0.35 %, index 5.7 → 2.7 MB, held-out null
-ceiling 58 → 20, reversed copies 254 → 82 votes (two false starts →
+complete sooner), CPU 0.9 → 0.35 %, index 5.7 → 2.7 MB, second null
+stream's ceiling 58 → 20, reversed copies 254 → 82 votes (two false starts →
 none). One regression: a quiet passage of `sweet_waltz key_change_-1`
 dropped the evidence under 98 for 3 s and the play ended and restarted.
 
@@ -452,19 +462,31 @@ with no extra start (was 44/45 with one or two); hard negatives: no
 start on reversed or out-of-range copies, loops still start but 14
 times instead of 38.
 
-### Hard negatives and a held-out null set (kept)
+### Hard negatives and a second null set (kept, with a caveat)
 
 `scripts/radio_negatives.py` renders `stream_null2` (seed 7777, the
-same generator as the calibration stream) and `stream_hard` (families
-in the ground truth's `family` key). `radio_eval.py --negatives` charges
-a report or start to a segment only when the whole evidence window is
-inside it, and prints the per-family table. The calibration ceiling
-transferred to the held-out stream exactly at fan-out 4 (20 = 20) and
-not at fan-out 6 (58 > 50), which is the reason to calibrate with a
-margin (`half` at 2× the ceiling, threshold at 4.9× it) rather than at
-the ceiling. The Poisson bound of §8 (at most 5.8 alarms per hour at
-95 %) now rests on 31 minutes of null material that the threshold never
-saw, instead of the stream it was tuned on.
+same generator and source pool as the calibration stream) and
+`stream_hard` (families in the ground truth's `family` key).
+`radio_eval.py --negatives` charges a report to a segment only when the
+whole evidence window is inside it, counts a start whose window spans
+segments under "transition", and prints the per-family table. The
+calibration ceiling transferred to the second stream exactly at fan-out
+4 (20 = 20) and not at fan-out 6 (58 > 50), which is the reason to
+calibrate with a margin (`half` at 2× the ceiling, threshold at 4.9×
+it) rather than at the ceiling.
+
+The caveat, raised in review round 2: a new seed reshuffles the same
+eight tracks and three speech recordings, and the alignment thresholds
+were chosen after observing these streams' scores, so the second
+stream is not held out from the complete detector. It is development
+validation. The Poisson bound of §8 (5.8 alarms per hour at 95 % from
+31 alarm-free minutes) therefore still describes the development
+material. An independent estimate needs the configuration frozen, which
+it now is (fan-out 4, `half` 40, threshold 70, alignment 0.4 / 0.3,
+jump 10 s), and recordings used nowhere in development; the librosa
+example corpus that supplied every track here has no unused music, so
+that material has to come from elsewhere (CC-licensed radio or DJ
+recordings) and is the first next step.
 
 ### After the experiments: live input, per-play figures, a DJ set
 
@@ -489,3 +511,12 @@ song played 4 % faster and higher between noise and an unwatched song
 confidence under 50 elsewhere). A library release needs the library jobs
 green on the tagged commit; the monitor stays `publish = false` and its
 jobs may be red without blocking a library release.
+
+## 10. Review round 2 and what was done
+
+| Finding | Verdict | Change |
+| --- | --- | --- |
+| [P1] The reported tempo and offset describe different lines: offsets are accumulated with each cell's quantized tempo, the candidate combines their mean with the mean unquantized tempo | correct; the synthetic tests had hidden it because their per-vote tempos split symmetrically over two cells | each cell also sums its votes' origin-relative query frames (shifted on rebase, subtracted on expiry); the candidate refits the offset with the reported tempo through the same correspondences, `mean(ref − tempo·q) = mean(offset) + mean((cell_tempo − tempo)·q)`. Regression test sweeps tempos 0.985–1.1 (a quarter, a half and a full cell off the centres) and plays starting at 0, 1300 (ending just before a rebase), 3500, 4200 (straddling one), 4400 and 8700 (a second one); it fails on the old code (alignment 0.04 at tempo 0.985) and passes now. On the audio: the between-centre DJ play (pitch fader −7 %, tempo 0.93) is detected 5 s earlier, everything else unchanged |
+| [P2] A "persistent" jump could be two isolated jumps with weak evidence between them, and successive disagreeing candidates were not checked against each other | correct | `Active::pending` records the disagreeing hypothesis (shift, tempo, position, frames); a report agrees with it under the same jump tolerances or replaces it; a report with neither strong nor held evidence clears it. Test: the reviewer's sequence (strong jump, three weak reports, a different strong jump) produces no event; alternating hypotheses never confirm; ten uninterrupted frames of one do |
+| [P2] The "held-out" claim overreaches: same pool, same generator, and the alignment thresholds were chosen after observing the negative scores | correct | wording changed everywhere to "second null stream, development validation"; the caveat and what an independent test needs are in §7 and §9, and the independent evaluation is item 0 of the next steps. The configuration is frozen at the defaults |
+| [P2] Family false-start counts omitted starts whose window began in the previous segment | correct | every start is charged to a family, or to "transition" with the two segments named; a sum check enforces it. On the hard stream: 3 starts inside 2 s loops, 4 on transitions between loop segments, 7 in total as before |
