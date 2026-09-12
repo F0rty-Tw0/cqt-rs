@@ -46,6 +46,19 @@ Breaking rewrite of the transform.
   the fingerprint delay in normal music; the index caps repetitive keys
   per song; the matcher searches every occupied cell and removes expired
   votes exactly.
+- `cqt-monitor`: a `PeakTrack` per watched song aligns the most recent
+  stream peaks with the song under the matcher's hypothesis; the
+  `Tracker` takes `Scored` candidates and starts a play only when the
+  alignment confirms the votes, and holds a play through a quiet
+  passage while the peaks still align. Fan-out 4 with `half` 40 is the
+  default (same evidence margin as fan-out 6, half the index and CPU).
+  `Fingerprinter` (dB → peaks → hashes) is a library type, with an
+  end-to-end detection test on synthetic audio.
+  `scripts/radio_negatives.py` builds a held-out null stream and hard
+  negatives (same artist, reversed, out-of-range speed, loops) that
+  `scripts/radio_eval.py --negatives` scores per family.
+- CI runs separate gates for the library (`cargo publish --dry-run`,
+  CHANGELOG heading check) and the monitor crate.
 - `CqtStream::params`, `CqtStream::padding_samples`,
   `CqtWorkspace::params`.
 - Multi-rate processing (Schörkhuber & Klapuri, 2010): each octave is

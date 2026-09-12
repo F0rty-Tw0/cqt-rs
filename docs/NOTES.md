@@ -187,8 +187,29 @@ Design decisions and why:
   second (a repeated riff briefly wins the vote at the tail of a play).
 - **Confidence** `100·n/(n+half)`, `half = 2 × max null evidence`. The
   null maximum over 31 min was 25 with absolute offsets and 51 with the
-  rolling origin (true evidence rose 4×, null 2×), hence `half = 100`.
-  Threshold 70 ⇔ evidence ≥ 233 ⇔ 4.6× the worst null cell.
+  rolling origin (true evidence rose 4×, null 2×), hence `half = 100`
+  at fan-out 6. With the default fan-out of 4 the null maximum is 20
+  and `half` 40; threshold 70 ⇔ evidence ≥ 98 ⇔ 4.9× the worst null
+  cell, the same margin.
+- **Fan-out 4 by default** (§9): the null ceiling, the true evidence,
+  the index and the CPU all scale down together (20 vs 50, 1 750 vs
+  4 450 median play evidence, 24 vs 51 kB per song-second, 0.4 vs
+  0.9 % of a core), so the evidence margin is unchanged while
+  detections come 0.3 s earlier (fewer hashes per anchor complete
+  sooner). Fan-out 6 stays available (`--fan-out 6 --half 100`).
+- **Alignment.** The votes are indirect evidence; once a hypothesis
+  wins, `PeakTrack::verify` maps the last 2 s of stream peaks onto the
+  song (`frame_ref = tempo·frame + offset`, `bin_ref = bin − shift`,
+  tolerance ±4 frames, ±1 bin) and reports the fraction that land on a
+  song peak. On the null streams that fraction never exceeds 0.30, on a
+  play it is 0.5–0.9 (0.26 in a crossfade's fade-in). The tracker uses
+  it twice: a start needs alignment ≥ 0.4 besides confidence 70, which
+  rejects a reversed copy of the song (votes 82–254, alignment ≤ 0.29);
+  and an active play is held while alignment ≥ 0.3 and confidence ≥ 35,
+  which carries a play through a quiet passage where the votes thin out
+  (`sweet_waltz key_change_-1`, 4 s at evidence 50–90, previously an
+  `end` and a second `start`). Cost: about a hundred binary searches per
+  report.
 - **Bucket cap** 8 per `(key, song)`, enforced when the index is built:
   a key that occurs more than 8 times in one song loses that song's
   entries and keeps every other song's. The first version compared the
@@ -201,49 +222,82 @@ Design decisions and why:
   (tests against brute force with random watermark steps, sparse and
   dense peaks, fan-out 0–6); the worst case is still `zone`.
 - **Detection tracker** (`Tracker`) is a library type with unit tests for
-  start, release, brief versus persistent jumps and end-of-stream; the
-  binary only formats its events (strings JSON-escaped).
+  start, release, brief versus persistent jumps, the alignment gate and
+  hold, and end-of-stream; the binary only formats its events (strings
+  JSON-escaped). The whole chain behind the transform is one
+  `Fingerprinter` (dB → peaks → hashes) shared by the binary and the
+  end-to-end test `monitor/tests/end_to_end.rs`, which detects a
+  synthetic song played 4 % faster and higher between noise and an
+  unwatched song without any audio file.
 
-Measured (4-core container, one thread, after review round 1):
+Measured (4-core container, one thread, defaults: fan-out 4, `half`
+40, alignment gate; the fan-out 6 numbers after review round 1 in
+brackets):
 
-| | Null stream (31 min) | Programme (15 min) |
+| | Calibration null stream (31 min) | Programme (15 min) |
 | --- | --- | --- |
-| Evidence | max 50, 99.9 % 46, median 17 | thousands during plays |
+| Evidence | max 20, 99.9 % 19, median 7 (50 / 46 / 17) | hundreds to thousands during plays |
 | Confidence | max 33.3, no start event | 16/16 plays, 0 false starts |
-| Detection after play start | | median 2.3 s (was 3.0 s), max 13.6 s (talk-over), crossfade 6.8 s |
-| Hash delay (anchor → hashes) | median 1.13 s, max 2.0 s (was a fixed 2.0 s) | median 1.02 s |
-| CPU | 0.9 % of one core (0.33 % without reports; the exact search per report is the rest) | 0.9 % |
-| Index | 169 k hashes (3 339 dropped by the per-song cap), 5.7 MB for 111 s of songs | |
+| Alignment | max 0.28, 99.9 % 0.25 | 0.49–0.84 at detection, crossfade 0.61 |
+| Detection after play start | | median 1.8 s (2.3 s), max 13.3 s (talk-over), crossfade 7.5 s (6.8 s) |
+| Hash delay (anchor → hashes) | median 0.73 s, max 2.0 s (1.13 s) | median 0.73 s (1.02 s) |
+| CPU | 0.36 % of one core (0.86 %) | 0.40 % (0.94 %) |
+| Index | 73 k hashes (540 dropped by the per-song cap), 2.7 MB for 111 s of songs (169 k, 5.7 MB) | |
+
+Held-out material (`scripts/radio_negatives.py`, threshold calibrated on
+the stream above and never touched afterwards):
+
+| Stream | Minutes | Max evidence | Max confidence | Max alignment | Starts |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Second null programme, seed 7777 | 30.7 | 20 (fan-out 6: 58) | 33.3 | 0.30 | 0 |
+| Hard negatives, same artist (sugar_plum, 11 treatments) | 6.5 | 14 (34) | 25.9 | 0.30 | 0 |
+| Hard negatives, watched songs reversed | 3.9 | 82 (254) | 67.2 (71.8) | 0.29 | 0 (2) |
+| Hard negatives, watched songs at 0.6× and 1.5× speed | 3.1 | 58 (197) | 59.2 (66.3) | 0.30 | 0 |
+| Hard negatives, 0.5 s loop of a watched song | 2.0 | 122 | 75.3 | 0.33 | 0 |
+| Hard negatives, 1 s loop | 2.0 | 397 | 90.8 | 0.62 | 2 |
+| Hard negatives, 2 s loop | 1.9 | 1 089 | 96.5 | 0.88 | 8 |
+| Hard negatives, speech between them | 1.7 | 10 | 20.0 | 0.25 | 0 |
+
+A report or start is charged to a segment only when its whole evidence
+window lies inside the segment. The held-out null stream reproduces the
+calibration ceiling exactly at fan-out 4 (at fan-out 6 it exceeded it,
+58 against 50, still at confidence 37). Loops of one second and more
+are the song's own audio repeated; the matcher finds them (with fewer
+restarts than without the gate, 14 starts against 38) and the reported
+position jumps back once per loop, which is the cue a policy that
+excludes sampled loops would use.
 
 Eight-song watch list (every music track of the simulation, 510 s of
 audio, run over the 31 min stream that is built from six of them, so
 the stream is mostly watched material and the two absent songs measure
 false alarms):
 
-| | Fan-out 6, `half` 100 | Fan-out 4, `half` 42 |
-| --- | --- | --- |
-| Index | 727 k hashes, 16.1 MB, built in 1.1 s | 316 k hashes, 7.5 MB |
-| Plays detected | 44 / 45, 1 extra start, 0 starts outside a play | 44 / 45, 2 extra starts, 0 outside |
-| Detection after play start | median 2.5 s, max 9.3 s | median 2.5 s, max 9.3 s |
-| Absent songs, max confidence | 16.0 / 18.7 | 16.0 / 16.0 |
-| Hash delay median | 1.13 s | 0.80 s |
-| CPU | 3.0 % | 0.7 % |
+| | Fan-out 6, `half` 100, votes only | Fan-out 4, `half` 42, votes only | Fan-out 4, `half` 40, alignment gate (default) |
+| --- | --- | --- | --- |
+| Index | 727 k hashes, 16.1 MB, built in 1.1 s | 316 k hashes, 7.5 MB | 316 k hashes, 7.5 MB |
+| Plays detected | 44 / 45, 1 extra start, 0 starts outside a play | 44 / 45, 2 extra starts, 0 outside | 45 / 45, 0 extra starts, 0 outside |
+| Detection after play start | median 2.5 s, max 9.3 s | median 2.5 s, max 9.3 s | median 2.4 s, max 9.1 s |
+| Absent songs, max confidence | 16.0 / 18.7 | 16.0 / 16.0 | 16.0 / 16.0 |
+| Hash delay median | 1.13 s | 0.80 s | 0.80 s |
+| CPU | 3.0 % | 0.7 % | 0.7 % |
 
-The one miss is a talk-over play of *brahms* (speech over quiet strings
-for 12 s of a 42 s play; the other talk-over play of the same track is
-found in 2.3 s). The extra start is a real ambiguity: *brahms*
-`key_change_-1` contains a repeat that the tracker takes for a new play
-after one second of disagreement. Memory grows linearly with watched
-audio (about 6–9 MB per 3 minutes at fan-out 6, half at fan-out 4);
-CPU grows with the number of matches, which in this run is dominated by
-the six songs that really are playing. A 100-song watch list on an
-ordinary programme (most of the stream unwatched) has not been measured.
+The miss of the first two columns is a talk-over play of *brahms*
+(speech over quiet strings for 12 s of a 42 s play), which the alignment
+hold now carries through; the extra starts were a repeat inside *brahms*
+`key_change_-1` that the tracker took for a new play, which the gate
+now declines because the repeat's hypothesis does not align. Memory
+grows linearly with watched audio (about 4 MB per 3 minutes); CPU grows
+with the number of matches, which in this run is dominated by the six
+songs that really are playing. A 100-song watch list on an ordinary
+programme (most of the stream unwatched) has not been measured.
 
 Known limits:
-- Talk-over with speech louder than the music: evidence 50–70 (confidence
-  30–40) while the speech lasts, detection 1–3 s after it stops; one of
-  three such plays over quiet strings was missed altogether.
-- A crossfade is detected ~0.8 s after the fade-in completes.
+- Talk-over with speech louder than the music: evidence 20–40 (confidence
+  30–50) while the speech lasts, detection 1–3 s after it stops.
+- A crossfade is detected ~1.5 s after the fade-in completes: the
+  alignment gate waits until the song is audible in the last 2 s.
+- A looped sample of a second or more of a watched song is reported as
+  the song (see the hard negatives above).
 - `end` events lag the real end by window + delay (~7 s).
 - Only tested at 44.1 kHz mono; the binary refuses mismatched rates.
 
@@ -253,14 +307,13 @@ Next steps for monitoring, in order:
    catch the talk-over intro; measure on `pitch_fader_+4_talkover`.
 2. Index serialization (`Index` to/from a file) and a `--listen` mode that
    reads PCM from stdin so the binary can sit behind an FM/stream decoder.
-3. Reduce `end` lag by ending on evidence decay slope rather than a fixed
-   release.
+3. End a play on the alignment rather than on the evidence release: the
+   alignment drops within a second of the song stopping, the votes take
+   the window to decay.
 4. A second real recording (phone mic in a room) to confirm the FM chain
    simulation is not optimistic.
-5. Candidate generation at fan-out 4 followed by verification against the
-   reference peak track near the predicted position (observation-only
-   first), with hard negatives (shared loops, same-artist tracks) and a
-   null set separate from the calibration set; see §8.
+5. A loop policy: declare a sampled loop when the reported position jumps
+   back by the same amount at a fixed period.
 6. Maintain the matcher's slab histogram incrementally to take the exact
    search off the per-report cost.
 
@@ -285,11 +338,11 @@ measurements.
 | `best_per_song` skips centres by their own count (30 vs 243 example) | correct | exact search over every occupied cell with an upper bound from a (song, shift, offset) histogram; oracle test against the full scan on 300 random histograms |
 | Early hash emission | adopted | anchor released when its `3·fan_out` candidates are known; hash delay median 2.0 → 1.0 s, detections up to 1.0 s earlier (median 3.0 → 2.3 s, `plots/radio_compare.png`), hash sequence unchanged |
 | Grouped ratio directory (27 → 9 probes) | deferred | after the hasher fix a lookup costs about 0.7 µs and the null stream does 1 400 lookups/s, i.e. 0.1 % of a core; the bound-based search and the pipeline itself dominate. Worth revisiting only with hundreds of songs |
-| Correlated triplets, distinct-anchor evidence | next experiment | needs its own calibration; the replay bundle below is the tool for it |
-| Candidate generation + verification stage | next experiment | agreed as the way to make fan-out 4 the default; run observation-only first |
-| Failure bundles | started | `eval_summary.json` now records commit, monitor configuration, the `stream` event, and for the three slowest plays and every false start the ground-truth segment with the report trace around it |
-| Awkward negatives, separate tuning/evaluation sets | agreed, not done | the eight-song run adds six more tracks as targets but no shared-sample or same-artist negatives; the null set was also the calibration set |
-| Separate release gates for library and monitor | agreed | the monitor crate stays unpublished; the library findings above are the transform's own acceptance list |
+| Correlated triplets, distinct-anchor evidence | tried, rejected | §9: the correlated votes are the signal; counting anchors cut the null ceiling by 30 % and the true evidence by 94 % |
+| Candidate generation + verification stage | done | §9: observed first, then adopted as the alignment gate and hold; fan-out 4 is the default |
+| Failure bundles | done | `eval_summary.json` records commit, monitor configuration, the `stream` event, and for the three slowest plays and every false start the ground-truth segment with the report trace around it |
+| Awkward negatives, separate tuning/evaluation sets | done | `scripts/radio_negatives.py`: a second null programme and 21 min of hard negatives (same artist, reversed, out-of-range speed, loops), evaluated with `radio_eval.py --negatives` after calibrating on the first null stream only |
+| Separate release gates for library and monitor | done | CI has `library-*` jobs (format, lint, docs, tests on stable and 1.98 with both feature sets, benches compile, `cargo publish --dry-run`, CHANGELOG heading for the crate version) and `monitor-*` jobs (the same checks plus the synthetic end-to-end detection); the library jobs never build the monitor |
 
 Two clarifications the review asked for:
 - **The 5 s target is measured from the first sample of the play in the
@@ -305,14 +358,15 @@ Two clarifications the review asked for:
   The evidence margin (worst null cell 50 versus threshold 233) is the
   reason to expect the rate to be far lower than the bound, not proof.
 
-Reproducing the before/after figure (`plots/radio_compare.png`):
+Reproducing a before/after figure such as `plots/radio_compare.png`
+(here the review-round result `f731b5d` against the current tree):
 
 ```console
-git worktree add /tmp/before 09978b8
+git worktree add /tmp/before f731b5d
 (cd /tmp/before && CARGO_TARGET_DIR=$PWD/../target/before cargo build --release -p cqt-monitor)
-python3 scripts/radio_eval.py --monitor target/before/release/monitor --label 09978b8 --out eval_summary_before --no-plots
-python3 scripts/radio_eval.py --label f731b5d
-python3 scripts/radio_compare.py eval_summary_before eval_summary
+python3 scripts/radio_eval.py --monitor target/before/release/monitor --half 100 --label f731b5d --out eval_summary_f731b5d --no-plots
+python3 scripts/radio_eval.py --negatives --label "fan-out 4, alignment gate"
+python3 scripts/radio_compare.py eval_summary_f731b5d eval_summary
 ```
 
 What the exact search costs: on the null stream every report (4 per
@@ -322,3 +376,86 @@ a fast integer hasher for the cell maps is about 0.5 %. Maintaining the
 slab histogram incrementally (update on push, expiry and rebase instead
 of rebuilding it per report) would remove most of that and is the next
 optimization if CPU matters.
+
+## 9. Experiments after review round 1
+
+The four items at the top of the previous next-steps list, each run
+against the calibration null stream, the programme, the held-out null
+stream and the hard negatives (`scripts/radio_negatives.py`,
+`scripts/radio_eval.py --negatives`), with `--arg` passing the variant's
+monitor flags. Kept: what improved a measured number without costing
+another; dropped: the rest.
+
+### Distinct-anchor evidence (dropped)
+
+Each vote recorded whether it was the first from its query anchor in
+its cell, cells counted anchors next to votes, and the evidence
+(neighbourhood sum, slab bound, tie-breaks) used the anchor count.
+Result at fan-out 6:
+
+| | Votes | Distinct anchors |
+| --- | ---: | ---: |
+| Null stream, max evidence | 50 | 35 |
+| Programme, max evidence per play, min / median | 1 539 / 4 445 | 236 / 268 |
+| Margin (play min ÷ null max) | 31× | 6.7× |
+| With `half` at 2× null max: plays detected | 16 / 16 | 12 / 16, 13 restarts |
+
+The correlated hashes of a true anchor pair are the signal: a matching
+anchor pair contributes tens of consistent votes, a chance pair one or
+two, so nearly all of the null evidence already comes from distinct
+anchors while the true evidence is almost entirely repeats. Any cap on
+votes per anchor moves the margin the wrong way. The code was removed;
+the numbers are in the table and the method in this paragraph.
+
+### Candidate-then-verify at fan-out 4 (kept)
+
+Step 1, observation only: `--fan-out 4` with `half` 40 against the
+fan-out 6 default. Every number moved the same way or stayed: null
+ceiling 50 → 20, median play evidence 4 445 → 1 752 (margin 89× → 88×),
+detections 0.1–0.7 s earlier (the anchors' `3·fan_out` candidates
+complete sooner), CPU 0.9 → 0.35 %, index 5.7 → 2.7 MB, held-out null
+ceiling 58 → 20, reversed copies 254 → 82 votes (two false starts →
+none). One regression: a quiet passage of `sweet_waltz key_change_-1`
+dropped the evidence under 98 for 3 s and the play ended and restarted.
+
+Step 2, observation only: `PeakTrack::verify` reported in every
+`report` line. Over the whole 5 s window the alignment at the moment of
+detection was 0.14–0.39 (the window still holds the previous segment),
+over the last 2 s it is 0.49–0.84 with null maxima of 0.28–0.30; at the
+reversed and looped segments' evidence peaks it is 0.01–0.23. Hence the
+2 s span and the thresholds 0.4 (start) and 0.3 (hold).
+
+Step 3, adopted: `Scored { candidate, confidence, alignment }` into the
+tracker; start needs both, an active play is held by alignment ≥ 0.3 at
+confidence ≥ 35. Programme: 16/16, 0 false starts, the restart gone,
+crossfade detection 6.8 → 7.5 s (the only cost); eight-song run 45/45
+with no extra start (was 44/45 with one or two); hard negatives: no
+start on reversed or out-of-range copies, loops still start but 14
+times instead of 38.
+
+### Hard negatives and a held-out null set (kept)
+
+`scripts/radio_negatives.py` renders `stream_null2` (seed 7777, the
+same generator as the calibration stream) and `stream_hard` (families
+in the ground truth's `family` key). `radio_eval.py --negatives` charges
+a report or start to a segment only when the whole evidence window is
+inside it, and prints the per-family table. The calibration ceiling
+transferred to the held-out stream exactly at fan-out 4 (20 = 20) and
+not at fan-out 6 (58 > 50), which is the reason to calibrate with a
+margin (`half` at 2× the ceiling, threshold at 4.9× it) rather than at
+the ceiling. The Poisson bound of §8 (at most 5.8 alarms per hour at
+95 %) now rests on 31 minutes of null material that the threshold never
+saw, instead of the stream it was tuned on.
+
+### Separate release gates (kept)
+
+`.github/workflows/ci.yml` runs `library-check`, `library-test` (stable
+and 1.98, both feature sets) and `library-package` (benches compile,
+`cargo publish --dry-run`, a `# <version>` heading in `CHANGELOG.md`)
+against `cqt-rs` alone, and `monitor-check` and `monitor-test` against
+`cqt-monitor`, whose `monitor/tests/end_to_end.rs` detects a synthetic
+song played 4 % faster and higher between noise and an unwatched song
+(one start within 5 s at the right tempo, shift and position, one end,
+confidence under 50 elsewhere). A library release needs the library jobs
+green on the tagged commit; the monitor stays `publish = false` and its
+jobs may be red without blocking a library release.

@@ -40,7 +40,7 @@ impl Default for MatcherConfig {
             offset_step: 86.0,
             bin_tolerance: 1,
             ratio_tolerance: 1,
-            half: 100.0,
+            half: 40.0,
         }
     }
 }
@@ -406,7 +406,8 @@ impl Matcher {
     /// no watched song: with `half` at twice the largest evidence ever seen
     /// on such audio, false matches stay below 34 and true matches with a
     /// few hundred votes read above 75. Thirty minutes of simulated radio
-    /// without the watched songs peaked at 51, hence the default of 100.
+    /// without the watched songs peaked at 20 with the default fan-out of
+    /// 4 (50 with fan-out 6), hence the default of 40.
     pub fn confidence(&self, evidence: u32) -> f64 {
         let n = f64::from(evidence);
         100.0 * n / (n + self.config.half)

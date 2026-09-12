@@ -2,7 +2,8 @@
 //!
 //! The pipeline turns the constant-Q magnitudes of [`cqt_rs`] into a sparse
 //! set of spectral peaks ([`PeakPicker`]), combines peaks into pitch- and
-//! tempo-invariant triplet hashes ([`TripletHasher`]), stores the hashes of
+//! tempo-invariant triplet hashes ([`TripletHasher`]; both stages behind
+//! one [`Fingerprinter`]), stores the hashes of
 //! the watched songs in an [`Index`] and accumulates the evidence of a live
 //! stream in a sliding window ([`Matcher`]) that reports which watched song
 //! is playing, how it was pitched and stretched, where in the song the
@@ -15,14 +16,18 @@
 
 #![warn(missing_docs)]
 
+mod fingerprint;
 mod hashes;
 mod index;
 mod matcher;
 mod peaks;
 mod tracker;
+mod verify;
 
+pub use fingerprint::{FingerprintConfig, Fingerprinter, fingerprint};
 pub use hashes::{Hash, HashKey, TripletHasher, decode_key, encode_key};
 pub use index::{Entry, FastMap, Index, IndexBuilder, KeyHasher};
 pub use matcher::{Candidate, Matcher, MatcherConfig};
 pub use peaks::{Peak, PeakPicker};
-pub use tracker::{Active, Event, Tracker, TrackerConfig};
+pub use tracker::{Active, Event, Scored, Tracker, TrackerConfig};
+pub use verify::{PeakTrack, Verification};

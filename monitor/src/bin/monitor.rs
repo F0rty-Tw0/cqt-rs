@@ -6,15 +6,16 @@
 //! monitor fingerprint file.wav      # peaks and hashes of one file, for validation
 //! ```
 
+use std::collections::VecDeque;
 use std::io::{BufWriter, Write};
 use std::process::exit;
 use std::time::Instant;
 
 use cqt_monitor::{
-    Candidate, Event, Hash, Index, IndexBuilder, Matcher, MatcherConfig, Peak, PeakPicker, Tracker,
-    TrackerConfig, TripletHasher,
+    Event, FingerprintConfig, Fingerprinter, Hash, Index, IndexBuilder, Matcher, MatcherConfig,
+    Peak, PeakTrack, Scored, Tracker, TrackerConfig, Verification, fingerprint,
 };
-use cqt_rs::{Cqt, CqtParams, CqtStream, magnitude_to_db};
+use cqt_rs::{Cqt, CqtParams, CqtStream};
 
 const USAGE: &str = "usage:
   monitor --watch NAME=FILE.wav [--watch ...] --stream FILE.wav [options]
@@ -29,10 +30,17 @@ options (defaults in brackets):
   --prominence DB      dB above the local mean [15]
   --floor DB           absolute peak floor in dBFS [-80]
   --zone N             hash zone in frames [320]
-  --fan-out N          [6]                    --ratio-steps N    [32]
+  --fan-out N          [4]                    --ratio-steps N    [32]
   --window S           evidence window in seconds [5]
-  --half N             evidence count giving confidence 50 [100]
+  --half N             evidence count giving confidence 50 [40]
   --threshold C        detection threshold, 0..100 [70]
+  --verify-seconds S   most recent query peaks aligned with the song's
+                       peaks [2]
+  --verify-frames N    alignment tolerance in frames [4]
+  --verify-bins N      alignment tolerance in bins [1]
+  --verify-start A     alignment a start needs, 0..1 [0.4]
+  --verify-hold A      alignment that keeps a play going at half the
+                       threshold, 0..1 [0.3]
   --release S          seconds below threshold that end a detection [3]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
@@ -54,6 +62,11 @@ struct Options {
     window: f64,
     half: f64,
     threshold: f64,
+    verify_seconds: f64,
+    verify_frames: u32,
+    verify_bins: u32,
+    verify_start: f64,
+    verify_hold: f64,
     release: f64,
     report: f64,
     block: usize,
@@ -75,11 +88,16 @@ impl Default for Options {
             prominence: 15.0,
             floor: -80.0,
             zone: 320,
-            fan_out: 6,
+            fan_out: 4,
             ratio_steps: 32,
             window: 5.0,
-            half: 100.0,
+            half: 40.0,
             threshold: 70.0,
+            verify_seconds: 2.0,
+            verify_frames: 4,
+            verify_bins: 1,
+            verify_start: 0.4,
+            verify_hold: 0.3,
             release: 3.0,
             report: 0.25,
             block: 4096,
@@ -132,6 +150,11 @@ fn parse_args() -> Options {
             "--window" => opts.window = value(&arg, args.next()),
             "--half" => opts.half = value(&arg, args.next()),
             "--threshold" => opts.threshold = value(&arg, args.next()),
+            "--verify-seconds" => opts.verify_seconds = value(&arg, args.next()),
+            "--verify-frames" => opts.verify_frames = value(&arg, args.next()),
+            "--verify-bins" => opts.verify_bins = value(&arg, args.next()),
+            "--verify-start" => opts.verify_start = value(&arg, args.next()),
+            "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
             "--release" => opts.release = value(&arg, args.next()),
             "--report" => opts.report = value(&arg, args.next()),
             "--block" => opts.block = value(&arg, args.next()),
@@ -177,70 +200,15 @@ fn read_wav(path: &str) -> (Vec<f32>, u32) {
     (mono, spec.sample_rate)
 }
 
-/// Peak picker and hasher chained behind a dB conversion.
-struct Fingerprinter {
-    picker: PeakPicker,
-    hasher: TripletHasher,
-    db: Vec<f32>,
-    frames: u64,
-    peaks: u64,
-}
-
-impl Fingerprinter {
-    fn new(opts: &Options, num_bins: usize) -> Self {
-        Self {
-            picker: PeakPicker::new(
-                num_bins,
-                opts.time_radius,
-                opts.bin_radius,
-                opts.prominence,
-                opts.floor,
-            ),
-            hasher: TripletHasher::new(opts.zone, opts.fan_out, opts.ratio_steps),
-            db: vec![0.0; num_bins],
-            frames: 0,
-            peaks: 0,
-        }
-    }
-
-    /// Frames of delay between a pushed frame and the hashes anchored on it.
-    fn delay_frames(&self) -> u64 {
-        (self.picker.delay_frames() + self.hasher.delay_frames()) as u64
-    }
-
-    fn push<P: FnMut(Peak), H: FnMut(Hash)>(
-        &mut self,
-        magnitudes: &[f32],
-        mut on_peak: P,
-        on_hash: H,
-    ) {
-        self.db.copy_from_slice(magnitudes);
-        magnitude_to_db(&mut self.db, 1.0, 1e-5, None);
-        let hasher = &mut self.hasher;
-        let peaks = &mut self.peaks;
-        self.picker.push(&self.db, |p| {
-            *peaks += 1;
-            on_peak(p);
-            hasher.push(p);
-        });
-        self.frames += 1;
-        if let Some(decided) = self
-            .frames
-            .checked_sub(self.picker.delay_frames() as u64 + 1)
-        {
-            self.hasher.advance(decided, on_hash);
-        }
-    }
-
-    fn flush<P: FnMut(Peak), H: FnMut(Hash)>(&mut self, mut on_peak: P, mut on_hash: H) {
-        let hasher = &mut self.hasher;
-        let peaks = &mut self.peaks;
-        self.picker.flush(|p| {
-            *peaks += 1;
-            on_peak(p);
-            hasher.push(p);
-        });
-        self.hasher.flush(&mut on_hash);
+fn fingerprint_config(opts: &Options) -> FingerprintConfig {
+    FingerprintConfig {
+        time_radius: opts.time_radius,
+        bin_radius: opts.bin_radius,
+        prominence: opts.prominence,
+        floor: opts.floor,
+        zone: opts.zone,
+        fan_out: opts.fan_out,
+        ratio_steps: opts.ratio_steps,
     }
 }
 
@@ -257,18 +225,11 @@ fn build_cqt(opts: &Options, sample_rate: u32) -> Cqt {
 }
 
 /// Fingerprints a whole file in batch mode (identical to streaming).
-fn fingerprint_file(opts: &Options, cqt: &Cqt, samples: &[f32]) -> (u64, u64, Vec<Hash>) {
-    let magnitudes = cqt.process(samples, opts.hop).unwrap_or_else(|e| {
+fn fingerprint_file(opts: &Options, cqt: &Cqt, samples: &[f32]) -> (u64, Vec<Peak>, Vec<Hash>) {
+    fingerprint(cqt, opts.hop, samples, &fingerprint_config(opts)).unwrap_or_else(|e| {
         eprintln!("transform failed: {e}");
         exit(1)
-    });
-    let mut fp = Fingerprinter::new(opts, cqt.num_bins());
-    let mut hashes = Vec::new();
-    for row in magnitudes.rows() {
-        fp.push(row.as_slice().unwrap(), |_| {}, |h| hashes.push(h));
-    }
-    fp.flush(|_| {}, |h| hashes.push(h));
-    (fp.frames, fp.peaks, hashes)
+    })
 }
 
 fn main() {
@@ -278,18 +239,7 @@ fn main() {
     if let Some(path) = &opts.fingerprint {
         let (samples, sample_rate) = read_wav(path);
         let cqt = build_cqt(&opts, sample_rate);
-        let magnitudes = cqt.process(&samples, opts.hop).unwrap();
-        let mut fp = Fingerprinter::new(&opts, cqt.num_bins());
-        let mut peaks = Vec::new();
-        let mut hashes = Vec::new();
-        for row in magnitudes.rows() {
-            fp.push(
-                row.as_slice().unwrap(),
-                |p| peaks.push(p),
-                |h| hashes.push(h),
-            );
-        }
-        fp.flush(|p| peaks.push(p), |h| hashes.push(h));
+        let (_, peaks, hashes) = fingerprint_file(&opts, &cqt, &samples);
         for p in peaks {
             writeln!(out, "P {} {}", p.frame, p.bin).unwrap();
         }
@@ -301,6 +251,7 @@ fn main() {
 
     // Index the watched songs.
     let mut builder = IndexBuilder::new();
+    let mut tracks: Vec<PeakTrack> = Vec::new();
     let mut cqt: Option<(Cqt, u32)> = None;
     let index_start = Instant::now();
     for (name, path) in &opts.watch {
@@ -321,11 +272,13 @@ fn main() {
         builder.add_song(name, frames as u32, hashes);
         writeln!(
             out,
-            "{{\"event\":\"index\",\"song\":{},\"seconds\":{:.2},\"frames\":{frames},\"peaks\":{peaks},\"hashes\":{count}}}",
+            "{{\"event\":\"index\",\"song\":{},\"seconds\":{:.2},\"frames\":{frames},\"peaks\":{},\"hashes\":{count}}}",
             json_string(name),
-            samples.len() as f64 / f64::from(sample_rate)
+            samples.len() as f64 / f64::from(sample_rate),
+            peaks.len()
         )
         .unwrap();
+        tracks.push(PeakTrack::new(peaks));
     }
     let index: Index = builder.build(8);
     let (cqt, sample_rate) = cqt.unwrap();
@@ -365,9 +318,12 @@ fn main() {
             jump_shift: 2,
             jump_tempo: 0.05,
             jump_frames: 3.0 * frames_per_second,
+            start_alignment: opts.verify_start,
+            hold_alignment: opts.verify_hold,
+            hold_confidence: 0.5 * opts.threshold,
         },
     );
-    let mut fp = Fingerprinter::new(&opts, cqt.num_bins());
+    let mut fp = Fingerprinter::new(cqt.num_bins(), &fingerprint_config(&opts));
     let delay = fp.delay_frames();
     let report_every = (opts.report * frames_per_second).round().max(1.0) as u64;
     let mut stream = CqtStream::new(&cqt, opts.hop).unwrap_or_else(|e| {
@@ -376,36 +332,46 @@ fn main() {
     });
     writeln!(
         out,
-        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{}}}",
+        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
         json_string(stream_path),
         samples.len() as f64 / f64::from(sample_rate),
         cqt.latency_samples() as f64 / f64::from(sample_rate),
         delay as f64 / frames_per_second,
         opts.window,
         opts.half,
-        opts.threshold
+        opts.threshold,
+        opts.fan_out,
+        opts.verify_seconds,
+        opts.verify_start,
+        opts.verify_hold
     )
     .unwrap();
 
     let ctx = Context {
         names: index.names(),
+        tracks: &tracks,
         seconds_per_frame: opts.hop as f64 / f64::from(sample_rate),
         sample_rate: f64::from(sample_rate),
         delay,
+        verify_span: (opts.verify_seconds * frames_per_second).round() as u64,
+        verify_frames: opts.verify_frames,
+        verify_bins: opts.verify_bins,
     };
     let mut frames = 0u64;
     let mut consumed = 0u64;
     let mut delays = Histogram::new(delay as usize + 1);
+    // Query peaks not older than the evidence window, for verification.
+    let mut recent: VecDeque<Peak> = VecDeque::new();
     let started = Instant::now();
     let mut pending_report = false;
     for block in samples.chunks(opts.block) {
         consumed += block.len() as u64;
-        let (matcher_ref, fp_ref, frames_ref, delays_ref) =
-            (&mut matcher, &mut fp, &mut frames, &mut delays);
+        let (matcher_ref, fp_ref, frames_ref, delays_ref, recent_ref) =
+            (&mut matcher, &mut fp, &mut frames, &mut delays, &mut recent);
         stream.push(&cqt, block, |magnitudes| {
             fp_ref.push(
                 magnitudes,
-                |_| {},
+                |p| recent_ref.push_back(p),
                 |h| {
                     delays_ref.record(*frames_ref - h.frame);
                     matcher_ref.push(&index, &h);
@@ -420,6 +386,7 @@ fn main() {
             ctx.report(
                 &mut matcher,
                 &mut tracker,
+                &mut recent,
                 frames,
                 consumed,
                 &mut out,
@@ -429,12 +396,12 @@ fn main() {
         }
     }
     {
-        let (matcher_ref, fp_ref, frames_ref, delays_ref) =
-            (&mut matcher, &mut fp, &mut frames, &mut delays);
+        let (matcher_ref, fp_ref, frames_ref, delays_ref, recent_ref) =
+            (&mut matcher, &mut fp, &mut frames, &mut delays, &mut recent);
         stream.flush(&cqt, |magnitudes| {
             fp_ref.push(
                 magnitudes,
-                |_| {},
+                |p| recent_ref.push_back(p),
                 |h| {
                     delays_ref.record(*frames_ref - h.frame);
                     matcher_ref.push(&index, &h);
@@ -442,16 +409,27 @@ fn main() {
             );
             *frames_ref += 1;
         });
-        fp_ref.flush(|_| {}, |h| matcher_ref.push(&index, &h));
+        fp_ref.flush(
+            |p| recent_ref.push_back(p),
+            |h| matcher_ref.push(&index, &h),
+        );
     }
-    ctx.report(&mut matcher, &mut tracker, frames, consumed, &mut out, true);
+    ctx.report(
+        &mut matcher,
+        &mut tracker,
+        &mut recent,
+        frames,
+        consumed,
+        &mut out,
+        true,
+    );
     let cpu = started.elapsed().as_secs_f64();
     let audio = samples.len() as f64 / ctx.sample_rate;
     writeln!(
         out,
         "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
         cpu / audio,
-        fp.peaks,
+        fp.peaks(),
         matcher.lookups(),
         matcher.matches(),
         delays.quantile(0.5) as f64 * ctx.seconds_per_frame,
@@ -465,20 +443,27 @@ type Out = BufWriter<std::io::StdoutLock<'static>>;
 /// What the report and event writers need to know about the stream.
 struct Context<'a> {
     names: &'a [String],
+    tracks: &'a [PeakTrack],
     seconds_per_frame: f64,
     sample_rate: f64,
     /// Worst-case frames between a pushed frame and its hashes.
     delay: u64,
+    /// Most recent query frames whose peaks are verified.
+    verify_span: u64,
+    verify_frames: u32,
+    verify_bins: u32,
 }
 
 impl Context<'_> {
     /// Writes a report line for the state after `frames` frames and
     /// `consumed` samples, then feeds the tracker and writes its events.
     /// With `final_flush` every play is ended instead.
+    #[allow(clippy::too_many_arguments)]
     fn report(
         &self,
         matcher: &mut Matcher,
         tracker: &mut Tracker,
+        recent: &mut VecDeque<Peak>,
         frames: u64,
         consumed: u64,
         out: &mut Out,
@@ -488,32 +473,76 @@ impl Context<'_> {
         matcher.advance(frame.saturating_sub(self.delay));
         let t = frame as f64 * self.seconds_per_frame;
         let consumed = consumed as f64 / self.sample_rate;
-        let scored: Vec<(Candidate, f64)> = matcher
+        // The most recent query peaks: the votes lag the audio by the
+        // window, but whether the song is playing *now* is decided by
+        // the newest peaks, which are known up to the picker's delay.
+        let horizon = frame.saturating_sub(self.verify_span);
+        while recent.front().is_some_and(|p| p.frame < horizon) {
+            recent.pop_front();
+        }
+        let query = recent.make_contiguous();
+        let verified: Vec<(Scored, Verification)> = matcher
             .best_per_song()
             .into_iter()
-            .map(|c| (c, matcher.confidence(c.evidence)))
-            .collect();
-        if !final_flush {
-            let best = scored.iter().max_by_key(|(c, _)| c.evidence);
-            let (name, evidence, confidence, shift, tempo, position) = match best {
-                Some((c, confidence)) => (
-                    json_string(&self.names[usize::from(c.song)]),
-                    c.evidence,
-                    *confidence,
+            .map(|c| {
+                let v = self.tracks[usize::from(c.song)].verify(
+                    query,
                     c.shift,
                     c.tempo,
-                    (c.tempo * frame as f64 + c.offset) * self.seconds_per_frame,
+                    c.offset,
+                    self.verify_frames,
+                    self.verify_bins,
+                );
+                let scored = Scored {
+                    candidate: c,
+                    confidence: matcher.confidence(c.evidence),
+                    alignment: v.query_fraction(),
+                };
+                (scored, v)
+            })
+            .collect();
+        if !final_flush {
+            let best = verified.iter().max_by_key(|(s, _)| s.candidate.evidence);
+            let (name, evidence, confidence, shift, tempo, position, v) = match best {
+                Some((s, v)) => (
+                    json_string(&self.names[usize::from(s.candidate.song)]),
+                    s.candidate.evidence,
+                    s.confidence,
+                    s.candidate.shift,
+                    s.candidate.tempo,
+                    (s.candidate.tempo * frame as f64 + s.candidate.offset)
+                        * self.seconds_per_frame,
+                    *v,
                 ),
-                None => ("null".to_owned(), 0, 0.0, 0, 1.0, 0.0),
+                None => (
+                    "null".to_owned(),
+                    0,
+                    0.0,
+                    0,
+                    1.0,
+                    0.0,
+                    Verification::default(),
+                ),
             };
             writeln!(
                 out,
-                "{{\"event\":\"report\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{name},\"evidence\":{evidence},\"confidence\":{confidence:.1},\"shift\":{shift},\"tempo\":{tempo:.4},\"position\":{position:.2},\"votes\":{}}}",
-                matcher.votes_in_window()
+                "{{\"event\":\"report\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{name},\"evidence\":{evidence},\"confidence\":{confidence:.1},\"shift\":{shift},\"tempo\":{tempo:.4},\"position\":{position:.2},\"votes\":{},{}}}",
+                matcher.votes_in_window(),
+                verification_json(&v)
             )
             .unwrap();
         }
-        let on_event = |event: Event| self.write_event(out, &event, t, consumed);
+        let scored: Vec<Scored> = verified.iter().map(|(s, _)| *s).collect();
+        let on_event = |event: Event| {
+            let v = match event {
+                Event::Start { song, .. } => verified
+                    .iter()
+                    .find(|(s, _)| s.candidate.song == song)
+                    .map_or(Verification::default(), |(_, v)| *v),
+                Event::End { .. } => Verification::default(),
+            };
+            self.write_event(out, &event, t, consumed, &v)
+        };
         if final_flush {
             tracker.finish(frame, on_event);
         } else {
@@ -521,7 +550,14 @@ impl Context<'_> {
         }
     }
 
-    fn write_event(&self, out: &mut Out, event: &Event, t: f64, consumed: f64) {
+    fn write_event(
+        &self,
+        out: &mut Out,
+        event: &Event,
+        t: f64,
+        consumed: f64,
+        verification: &Verification,
+    ) {
         match *event {
             Event::Start {
                 song,
@@ -531,12 +567,13 @@ impl Context<'_> {
                 ..
             } => writeln!(
                 out,
-                "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{:.2}}}",
+                "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{:.2},{}}}",
                 json_string(&self.names[usize::from(song)]),
                 c.evidence,
                 c.shift,
                 c.tempo,
-                position * self.seconds_per_frame
+                position * self.seconds_per_frame,
+                verification_json(verification)
             ),
             Event::End {
                 song, start_frame, ..
@@ -549,6 +586,19 @@ impl Context<'_> {
         }
         .unwrap();
     }
+}
+
+/// The verification fields of a report or start line.
+fn verification_json(v: &Verification) -> String {
+    format!(
+        "\"verify_q\":{:.3},\"verify_r\":{:.3},\"query_peaks\":{},\"query_matched\":{},\"reference_peaks\":{},\"reference_matched\":{}",
+        v.query_fraction(),
+        v.reference_fraction(),
+        v.query_peaks,
+        v.query_matched,
+        v.reference_peaks,
+        v.reference_matched
+    )
 }
 
 /// Counts of integer values `0..len`, larger values in the last slot.
