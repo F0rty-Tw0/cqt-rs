@@ -161,10 +161,13 @@ cargo run --release --example generate_plots
 as the reference. Modified versions of the excerpt, the other half of the
 same song, and an unrelated piece (*Dance of the Sugar Plum Fairy*, Kevin
 MacLeod, CC BY 3.0) are cut into 10 s chunks, and every chunk is matched
-against the reference on its own. Spectrograms use hop 256; fingerprints
-are pitch- and tempo-invariant peak triplets (two bin differences plus a
-quantized time ratio, as in Panako) looked up with ±1 bin and ±1 ratio step
-of tolerance; the tempo of a match is the ratio of the two triplets' time
+against the reference on its own. Spectrograms use hop 256. Peaks are
+local maxima that stand 15 dB above the mean of their ±24 frame × ±9 bin
+neighbourhood, a prominence rule that adapts to quiet passages, a raised
+noise floor and the side lobes of clipping alike. Fingerprints are pitch-
+and tempo-invariant peak triplets (two bin differences plus the time ratio
+quantized to 1/32, as in Panako) looked up with ±1 bin and ±1 ratio step of
+tolerance; the tempo of a match is the ratio of the two triplets' time
 spans, the pitch shift and tempo are chosen by vote, and the position
 follows from `t_ref = tempo · t_query + offset`.
 
@@ -176,29 +179,45 @@ with a correlation of 0.9996, and the linear gain ratio is 1.009.
   <img src="./plots/song_cqt_vs_librosa.png" width="98%" />
 </p>
 
-Score = consistent hashes / hashes of the chunk. "Located" is the detected
-start of the chunk in the reference, expected value in parentheses.
+Score = consistent hashes / hashes of the chunk. "Peaks kept" is the share
+of the chunk's peaks that have a counterpart in the reference after the
+detected mapping; a triplet survives only if all three of its peaks do, so
+the score is bounded by roughly its cube. "Located" is the detected start
+of the chunk in the reference, expected value in parentheses.
 
-| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Shift applied / detected | Tempo applied / detected | Located at (expected) |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
-| original | 95.7 % | 48.9 % | 53.8 % | 66.1 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
-| pitch +2 semitones | 11.1 % | 9.8 % | 12.9 % | 11.3 % | +4 / +4/+4/+4 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
-| pitch −1 semitone | 16.4 % | 7.7 % | 7.6 % | 10.6 % | −2 / −2/−2/−2 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
-| tempo +12 % | 13.5 % | 9.6 % | 8.4 % | 10.5 % | +0 / +0/+0/+0 | ×1.12 / 1.115/1.118/1.099 | 0.0 (0.0), 11.2 (11.2), 22.5 (22.4) s |
-| tempo −8 % | 13.7 % | 6.2 % | 11.9 % | 10.6 % | +0 / +0/+0/+0 | ×0.92 / 0.931/0.918/0.918 | −0.1 (0.0), 9.2 (9.2), 18.4 (18.4) s |
-| speed +6 % (resampled) | 63.9 % | 51.3 % | 50.8 % | 55.3 % | +2 / +2/+2/+2 | ×1.06 / 1.060/1.059/1.059 | 0.0 (0.0), 10.6 (10.6), 21.2 (21.2) s |
-| hard clip at 0.2 | 57.4 % | 20.2 % | 24.0 % | 33.9 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
-| white noise, 10 dB SNR | 5.6 % | 14.5 % | 17.5 % | 12.5 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
-| same song, other 30 s | 9.8 % | 7.4 % | 9.0 % | 8.7 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 19.4, 14.7, 21.0 s (repeated riffs) |
-| control (unrelated piece) | 0.2 % | 0.2 % | 0.1 % | 0.2 % | +0 / — | ×1.00 / — | — |
+| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Peaks kept | Shift applied / detected | Tempo applied / detected | Located at (expected) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| original | 92.5 % | 53.8 % | 56.8 % | 67.7 % | 96/86/87 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| pitch +2 semitones | 13.7 % | 14.0 % | 19.9 % | 15.8 % | 57/60/73 % | +4 / +4/+4/+4 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| pitch −1 semitone | 15.8 % | 12.8 % | 10.9 % | 13.2 % | 58/62/58 % | −2 / −2/−2/−2 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| tempo +12 % | 16.7 % | 12.0 % | 12.0 % | 13.5 % | 59/56/61 % | +0 / +0/+0/+0 | ×1.12 / 1.117/1.115/1.115 | 0.0 (0.0), 11.2 (11.2), 22.4 (22.4) s |
+| tempo −8 % | 13.5 % | 12.4 % | 14.5 % | 13.5 % | 54/54/62 % | +0 / +0/+0/+0 | ×0.92 / 0.919/0.918/0.923 | 0.0 (0.0), 9.2 (9.2), 18.4 (18.4) s |
+| speed +6 % (resampled) | 67.5 % | 60.6 % | 54.3 % | 60.8 % | 89/90/88 % | +2 / +2/+2/+2 | ×1.06 / 1.060/1.059/1.059 | 0.0 (0.0), 10.6 (10.6), 21.2 (21.2) s |
+| hard clip at 0.2 | 64.6 % | 30.0 % | 28.7 % | 41.1 % | 85/73/75 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| white noise, 10 dB SNR | 28.9 % | 26.3 % | 28.8 % | 28.0 % | 85/91/91 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| same song, other 30 s | 13.5 % | 8.9 % | 13.8 % | 12.1 % | 56/40/60 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 19.4 (0.0), 11.0 (10.0), 21.0 (20.0) s |
+| control (unrelated piece) | 0.1 % | 0.1 % | 0.1 % | 0.1 % | —/—/— % | +0 / —/—/— | ×1.00 / —/—/— | — (0.0), — (10.0), — (20.0) s |
 
-Every chunk of every modified version is identified at 30× to 300× the
+Every chunk of every modified version is identified at 100× to 900× the
 score of the unrelated piece, its pitch shift and tempo are recovered
 exactly, and its position in the reference is found to within 0.1 s. The
 chunks of the other half of the same song match at positions where the song
 repeats its riffs, which is real shared content rather than a false
-positive. Chunks 2 and 3 of the unmodified original score about 50 %
-because triplets crossing a chunk edge are lost.
+positive. Chunks 2 and 3 of the unmodified original score about 55 %
+because triplets crossing a chunk edge are lost. The pitch-shifted and
+time-stretched versions keep only about 60 % of their peaks, because the
+phase vocoder smears transients, which caps their triplet scores near 20 %;
+the resampled version, a clean transform, keeps 90 %.
+
+For real-time monitoring the question is how much audio a decision needs.
+Matching the first 1 to 10 s of the middle chunk of every version, the
+evidence for the true reference exceeds the unrelated piece by an order of
+magnitude after 2 to 3 s and by two orders after 6 s, while the unrelated
+piece stays at about ten stray matches however long the query grows.
+
+<p align="center">
+  <img src="./plots/song_detection_time.png" width="80%" />
+</p>
 
 <p align="center">
   <img src="./plots/song_pitch_tempo_proof.png" width="98%" />

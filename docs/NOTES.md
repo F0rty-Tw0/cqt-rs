@@ -60,19 +60,40 @@ music 0.20 dB mean, r = 0.9996.
 ## 4. Fingerprint experiment (`scripts/fingerprint_demo.py`)
 
 Reference: 30 s of *Vibe Ace* (CC BY). Queries: 10 s chunks of modified
-versions. Features: dB CQT (hop 256), local maxima over ±24 frames × ±6
-bins above −50 dB (≈950 peaks / 30 s), Panako-style triplet hashes
-`(Δbin12, Δbin23, round(24·(t2−t1)/(t3−t1)))` with zone 240 frames, fan-out
+versions. Features: dB CQT (hop 256); peaks = local maxima over ±24 frames ×
+±9 bins that stand ≥ 15 dB above the mean of that neighbourhood, floor −70
+dB (≈600 peaks / 30 s); Panako-style triplet hashes
+`(Δbin12, Δbin23, round(32·(t2−t1)/(t3−t1)))` with zone 320 frames, fan-out
 6, storing `(t1, b1, span)`. Matching: lookups with ±1 bin and ±1 ratio
-step; tempo per match from span ratio (offset-free); vote in a
-(Δbin, tempo) histogram; offset from `t_ref − tempo·t_query`; consistent =
-±1 bin, ±3 % tempo, ±1 s offset.
+step, buckets larger than 8 skipped; tempo per match from span ratio
+(offset-free); vote in a (Δbin, tempo) histogram; offset from
+`t_ref − tempo·t_query`; consistent = ±1 bin, ±3 % tempo, ±1 s offset;
+fewer than 30 consistent matches = no identification.
 
-Per-chunk scores (consistent hashes / chunk hashes): original 96/49/54 %,
-pitch ±: 8–16 %, tempo ±: 6–14 %, speed +6 %: 51–64 %, clip: 20–57 %,
-noise 10 dB: 6–18 %, same song other half: 7–10 % (located at repeated
-riffs), unrelated piece: 0.1–0.2 %. Shift, tempo and position recovered
-exactly in every chunk (position within 0.1 s).
+Per-chunk scores (consistent hashes / chunk hashes): original 93/54/57 %,
+pitch ±: 11–20 %, tempo ±: 12–17 %, speed +6 %: 54–68 %, clip: 29–65 %,
+noise 10 dB: 26–29 %, same song other half: 9–14 % (located at repeated
+riffs), unrelated piece: 0.1 %. Shift, tempo and position recovered exactly
+in every chunk (position within 0.1 s). Growth with query length (middle
+chunk, consistent matches after 1/2/3/5/10 s): original 169/861/1880/3662/
+8675, worst modified version (tempo −8 %) 5/38/177/742/1949, unrelated
+piece 6/7/7/10/10.
+
+Tuning (offline on cached dumps, `evaluate` in the sweep scripts):
+- The old fixed threshold (−50 dB below the global maximum) gave noise
+  6–18 %, clip 20–57 %, pitch/tempo 6–16 %. Prominence over the local mean
+  is the single largest gain (noise → 26–29 %); 12–18 dB all work, 15 dB
+  chosen; ±9 bins beats ±6 (fewer, stabler peaks), ±12 loses matches;
+  ±32 frames is a wash, ±16 hurts.
+- Per-second or per-octave peak caps did not help on this material.
+- Hash parameters matter little: ratio quantization 16–32 equivalent (32
+  chosen, 12 raises the control), zone ≥ 320 frames saturates, fan-out 8–10
+  gives more absolute matches but a proportionally higher control, ratio
+  tolerance 0 or 2 both worse than 1, bin tolerance 1 needed for the
+  vocoder cases.
+- The control is ~10 matches per chunk whatever the setting, so the
+  separation ratio is noisy; judge by the weakest true chunk and matches
+  per second.
 
 Lessons:
 - Estimating tempo from absolute time ratios only works for offset-zero
@@ -80,28 +101,39 @@ Lessons:
 - A median estimate lands between clusters; vote (histogram mode).
 - Another part of the same song is not a negative control for music with
   repeated riffs.
-- Chunk 1 of "original" scores ~96 %, later chunks ~50 %: triplets that
+- Chunk 1 of "original" scores ~93 %, later chunks ~55 %: triplets that
   cross a chunk edge are lost and zero padding changes edge frames. Expect
   this for any windowed query.
+- Score ≈ (peak survival)³: the vocoder-based pitch/tempo variants keep
+  ~60 % of their peaks (transient smearing), so triplets cap near 20 %;
+  resampling keeps 90 %, noise 85–90 %, clipping 75–85 %. Raising survival
+  (peak picking) pays three times; hash tweaks pay once.
 
 ## 5. Next steps, in order of expected payoff
 
-1. **Peak picker**: local adaptive threshold (dB above the local mean, e.g.
-   12 dB over a ±24×±6 window) gave 26 % vs 19 % on the noisy case in trials
-   but must be re-tuned with the chunked protocol; add per-band peak caps
-   so bass does not dominate.
-2. **Hash design**: keep triplets (tempo-invariant) but add pair hashes with
-   coarse `Δt` for very short queries; quantize the ratio to 1/32 with ±1
-   tolerance; store `(t1, b1, span)` as now so tempo is offset-free.
+1. **Decision rule for streaming**: keep a running (Δbin, tempo, offset)
+   vote over a sliding window; declare a match when the best cell holds
+   ≥ 10× the second-best song and ≥ 30 hashes. From the growth curve this
+   fires after 2–3 s for every distortion tried, ~1 s for clean audio.
+2. **Hash design**: pair hashes `(Δbin, round(8·log2 Δt))` with the value
+   `(t1, b1, Δt)` give tempo per match as `Δt_ref/Δt_query` and survive as
+   (peak survival)², so they should double the vocoder-case scores for
+   short queries; their keys carry less entropy (~2000 distinct), so
+   combine with triplets or score them with a stricter offset vote in a
+   catalogue.
 3. **Index**: hash → (song id, t1, b1, span) in a sorted/flat map; score by
    the largest (Δbin, tempo, offset) cell per song; report position.
-4. **Transform settings for streaming**: `gamma` 10–25 Hz cuts latency to
+4. **Peak survival under vocoding**: a wider time radius on the query side
+   only (±32) or matching peaks by time within ±3 frames instead of exact
+   triplet ratios may recover part of the smeared transients; measure with
+   `peak_survival` first, then hashes.
+5. **Transform settings for streaming**: `gamma` 10–25 Hz cuts latency to
    ~70 ms at 44.1 kHz; hop 256 helps tempo estimation; `bins_per_octave`
    24 keeps semitone shifts on integer bins (36 for finer detune).
-5. **Library**: consider exposing `Kernel::apply` on a caller-supplied
+6. **Library**: consider exposing `Kernel::apply` on a caller-supplied
    spectrum for users with their own FFT; a `CqtStream::push_interleaved`
    for stereo capture; SIMD (`std::simd`) once stable for the run product.
-6. **Decimation cost**: the half-band filter is ~half of batch time; a
+7. **Decimation cost**: the half-band filter is ~half of batch time; a
    two-stage design (short first stage, longer second) or `f32x8`
    intrinsics would halve it. Not needed for real-time.
 

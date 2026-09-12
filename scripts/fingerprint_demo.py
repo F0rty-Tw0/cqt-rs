@@ -7,8 +7,9 @@ sped-up, clipped and noisy versions, cuts every version into 10 s chunks,
 runs `examples/cqt_dump.rs` on each chunk, fingerprints the spectrograms
 with pitch- and tempo-invariant peak triplets, and matches every chunk
 against the fingerprint of the full original, reporting the recovered pitch
-shift, tempo factor and position. It also compares our spectrogram with
-librosa's CQT of the same excerpt.
+shift, tempo factor and position, plus how the evidence grows with the
+length of the query. It also compares our spectrogram with librosa's CQT of
+the same excerpt.
 
     pip install numpy scipy soundfile librosa matplotlib
     python3 scripts/fingerprint_demo.py
@@ -66,6 +67,8 @@ EXCERPT = (0.5, 30.5)  # seconds
 SAME_SONG = (31.0, 61.0)  # the other, non-overlapping half of the song
 CONTROL = (5.0, 35.0)  # window of the unrelated control piece
 CHUNK_SECONDS = 10.0
+# Fewer consistent matches than this is treated as no identification.
+MIN_CONSISTENT = 30
 
 
 def download(name: str, sha256: str) -> Path:
@@ -98,21 +101,49 @@ def to_db(magnitudes: np.ndarray, top_db: float = 80.0) -> np.ndarray:
     return np.maximum(db, db.max() - top_db)
 
 
-def peaks(db: np.ndarray, time_radius: int = 24, bin_radius: int = 6, min_db: float = -50.0):
-    """Local maxima of the dB spectrogram, as (frame, bin) pairs."""
-    footprint = np.ones((2 * time_radius + 1, 2 * bin_radius + 1), dtype=bool)
-    local_max = ndimage.maximum_filter(db, footprint=footprint, mode="nearest") == db
-    strong = db >= db.max() + min_db
+def peaks(db: np.ndarray, time_radius: int = 24, bin_radius: int = 9, prominence_db: float = 15.0,
+          floor_db: float = -70.0):
+    """Local maxima of the dB spectrogram that stand `prominence_db` above the
+    mean of their neighbourhood, as (frame, bin) pairs.
+
+    A prominence threshold adapts to the local level: it keeps peaks in
+    quiet passages, ignores the raised floor of noisy audio and drops the
+    dense side lobes of clipped audio, where a fixed threshold does the
+    opposite. `floor_db` below the global maximum is a safety net."""
+    size = (2 * time_radius + 1, 2 * bin_radius + 1)
+    local_max = ndimage.maximum_filter(db, size=size, mode="nearest") == db
+    local_mean = ndimage.uniform_filter(db, size=size, mode="nearest")
+    strong = (db >= local_mean + prominence_db) & (db >= db.max() + floor_db)
     frames, bins = np.nonzero(local_max & strong)
     return np.stack([frames, bins], axis=1)
 
 
-def triplet_hashes(points: np.ndarray, zone_frames: int = 240, fan_out: int = 6):
+def peak_survival(query_peaks: np.ndarray, reference_peaks: np.ndarray, shift: int, tempo: float,
+                  offset: float, time_tolerance: int = 3, bin_tolerance: int = 1) -> float:
+    """Fraction of the query's peaks with a reference peak within tolerance
+    after mapping through the detected shift, tempo and offset. A triplet
+    hash survives only when all three of its peaks do, so the match score is
+    bounded by roughly the cube of this number."""
+    if len(query_peaks) == 0 or np.isnan(offset):
+        return np.nan
+    reference = {(int(t), int(b)) for t, b in reference_peaks}
+    hits = 0
+    for t, b in query_peaks:
+        t_mapped = int(round(tempo * t + offset))
+        b_mapped = int(b) - shift
+        if any((t_mapped + dt, b_mapped + db) in reference
+               for dt in range(-time_tolerance, time_tolerance + 1)
+               for db in range(-bin_tolerance, bin_tolerance + 1)):
+            hits += 1
+    return hits / len(query_peaks)
+
+
+def triplet_hashes(points: np.ndarray, zone_frames: int = 320, fan_out: int = 6, ratio_steps: int = 32):
     """Pitch- and tempo-invariant hashes from peak triplets.
 
     For peaks p1 < p2 < p3 in time the key is the two bin differences and the
-    quantized ratio (t2 - t1) / (t3 - t1); bin differences survive pitch
-    shifts and the ratio survives tempo changes.
+    ratio (t2 - t1) / (t3 - t1) quantized to `ratio_steps`; bin differences
+    survive pitch shifts and the ratio survives tempo changes.
     """
     order = np.lexsort((points[:, 1], points[:, 0]))
     points = points[order]
@@ -130,7 +161,7 @@ def triplet_hashes(points: np.ndarray, zone_frames: int = 240, fan_out: int = 6)
                 if t3 == t2:
                     continue
                 ratio = (t2 - t1) / (t3 - t1)
-                key = (int(b2 - b1), int(b3 - b2), int(round(ratio * 24)))
+                key = (int(b2 - b1), int(b3 - b2), int(round(ratio * ratio_steps)))
                 hashes[key].append((int(t1), int(b1), int(t3 - t1)))
     return hashes
 
@@ -333,10 +364,13 @@ def main() -> None:
             est = estimate(pairs)
             total = sum(len(v) for v in hs.values())
             expected_offset = start_s * applied_rate
+            if est["consistent"] < MIN_CONSISTENT:
+                est.update(bins=np.nan, tempo=np.nan, offset=np.nan)
+            survival = peak_survival(pk, reference_peaks, est["bins"], est["tempo"], est["offset"])
             rows.append(dict(
                 chunk=k + 1, start=start_s, seconds=len(piece) / sr, hashes=total, pairs=pairs,
                 peaks=pk, db=db, score=100.0 * est["consistent"] / max(total, 1),
-                expected_offset=expected_offset,
+                survival=survival, expected_offset=expected_offset,
                 located=est["offset"] * HOP / sr if not np.isnan(est["offset"]) else np.nan, **est,
             ))
         results[name] = (rows, applied_bins, applied_rate)
@@ -344,17 +378,20 @@ def main() -> None:
         print(f"{name:34} {summary}")
 
     def fmt(value, spec):
-        return "—" if value is None or (isinstance(value, float) and np.isnan(value)) else format(value, spec)
+        if value is None or (isinstance(value, float) and np.isnan(value)):
+            return "—"
+        return format(int(value) if spec == "+d" else value, spec)
 
-    print("\n| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Shift applied / detected | Tempo applied / detected | Located at (expected) |")
-    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+    print("\n| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Peaks kept | Shift applied / detected | Tempo applied / detected | Located at (expected) |")
+    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
     for name, (rows, applied_bins, applied_rate) in results.items():
         scores = [f"{r['score']:.1f} %" for r in rows] + ["—"] * (3 - len(rows))
         mean = np.mean([r["score"] for r in rows])
         shifts = "/".join(fmt(r["bins"], "+d") for r in rows)
         tempos = "/".join(fmt(r["tempo"], ".3f") for r in rows)
         located = ", ".join(f"{fmt(r['located'], '.1f')} ({r['expected_offset']:.1f})" for r in rows)
-        print(f"| {name} | {' | '.join(scores)} | {mean:.1f} % | {applied_bins:+d} / {shifts} | "
+        kept = "/".join(fmt(100 * r["survival"], ".0f") for r in rows) + " %"
+        print(f"| {name} | {' | '.join(scores)} | {mean:.1f} % | {kept} | {applied_bins:+d} / {shifts} | "
               f"×{applied_rate:.2f} / {tempos} | {located} s |")
 
     # --- figure: pitch shift and tempo change proofs on the middle chunk -----
@@ -423,9 +460,42 @@ def main() -> None:
     fig.savefig(PLOTS / "song_match_scores.png", dpi=100)
     plt.close(fig)
 
+    # --- figure: how many seconds of audio a match needs -------------------------
+    # A real-time monitor sees the query grow; match the first 1..10 s of the
+    # middle chunk of every version and count the consistent hashes.
+    lengths = list(range(1, int(CHUNK_SECONDS) + 1))
+    growth = {}
+    for name, (rows, applied_bins, applied_rate) in results.items():
+        r = rows[min(1, len(rows) - 1)]
+        counts = []
+        for seconds in lengths:
+            db = r["db"][: int(seconds * sr / HOP)]
+            hs = triplet_hashes(peaks(db))
+            counts.append(estimate(match(hs, reference_hashes))["consistent"])
+        growth[name] = counts
+    fig, ax = plt.subplots(figsize=(10, 6), constrained_layout=True)
+    for name, counts in growth.items():
+        is_control = name.startswith("control")
+        ax.plot(lengths, np.maximum(counts, 0.5), marker="o", ms=4, lw=2.2 if is_control else 1.4,
+                ls="--" if is_control else "-", color="k" if is_control else None, label=name)
+    ax.set_yscale("log")
+    ax.set_xlabel("seconds of the query (start of the middle 10 s chunk)")
+    ax.set_ylabel("consistent triplet matches with the original")
+    ax.set_xticks(lengths)
+    ax.grid(True, which="both", alpha=0.3)
+    ax.set_title("Evidence accumulated against the original as the query grows "
+                 "(dashed: unrelated piece)", fontsize=10)
+    ax.legend(fontsize=8, loc="lower right", ncol=2)
+    fig.savefig(PLOTS / "song_detection_time.png", dpi=100)
+    plt.close(fig)
+    print("\nconsistent matches after 1..10 s of the middle chunk:")
+    for name, counts in growth.items():
+        print(f"{name:34} " + " ".join(f"{c:5d}" for c in counts))
+
     json.dump(
         {name: dict(applied_bins=applied_bins, applied_rate=applied_rate,
-                    chunks=[{k: v for k, v in r.items() if k not in ("pairs", "peaks", "db")} for r in rows])
+                    chunks=[{k: v for k, v in r.items() if k not in ("pairs", "peaks", "db")} for r in rows],
+                    growth=growth[name])
          for name, (rows, applied_bins, applied_rate) in results.items()},
         open(WORK / "summary.json", "w"), indent=2, default=float,
     )
