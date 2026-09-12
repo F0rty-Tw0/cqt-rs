@@ -134,18 +134,18 @@ the rayon pool.
 
 | Configuration | Bins | Levels | FFT lengths | Non-zeros | Build | Stream, per frame | Batch |
 | --- | ---: | ---: | --- | ---: | ---: | ---: | ---: |
-| Legacy grid (14.6–7902 Hz, 12/oct, 22 kHz, hop 1760) | 109 | 10 | 64, 128 × 9 | 1 323 | BUILD_LEGACY | FRAME_LEGACY | BATCH_LEGACY (30 s) |
-| Same grid, single-rate | 109 | 1 | 32768 | 70 990 | BUILD_SINGLE | FRAME_SINGLE | BATCH_SINGLE (30 s) |
-| Same grid, kernels capped at 2048 | 109 | CAP_LEVELS | | | BUILD_CAPPED | | BATCH_CAPPED (30 s) |
-| Fingerprint (55–7040 Hz, 24/oct, 44.1 kHz, hop 512) | 169 | 8 | 256, 512 × 7 | 1 891 | BUILD_FP | FRAME_FP | BATCH_FP (10 s) |
+| Legacy grid (14.6–7902 Hz, 12/oct, 22 kHz, hop 1760) | 109 | 10 | 64, 128 × 9 | 1 323 | 0.67 ms | 9.3 µs | 4.06 ms, 1.74 ms with a reused workspace (30 s) |
+| Same grid, single-rate | 109 | 1 | 32768 | 70 990 | 45.4 ms | 158 µs | 15.7 ms (30 s) |
+| Same grid, kernels capped at 2048 | 109 | 9 | 8–128 | 1 038 | 0.53 ms | | 1.93 ms (30 s) |
+| Fingerprint (55–7040 Hz, 24/oct, 44.1 kHz, hop 512) | 169 | 8 | 256, 512 × 7 | 1 891 | 2.0 ms | 10.1 µs | 2.94 ms (10 s) |
 
 For comparison, version 0.1 on the same machine and legacy grid needed
 1.50 ms to build its filterbank and 7.44 ms for the 30 s batch, while using
 one 2048-sample window for every bin (so it was not constant-Q) and the
 rayon pool for both. The 0.2 multi-rate engine processes the same audio
-SPEEDUP_LEGACY faster with true constant-Q resolution, and the streaming
-path handles a frame in FRAME_LEGACY, which at hop 1760 is REALTIME_LEGACY
-of real time.
+1.8× faster (4.3× with a reused workspace) with true constant-Q
+resolution, and the streaming path handles a frame in 9.3 µs, which at hop
+1760 is about 0.01 % of one core.
 
 Regenerate the figures with:
 
