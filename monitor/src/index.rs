@@ -18,8 +18,9 @@ pub struct Entry {
     pub frame: u32,
 }
 
-/// Multiplicative hasher for the packed keys: the map is keyed by a `u32`
-/// only, so a multiply and a fold are faster than SipHash.
+/// Multiplicative hasher for the packed hash keys and the matcher's cell
+/// keys: the maps are keyed by one integer, so a multiply and a fold are
+/// much faster than SipHash.
 ///
 /// The table uses the low bits of the hash for the bucket and the top
 /// seven bits as a tag that filters probes before any key comparison, so
@@ -39,10 +40,16 @@ impl Hasher for KeyHasher {
         }
     }
     fn write_u32(&mut self, key: u32) {
-        let x = u64::from(key).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        self.write_u64(u64::from(key));
+    }
+    fn write_u64(&mut self, key: u64) {
+        let x = key.wrapping_mul(0x9E37_79B9_7F4A_7C15);
         self.0 = x ^ (x >> 32);
     }
 }
+
+/// A `HashMap` keyed by one integer, hashed with [`KeyHasher`].
+pub type FastMap<K, V> = HashMap<K, V, BuildHasherDefault<KeyHasher>>;
 
 /// Accumulates the hashes of the watched songs.
 #[derive(Debug, Default)]

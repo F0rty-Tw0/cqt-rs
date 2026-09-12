@@ -204,30 +204,47 @@ Design decisions and why:
   start, release, brief versus persistent jumps and end-of-stream; the
   binary only formats its events (strings JSON-escaped).
 
-Measured (4-core container, one thread):
+Measured (4-core container, one thread, after review round 1):
 
 | | Null stream (31 min) | Programme (15 min) |
 | --- | --- | --- |
-| Evidence | max 51, 99.9 % 46, median 17 | 90th percentile 4755 during plays |
-| Confidence | max 33.8, no start event | 16/16 plays, 0 false starts |
-| Detection after play start | | median 2.7 s (2.4 s is pipeline delay), max 14.3 s (talk-over) |
-| CPU | 0.63 % of one core | 0.69 % |
-| Index | 172 k hashes, 5.7 MB for 111 s of songs (≈ 9 MB per 3-min song) | |
+| Evidence | max 50, 99.9 % 46, median 17 | thousands during plays |
+| Confidence | max 33.3, no start event | 16/16 plays, 0 false starts |
+| Detection after play start | | median 2.2 s, max 13.6 s (talk-over), crossfade 6.8 s |
+| Hash delay (anchor → hashes) | median 1.13 s, max 2.0 s (was a fixed 2.0 s) | median 1.02 s |
+| CPU | 0.9 % of one core (0.33 % without reports; the exact search per report is the rest) | 0.9 % |
+| Index | 169 k hashes (3 339 dropped by the per-song cap), 5.7 MB for 111 s of songs | |
 
-Fan-out trade-off (same streams): fan-out 4 → 2.7 MB, 0.35 % CPU, null
-max 21; recalibrated to `half = 42` it detects 16/16 at a median 3.0 s
-(max 14.8 s) with no null alarm but one extra start event inside a play.
-Fan-out 3 → 1.4 MB, 0.28 %, null max 10, but with `half = 100` one play
-is missed and latencies reach 33 s. The ratio of true to null evidence is
-~90 at every fan-out; what fan-out buys is absolute counts, i.e. speed and
-stability at the same margin. Default stays 6; use 4 for watch lists of
-hundreds of songs.
+Eight-song watch list (every music track of the simulation, 510 s of
+audio, run over the 31 min stream that is built from six of them, so
+the stream is mostly watched material and the two absent songs measure
+false alarms):
+
+| | Fan-out 6, `half` 100 | Fan-out 4, `half` 42 |
+| --- | --- | --- |
+| Index | 727 k hashes, 16.1 MB, built in 1.1 s | 316 k hashes, 7.5 MB |
+| Plays detected | 44 / 45, 1 extra start, 0 starts outside a play | 44 / 45, 2 extra starts, 0 outside |
+| Detection after play start | median 2.5 s, max 9.3 s | median 2.5 s, max 9.3 s |
+| Absent songs, max confidence | 16.0 / 18.7 | 16.0 / 16.0 |
+| Hash delay median | 1.13 s | 0.80 s |
+| CPU | 3.0 % | 0.7 % |
+
+The one miss is a talk-over play of *brahms* (speech over quiet strings
+for 12 s of a 42 s play; the other talk-over play of the same track is
+found in 2.3 s). The extra start is a real ambiguity: *brahms*
+`key_change_-1` contains a repeat that the tracker takes for a new play
+after one second of disagreement. Memory grows linearly with watched
+audio (about 6–9 MB per 3 minutes at fan-out 6, half at fan-out 4);
+CPU grows with the number of matches, which in this run is dominated by
+the six songs that really are playing. A 100-song watch list on an
+ordinary programme (most of the stream unwatched) has not been measured.
 
 Known limits:
 - Talk-over with speech louder than the music: evidence 50–70 (confidence
-  30–40) while the speech lasts, detection 2–3 s after it stops.
-- A crossfade is detected ~1.5 s after the fade-in completes.
-- `end` events lag the real end by window + delay (~8 s).
+  30–40) while the speech lasts, detection 1–3 s after it stops; one of
+  three such plays over quiet strings was missed altogether.
+- A crossfade is detected ~0.8 s after the fade-in completes.
+- `end` events lag the real end by window + delay (~7 s).
 - Only tested at 44.1 kHz mono; the binary refuses mismatched rates.
 
 Next steps for monitoring, in order:
@@ -240,3 +257,58 @@ Next steps for monitoring, in order:
    release.
 4. A second real recording (phone mic in a room) to confirm the FM chain
    simulation is not optimistic.
+5. Candidate generation at fan-out 4 followed by verification against the
+   reference peak track near the predicted position (observation-only
+   first), with hard negatives (shared loops, same-artist tracks) and a
+   null set separate from the calibration set; see §8.
+6. Maintain the matcher's slab histogram incrementally to take the exact
+   search off the per-report cost.
+
+## 8. Review round 1 (PR #3 comments) and what was done
+
+Every inline finding was reproduced against the code and fixed; the
+design comments were sorted into "done now", "measured and deferred" and
+"next experiment". Commit `4cea498` carries the code, this commit the
+measurements.
+
+| Finding | Verdict | Change |
+| --- | --- | --- |
+| `radio_sim.py` deletes every file in `RADIO_SIM_TMP` | correct, P1 | the run creates its own `TemporaryDirectory` under that location and removes only that |
+| Key hasher shifts the product right by 20, zeroing hashbrown's tag bits | correct | multiply and fold the high half into the low half; `monitor/benches/index.rs` measures 4 096 tolerant lookups: hits 5.80 → 2.77 ms, misses 4.80 → 0.53 ms |
+| Bucket cap `8 × songs` on the whole bucket | correct | cap enforced per `(key, song)` when the index is built (`Index::dropped` reports the count); a song's evidence no longer changes when unrelated songs are added |
+| `CqtWorkspace` / `CqtStream` accept any transform | correct | both record the parameters they were built for; `process_with` rebuilds a foreign workspace, the stream panics on a foreign transform and `reset` re-binds |
+| Expiry subtracts the cell mean, not the vote | correct | votes carry tempo and offset; expiry subtracts them exactly, rebase shifts them with their cell |
+| Pruning drops every coefficient tied at the boundary | correct | ties are dropped as a run or kept as a run; the two-tap example keeps both coefficients |
+| Filter designed before the tap check | correct | `HalfBand::taps_for` decides first; the 384-bins-per-octave example is rejected in microseconds |
+| Flush padding not in the frame timeline | correct | padding joins the timeline once audio follows it (`padding_samples`); a repeated flush emits nothing; test compares the continuation with the batch transform of the padded signal |
+| JSON built by interpolation | correct | strings escaped; the start/end state machine is a library `Tracker` with unit tests |
+| `best_per_song` skips centres by their own count (30 vs 243 example) | correct | exact search over every occupied cell with an upper bound from a (song, shift, offset) histogram; oracle test against the full scan on 300 random histograms |
+| Early hash emission | adopted | anchor released when its `3·fan_out` candidates are known; hash delay median 2.0 → 1.0 s, every detection 0.6–0.9 s earlier, hash sequence unchanged |
+| Grouped ratio directory (27 → 9 probes) | deferred | after the hasher fix a lookup costs about 0.7 µs and the null stream does 1 400 lookups/s, i.e. 0.1 % of a core; the bound-based search and the pipeline itself dominate. Worth revisiting only with hundreds of songs |
+| Correlated triplets, distinct-anchor evidence | next experiment | needs its own calibration; the replay bundle below is the tool for it |
+| Candidate generation + verification stage | next experiment | agreed as the way to make fan-out 4 the default; run observation-only first |
+| Failure bundles | started | `eval_summary.json` now records commit, monitor configuration, the `stream` event, and for the three slowest plays and every false start the ground-truth segment with the report trace around it |
+| Awkward negatives, separate tuning/evaluation sets | agreed, not done | the eight-song run adds six more tracks as targets but no shared-sample or same-artist negatives; the null set was also the calibration set |
+| Separate release gates for library and monitor | agreed | the monitor crate stays unpublished; the library findings above are the transform's own acceptance list |
+
+Two clarifications the review asked for:
+- **The 5 s target is measured from the first sample of the play in the
+  stream**, crossfade and talk-over included, to the `start` event. The
+  crossfade play therefore counts as 6.8 s even though the song is
+  inaudible for most of its first 6 s; measured from full level it is
+  0.8 s.
+- **Zero alarms in 31 minutes bounds the false-alarm rate, it does not
+  estimate it.** Under a Poisson model the one-sided 95 % upper bound is
+  `−ln 0.05 / T` ≈ 5.8 per hour. Claiming one alarm per 100 hours at
+  that confidence needs about 300 alarm-free hours of independent
+  material, and the null set must be separate from the calibration set.
+  The evidence margin (worst null cell 50 versus threshold 233) is the
+  reason to expect the rate to be far lower than the bound, not proof.
+
+What the exact search costs: on the null stream every report (4 per
+second) scans about 7 000 occupied cells. With the count-based pruning
+the search was 0.3 % of a core; the exact search with the slab bound and
+a fast integer hasher for the cell maps is about 0.5 %. Maintaining the
+slab histogram incrementally (update on push, expiry and rebase instead
+of rebuilding it per report) would remove most of that and is the next
+optimization if CPU matters.

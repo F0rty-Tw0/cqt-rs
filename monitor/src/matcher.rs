@@ -3,7 +3,7 @@
 use std::collections::{HashMap, VecDeque};
 
 use crate::hashes::Hash;
-use crate::index::Index;
+use crate::index::{FastMap, Index};
 
 /// Tunable parameters of the [`Matcher`].
 #[derive(Debug, Clone)]
@@ -96,7 +96,7 @@ struct Vote {
 #[derive(Debug)]
 pub struct Matcher {
     config: MatcherConfig,
-    cells: HashMap<u64, Cell>,
+    cells: FastMap<u64, Cell>,
     votes: VecDeque<Vote>,
     origin: u64,
     latest_frame: u64,
@@ -109,7 +109,7 @@ impl Matcher {
     pub fn new(config: MatcherConfig) -> Self {
         Self {
             config,
-            cells: HashMap::new(),
+            cells: FastMap::default(),
             votes: VecDeque::new(),
             origin: 0,
             latest_frame: 0,
@@ -192,9 +192,11 @@ impl Matcher {
         let new_origin = self.latest_frame - window;
         let shift_frames = (new_origin - self.origin) as f64;
         let cfg = &self.config;
-        let mut rekeyed: HashMap<u64, Cell> = HashMap::with_capacity(self.cells.len());
+        let mut rekeyed: FastMap<u64, Cell> =
+            FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
         // Old key → (new key, offset delta of that cell).
-        let mut mapping: HashMap<u64, (u64, f64)> = HashMap::with_capacity(self.cells.len());
+        let mut mapping: FastMap<u64, (u64, f64)> =
+            FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
         for (&key, cell) in &self.cells {
             let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
             let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
@@ -271,42 +273,32 @@ impl Matcher {
     ///
     /// Every occupied cell is a candidate centre: a cell's own count says
     /// nothing about its neighbourhood's, so no cell may be skipped on
-    /// its count alone. Instead each song keeps three marginal histograms
-    /// (votes per shift, per tempo index, per offset index); a
-    /// neighbourhood lies inside the ±1 slab of each, so its sum is at
-    /// most the smallest of the three slab sums, and a centre whose bound
-    /// cannot beat the incumbent is skipped without touching its 27
-    /// cells. The result is exactly the full scan's (tested against it).
+    /// its count alone. Instead the votes are also histogrammed over
+    /// (song, shift, offset), ignoring the tempo; a neighbourhood lies
+    /// inside the 3×3 slab of that histogram, so its sum is at most the
+    /// slab sum, and a centre whose slab sum cannot beat the incumbent is
+    /// skipped without touching its 27 cells. The result is exactly the
+    /// full scan's (tested against it). On audio without the watched
+    /// songs the votes are thin and spread out, which makes this bound
+    /// tight and the search cheap; during a play the incumbent is large
+    /// and prunes nearly everything.
+    ///
     /// Ties go to the centre with more votes of its own, then to the
     /// smallest cell key, which keeps the result independent of hash-map
     /// iteration order. The reported shift, tempo and offset are
     /// vote-weighted means over the winning neighbourhood.
     pub fn best_per_song(&self) -> Vec<Candidate> {
-        // Marginals keyed by the cell key with the other two fields
-        // masked out, and the strongest single cell per song as the seed.
-        let mut by_shift: HashMap<u64, u32> = HashMap::new();
-        let mut by_tempo: HashMap<u64, u32> = HashMap::new();
-        let mut by_offset: HashMap<u64, u32> = HashMap::new();
+        let mut slab_hist: FastMap<u64, u32> =
+            FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
         let mut seed: HashMap<u16, (u32, u64)> = HashMap::new();
         for (&key, cell) in &self.cells {
-            *by_shift.entry(key & MASK_SHIFT).or_default() += cell.count;
-            *by_tempo.entry(key & MASK_TEMPO).or_default() += cell.count;
-            *by_offset.entry(key & MASK_OFFSET).or_default() += cell.count;
+            *slab_hist.entry(key & MASK_NO_TEMPO).or_default() += cell.count;
             let song = (key >> 48) as u16;
             let entry = seed.entry(song).or_insert((cell.count, key));
             if (cell.count, std::cmp::Reverse(key)) > (entry.0, std::cmp::Reverse(entry.1)) {
                 *entry = (cell.count, key);
             }
         }
-        let slab = |hist: &HashMap<u64, u32>, key: u64, step: u64| {
-            (0..3)
-                .map(|d| {
-                    hist.get(&(key.wrapping_add(d * step).wrapping_sub(step)))
-                        .copied()
-                        .unwrap_or(0)
-                })
-                .sum::<u32>()
-        };
         let mut best: HashMap<u16, (u32, u32, u64)> = HashMap::new();
         for (&song, &(count, key)) in &seed {
             let total = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
@@ -315,9 +307,17 @@ impl Matcher {
         for (&key, cell) in &self.cells {
             let song = (key >> 48) as u16;
             let entry = best.get_mut(&song).expect("seeded");
-            let bound = slab(&by_shift, key & MASK_SHIFT, 1 << 40)
-                .min(slab(&by_tempo, key & MASK_TEMPO, 1 << 32))
-                .min(slab(&by_offset, key & MASK_OFFSET, 1));
+            let centre = key & MASK_NO_TEMPO;
+            let mut bound = 0;
+            for ds in [-1i64, 0, 1] {
+                let row = centre.wrapping_add((ds << 40) as u64);
+                for doff in [-1i64, 0, 1] {
+                    bound += slab_hist
+                        .get(&row.wrapping_add(doff as u64))
+                        .copied()
+                        .unwrap_or(0);
+                }
+            }
             if bound < entry.0 {
                 continue;
             }
@@ -415,10 +415,8 @@ impl Matcher {
 
 /// Cell key layout: song in bits 48–63, `shift + 128` in bits 40–47,
 /// `tempo_idx + 128` in bits 32–39 and `offset_idx + 2³¹` in bits 0–31.
-/// The masks keep the song and one field.
-const MASK_SHIFT: u64 = 0xffff_ff00_0000_0000;
-const MASK_TEMPO: u64 = 0xffff_00ff_0000_0000;
-const MASK_OFFSET: u64 = 0xffff_0000_ffff_ffff;
+/// This mask drops the tempo field.
+const MASK_NO_TEMPO: u64 = 0xffff_ff00_ffff_ffff;
 
 fn encode_cell_raw(song: u16, shift: i32, tempo_idx: i32, offset_idx: i32) -> u64 {
     (u64::from(song) << 48)

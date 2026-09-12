@@ -22,7 +22,7 @@ mod peaks;
 mod tracker;
 
 pub use hashes::{Hash, HashKey, TripletHasher, decode_key, encode_key};
-pub use index::{Entry, Index, IndexBuilder};
+pub use index::{Entry, FastMap, Index, IndexBuilder, KeyHasher};
 pub use matcher::{Candidate, Matcher, MatcherConfig};
 pub use peaks::{Peak, PeakPicker};
 pub use tracker::{Active, Event, Tracker, TrackerConfig};

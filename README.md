@@ -249,16 +249,19 @@ allocation per frame.
 | --- | --- | ---: |
 | `CqtStream` | 55–7040 Hz, 24 bins per octave, hop 256 | 0.39 s |
 | `PeakPicker` | local maxima 15 dB above the mean of a ±24 frame × ±9 bin neighbourhood | 0.14 s |
-| `TripletHasher` | pitch- and tempo-invariant triplet hashes, zone 320 frames, fan-out 6 | 1.86 s |
+| `TripletHasher` | pitch- and tempo-invariant triplet hashes, zone 320 frames, fan-out 6 | ≤ 1.86 s, median 1.0 s |
 | `Index` | hash table over the watched songs, ±1 bin and ±1 ratio-step lookups | |
 | `Matcher` | 5 s sliding vote over (song, pitch shift, tempo, position) | |
 
-The evidence for a song is the number of consistent hash matches in the
-window. The confidence is `100 · n / (n + half)`, with `half` calibrated
-on audio that contains none of the watched songs: at twice the largest
-evidence ever seen there, false matches stay below 34 while a watched song
-reads above 70 within seconds. The `monitor` binary prints one JSON line
-per report interval and `start`/`end` events for every detection.
+An anchor's hashes are emitted as soon as its candidate peaks are known,
+so in normal music the hasher waits about a second rather than the full
+zone. The evidence for a song is the number of consistent hash matches in
+the window. The confidence is `100 · n / (n + half)`, with `half`
+calibrated on audio that contains none of the watched songs: at twice the
+largest evidence ever seen there, false matches stay below 34 while a
+watched song reads above 70 within seconds. A `Tracker` turns the running
+scores into `start`/`end` events per song; the `monitor` binary prints
+one JSON line per report interval plus those events.
 
 ```console
 cargo run --release -p cqt-monitor -- --watch song=song.wav --watch other=other.wav --stream radio.wav
@@ -275,37 +278,39 @@ chain (15 kHz low-pass, 4:1 broadcast compressor). `scripts/radio_eval.py`
 runs the monitor over both and compares the detections with the ground
 truth.
 
-On the null stream the evidence never exceeds 51 (median 17), so `half` is
-100; the highest confidence in 31 minutes is 33.8 and there is no false
+On the null stream the evidence never exceeds 50 (median 17), so `half` is
+100; the highest confidence in 31 minutes is 33.3 and there is no false
 alarm at the threshold of 70. On the programme all 16 plays are detected
 with no false start:
 
 | Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected |
 | --- | --- | ---: | ---: | ---: | ---: |
-| vibe_ace | clean | 2.8 s | 84 / 98 | +0 / +0 | ×1.000 / ×1.000 |
-| sweet_waltz | pitch fader +6 % | 3.0 s | 81 / 98 | +2 / +2 | ×1.060 / ×1.064 |
-| vibe_ace | pitch fader +6 % | 2.9 s | 75 / 98 | +2 / +2 | ×1.060 / ×1.062 |
-| vibe_ace | pitch fader −8 % | 2.8 s | 80 / 98 | −3 / −3 | ×0.920 / ×0.922 |
-| vibe_ace | key-locked tempo +10 % | 3.1 s | 79 / 96 | +0 / +0 | ×1.100 / ×1.095 |
-| sweet_waltz | key change −1 semitone | 3.7 s | 73 / 94 | −2 / −2 | ×1.000 / ×1.001 |
-| vibe_ace | key-locked tempo −8 % | 3.2 s | 72 / 94 | +0 / +0 | ×0.920 / ×0.918 |
-| vibe_ace | key change +2 semitones | 4.6 s | 91 / 97 | +4 / +4 | ×1.000 / ×0.999 |
-| vibe_ace | key change −1 semitone | 2.6 s | 73 / 94 | −2 / −2 | ×1.000 / ×0.999 |
-| vibe_ace | pitch fader +4 % with 12 s of DJ talk-over | 14.3 s | 70 / 98 | +1 / +1 | ×1.040 / ×1.038 |
-| vibe_ace | 6 s crossfade in and out | 7.5 s | 75 / 98 | +0 / +0 | ×1.000 / ×1.003 |
-| vibe_ace | bass cut, FM chain, MP3 128k | 3.6 s | 77 / 98 | +0 / +0 | ×1.000 / ×0.999 |
-| sweet_waltz | FM chain, MP3 128k | 2.7 s | 71 / 98 | +0 / +0 | ×1.000 / ×1.002 |
-| vibe_ace | FM chain, MP3 128k | 2.7 s | 85 / 98 | +0 / +0 | ×1.000 / ×1.001 |
-| vibe_ace | pitch fader +6 %, FM chain, MP3 | 3.7 s | 88 / 98 | +2 / +2 | ×1.060 / ×1.059 |
-| sweet_waltz | pitch fader +6 %, FM chain, MP3 | 2.6 s | 73 / 98 | +2 / +2 | ×1.060 / ×1.064 |
+| vibe_ace | clean | 2.0 s | 79 / 98 | +0 / +0 | ×1.000 / ×1.000 |
+| sweet_waltz | pitch fader +6 % | 2.4 s | 79 / 98 | +2 / +2 | ×1.060 / ×1.064 |
+| vibe_ace | pitch fader +6 % | 1.9 s | 74 / 98 | +2 / +2 | ×1.060 / ×1.062 |
+| vibe_ace | pitch fader −8 % | 2.1 s | 73 / 98 | −3 / −3 | ×0.920 / ×0.920 |
+| vibe_ace | key-locked tempo +10 % | 2.1 s | 80 / 96 | +0 / +0 | ×1.100 / ×1.096 |
+| sweet_waltz | key change −1 semitone | 3.4 s | 74 / 94 | −2 / −2 | ×1.000 / ×1.000 |
+| vibe_ace | key-locked tempo −8 % | 3.2 s | 75 / 94 | +0 / +0 | ×0.920 / ×0.917 |
+| vibe_ace | key change +2 semitones | 3.9 s | 92 / 96 | +4 / +4 | ×1.000 / ×0.999 |
+| vibe_ace | key change −1 semitone | 1.9 s | 73 / 94 | −2 / −2 | ×1.000 / ×0.999 |
+| vibe_ace | pitch fader +4 % with 12 s of DJ talk-over | 13.6 s | 74 / 97 | +1 / +1 | ×1.040 / ×1.038 |
+| vibe_ace | 6 s crossfade in and out | 6.8 s | 74 / 98 | +0 / +0 | ×1.000 / ×1.003 |
+| vibe_ace | bass cut, FM chain, MP3 128k | 2.6 s | 70 / 98 | +0 / +0 | ×1.000 / ×0.999 |
+| sweet_waltz | FM chain, MP3 128k | 2.0 s | 72 / 98 | +0 / +0 | ×1.000 / ×1.002 |
+| vibe_ace | FM chain, MP3 128k | 2.0 s | 80 / 97 | +0 / +0 | ×1.000 / ×0.999 |
+| vibe_ace | pitch fader +6 %, FM chain, MP3 | 3.4 s | 91 / 98 | +2 / +2 | ×1.060 / ×1.059 |
+| sweet_waltz | pitch fader +6 %, FM chain, MP3 | 2.2 s | 73 / 98 | +2 / +2 | ×1.060 / ×1.064 |
 
-The detection time includes the 2.4 s of pipeline delay, so a song is
-recognised from its first half-second of audible material; the reported
-position is within 0.1 s in every case. The two slow cases are honest: the
-crossfade play is detected 1.5 s after its 6 s fade-in completes, and the
-talk-over play, where speech sits 3 dB above the ducked music for 12 s,
-holds a confidence of 30–40 during the talking and is detected 2.3 s after
-the speech stops.
+"Detected after" is measured from the first sample of the play in the
+stream, crossfade included, to the `start` event; it contains the
+pipeline delay (0.4 s transform, 0.14 s picker, about 1 s hasher), so a
+song is recognised from its first half-second of audible material, and
+the reported position is within 0.1 s in every case. The two slow cases
+are honest: the crossfade play is detected 0.8 s after its 6 s fade-in
+completes, and the talk-over play, where speech sits 3 dB above the
+ducked music for 12 s, holds a confidence of 30–40 during the talking and
+is detected 1.6 s after the speech stops.
 
 <p align="center">
   <img src="./plots/radio_timeline.png" width="98%" />
@@ -314,10 +319,15 @@ the speech stops.
   <img src="./plots/radio_detection.png" width="98%" />
 </p>
 
-Resources: the whole chain runs at 0.6–0.7 % of one core for a 44.1 kHz
-stream, and the index costs about 9 MB per 3-minute watched song at
-fan-out 6 (fan-out 4 halves both memory and CPU at a similar detection
-time once `half` is recalibrated, see `docs/NOTES.md`).
+Resources: with two watched songs the whole chain runs at 0.9 % of
+one core on the null stream and 0.9 % on the programme (44.1 kHz
+mono, one thread), and the index costs 6–9 MB per 3 minutes of watched
+audio at fan-out 6. Watching all eight music tracks of the simulation
+(8.5 minutes of audio, 16 MB) against the 31 minute stream, which is
+built from six of them, detects 44 of the 45 plays with one extra start
+event and no start outside a play, at 3.0 % of a core; fan-out 4
+with `half` 42 gives the same recall at 7.5 MB and 0.7 %
+(details in `docs/NOTES.md`). Larger watch lists have not been measured.
 
 ## References
 
