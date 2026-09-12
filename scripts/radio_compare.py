@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import json
 import sys
+import textwrap
 from pathlib import Path
 
 import matplotlib
@@ -76,8 +77,14 @@ def main() -> None:
     ax.axis("off")
     cell = [[name, f"{b:.2f}{u}" if isinstance(b, float) else f"{b}{u}", f"{a:.2f}{u}" if isinstance(a, float) else f"{a}{u}"]
             for name, b, a, u in rows]
-    table = ax.table(cellText=cell, colLabels=["", f"before ({label_b})", f"after ({label_a})"], loc="center",
-                     cellLoc="right", colLoc="right", colWidths=[0.5, 0.27, 0.27])
+    def wrap(text: str) -> str:
+        return "\n".join(textwrap.wrap(text, 22))
+
+    table = ax.table(cellText=cell, colLabels=["", wrap(f"before ({label_b})"), wrap(f"after ({label_a})")],
+                     loc="center", cellLoc="right", colLoc="right", colWidths=[0.44, 0.3, 0.3])
+    for (row, _), c in table.get_celld().items():
+        if row == 0:
+            c.set_height(c.get_height() * 2.2)
     table.auto_set_font_size(False)
     table.set_fontsize(8.5)
     table.scale(1.0, 1.7)

@@ -79,8 +79,69 @@ def worst_cases(rows: list[dict], false_starts: list[dict], reports: list[dict],
     return cases
 
 
+def negatives(stream: str, extra: list[str], monitor: str | None, threshold: float) -> dict:
+    """Runs a stream that contains no play of a watched song and reports the
+    evidence, confidence and start events per family of segments (the
+    `family` key of the ground truth, or the source for plain fillers)."""
+    events = run_monitor(WORK / f"{stream}.wav", extra, monitor)
+    truth = load_truth(stream)
+    reports = [e for e in events if e["event"] == "report"]
+    starts = [e for e in events if e["event"] == "start"]
+    done = next(e for e in events if e["event"] == "done")
+    info = next(e for e in events if e["event"] == "stream")
+    # A report's evidence window ends a fingerprint delay behind the
+    # consumed audio and spans window_seconds; a report (or start) counts
+    # for a segment when that whole window lies inside the segment, so
+    # evidence left over from the previous segment is not charged to it.
+    delay, window = info["fingerprint_delay_seconds"], info["window_seconds"]
+
+    def inside(seg: dict, consumed: float) -> bool:
+        return seg["start"] <= consumed - delay - window and consumed - delay <= seg["end"]
+
+    families: dict[str, dict] = {}
+    for seg in truth["segments"]:
+        if seg["source"] == "silence":
+            continue
+        family = seg.get("family", "other")
+        within = [r for r in reports if inside(seg, r["consumed"])]
+        fam = families.setdefault(family, dict(segments=0, seconds=0.0, max_evidence=0, max_confidence=0.0,
+                                               max_verify_q=0.0, verify_q_at_max=0.0, false_starts=0, worst=None))
+        fam["segments"] += 1
+        fam["seconds"] += seg["end"] - seg["start"]
+        if within:
+            top = max(within, key=lambda r: r["evidence"])
+            fam["max_verify_q"] = max(fam["max_verify_q"], max(r.get("verify_q", 0.0) for r in within))
+            if top["evidence"] > fam["max_evidence"]:
+                fam.update(max_evidence=top["evidence"], max_confidence=top["confidence"],
+                           verify_q_at_max=top.get("verify_q", 0.0),
+                           worst=dict(treatment=seg["treatment"], source=seg["source"], song=top["song"], t=top["consumed"]))
+        fam["false_starts"] += sum(inside(seg, st["consumed"]) for st in starts)
+    evidence = np.array([r["evidence"] for r in reports]) if reports else np.zeros(1)
+    verify_q = np.array([r.get("verify_q", 0.0) for r in reports]) if reports else np.zeros(1)
+    return dict(seconds=done["audio_seconds"], max_evidence=int(evidence.max()),
+                p999_evidence=float(np.percentile(evidence, 99.9)),
+                max_confidence=max((r["confidence"] for r in reports), default=0.0),
+                max_verify_q=float(verify_q.max()), p999_verify_q=float(np.percentile(verify_q, 99.9)),
+                false_alarms=len(starts), threshold=threshold, realtime_fraction=done["realtime_fraction"],
+                families=families)
+
+
+def print_negatives(name: str, neg: dict) -> None:
+    print(f"\n{name}: {neg['seconds'] / 60:.1f} min, evidence max {neg['max_evidence']}, 99.9 % {neg['p999_evidence']:.0f}, "
+          f"max confidence {neg['max_confidence']:.1f}, verify_q max {neg['max_verify_q']:.2f}, 99.9 % {neg['p999_verify_q']:.2f}, "
+          f"false alarms at {neg['threshold']}: {neg['false_alarms']}")
+    print("| Family | Segments | Minutes | Max evidence | Max confidence | verify_q at max / max | False starts | Worst segment |")
+    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+    for family, fam in sorted(neg["families"].items()):
+        worst = fam["worst"]
+        worst_text = f"{worst['source']} {worst['treatment']} as {worst['song']}" if worst else "—"
+        print(f"| {family} | {fam['segments']} | {fam['seconds'] / 60:.1f} | {fam['max_evidence']} | "
+              f"{fam['max_confidence']:.1f} | {fam['verify_q_at_max']:.2f} / {fam['max_verify_q']:.2f} | {fam['false_starts']} | {worst_text} |")
+
+
 def evaluate(args) -> dict:
     extra = ["--half", str(args.half), "--threshold", str(args.threshold), "--window", str(args.window)]
+    extra += [a for spec in args.arg for a in spec.split()]
     null_events = run_monitor(WORK / "stream_null.wav", extra, args.monitor)
     eval_events = run_monitor(WORK / "stream_eval.wav", extra, args.monitor)
     null_truth = load_truth("stream_null")
@@ -90,6 +151,7 @@ def evaluate(args) -> dict:
     null_reports = [e for e in null_events if e["event"] == "report"]
     null_evidence = np.array([e["evidence"] for e in null_reports])
     null_conf = np.array([e["confidence"] for e in null_reports])
+    null_verify = np.array([e.get("verify_q", 0.0) for e in null_reports])
     null_starts = [e for e in null_events if e["event"] == "start"]
     null_done = next(e for e in null_events if e["event"] == "done")
 
@@ -120,6 +182,11 @@ def evaluate(args) -> dict:
             row["position_error"] = det["position"] - expected_position
             inside = [r for r in reports if seg["start"] <= r["consumed"] <= seg["end"] and r["song"] == seg["source"]]
             row["max_confidence"] = max((r["confidence"] for r in inside), default=det["confidence"])
+            row["verify_q"] = det.get("verify_q", 0.0)
+            row["verify_r"] = det.get("verify_r", 0.0)
+            above = [r.get("verify_q", 0.0) for r in inside if r["confidence"] >= args.threshold]
+            row["verify_q_min_above"] = min(above, default=0.0)
+            row["verify_q_median_above"] = float(np.median(above)) if above else 0.0
             row["extra_starts"] = len(cands) - 1
             end = ends.get((det["song"], det["t"]))
             row["reported_end"] = end["consumed"] if end else None
@@ -127,7 +194,7 @@ def evaluate(args) -> dict:
     false_starts = [s for s in starts if id(s) not in used]
     # A false start inside a play of the *other* song or in filler music.
     summary = dict(
-        half=args.half, threshold=args.threshold, window=args.window,
+        half=args.half, threshold=args.threshold, window=args.window, args=extra,
         commit=git_commit(),
         label=args.label or git_commit()[:7],
         monitor=args.monitor or "target/release/monitor",
@@ -135,6 +202,7 @@ def evaluate(args) -> dict:
         null=dict(seconds=null_done["audio_seconds"], reports=len(null_reports), max_evidence=int(null_evidence.max()),
                   p999_evidence=float(np.percentile(null_evidence, 99.9)), median_evidence=float(np.median(null_evidence)),
                   max_confidence=float(null_conf.max()), false_alarms=len(null_starts),
+                  max_verify_q=float(null_verify.max()), p999_verify_q=float(np.percentile(null_verify, 99.9)),
                   realtime_fraction=null_done["realtime_fraction"],
                   hash_delay_median_seconds=null_done.get("hash_delay_median_seconds"),
                   hash_delay_max_seconds=null_done.get("hash_delay_max_seconds")),
@@ -145,25 +213,35 @@ def evaluate(args) -> dict:
         plays=rows,
         worst=worst_cases(rows, false_starts, reports, eval_truth),
     )
+    if args.negatives:
+        for name in ("stream_null2", "stream_hard"):
+            if (WORK / f"{name}.wav").exists():
+                summary[name] = negatives(name, extra, args.monitor, args.threshold)
     json.dump(summary, open(WORK / f"{args.out}.json", "w"), indent=2)
 
     # --- table --------------------------------------------------------------
     print(f"\nnull stream: {null_done['audio_seconds'] / 60:.1f} min, evidence max {null_evidence.max()}, "
           f"99.9 % {np.percentile(null_evidence, 99.9):.0f}, median {np.median(null_evidence):.0f}; "
-          f"max confidence {null_conf.max():.1f}; false alarms at {args.threshold}: {len(null_starts)}; "
+          f"max confidence {null_conf.max():.1f}; verify_q max {null_verify.max():.2f}, 99.9 % {np.percentile(null_verify, 99.9):.2f}; "
+          f"false alarms at {args.threshold}: {len(null_starts)}; "
           f"CPU {100 * null_done['realtime_fraction']:.2f} % of one core")
     print(f"eval stream: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
           f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %"
           + (f"; hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s"
              if "hash_delay_median_seconds" in done else ""))
-    print("\n| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected | Position error |")
-    print("| --- | --- | ---: | ---: | ---: | ---: | ---: |")
+    print("\n| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected | Position error | verify_q at detection / min / median while above |")
+    print("| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |")
     for r in rows:
         if r["detected"]:
             print(f"| {r['source']} | {r['treatment']} | {r['latency']:.1f} s | {r['confidence']:.0f} / {r['max_confidence']:.0f} | "
-                  f"{r['expected_shift']:+d} / {r['shift']:+d} | ×{r['expected_tempo']:.3f} / ×{r['tempo']:.3f} | {r['position_error']:+.1f} s |")
+                  f"{r['expected_shift']:+d} / {r['shift']:+d} | ×{r['expected_tempo']:.3f} / ×{r['tempo']:.3f} | {r['position_error']:+.1f} s | "
+                  f"{r['verify_q']:.2f} / {r['verify_q_min_above']:.2f} / {r['verify_q_median_above']:.2f} |")
         else:
-            print(f"| {r['source']} | {r['treatment']} | missed | — | {r['expected_shift']:+d} / — | ×{r['expected_tempo']:.3f} / — | — |")
+            print(f"| {r['source']} | {r['treatment']} | missed | — | {r['expected_shift']:+d} / — | ×{r['expected_tempo']:.3f} / — | — | — |")
+
+    for name in ("stream_null2", "stream_hard"):
+        if name in summary:
+            print_negatives(name, summary[name])
 
     if args.no_plots:
         return summary
@@ -233,7 +311,7 @@ def evaluate(args) -> dict:
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=7)
     ax.invert_yaxis()
-    ax.set_xlabel("seconds from the start of the play to the detection (includes 2.4 s of pipeline delay)")
+    ax.set_xlabel("seconds from the start of the play to the detection (pipeline delay included)")
     ax.set_title("Time to detection per play", fontsize=10)
     ax.set_xlim(0, max(lat) + 4)
     fig.savefig(PLOTS / "radio_detection.png", dpi=90)
@@ -243,13 +321,17 @@ def evaluate(args) -> dict:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--half", type=float, default=100.0)
+    parser.add_argument("--half", type=float, default=40.0)
     parser.add_argument("--threshold", type=float, default=70.0)
     parser.add_argument("--window", type=float, default=5.0)
     parser.add_argument("--monitor", help="monitor binary to run instead of building the current tree")
     parser.add_argument("--out", default="eval_summary", help="summary name under target/radio (default eval_summary)")
     parser.add_argument("--no-plots", action="store_true", help="skip the figures (for comparison runs)")
     parser.add_argument("--label", help="name of this run in comparisons (default: the short commit of the tree)")
+    parser.add_argument("--negatives", action="store_true",
+                        help="also run the held-out null stream and the hard negatives (scripts/radio_negatives.py)")
+    parser.add_argument("--arg", action="append", default=[],
+                        help="extra monitor arguments, e.g. --arg '--fan-out 4' (repeatable)")
     evaluate(parser.parse_args())
 
 
