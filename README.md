@@ -153,6 +153,55 @@ Regenerate the figures with:
 cargo run --release --example generate_plots
 ```
 
+## Validation on real music
+
+`scripts/fingerprint_demo.py` runs the transform (through
+`examples/cqt_dump.rs`) on a 30 s excerpt of *Vibe Ace* by Kevin MacLeod
+(CC BY 3.0, fetched from the librosa example-data repository), on modified
+versions of it, and on a non-overlapping part of the same song as a control.
+Each spectrogram is fingerprinted with pitch- and tempo-invariant peak
+triplets (bin differences plus a quantized time ratio, as in Panako) and
+matched against the original.
+
+Accuracy: after dividing out librosa's per-filter length scaling, the two
+spectrograms agree to a mean 0.20 dB (0.13 dB on components above −40 dB)
+with a correlation of 0.9996, and the linear gain ratio is 1.009.
+
+<p align="center">
+  <img src="./plots/song_cqt_vs_librosa.png" width="98%" />
+</p>
+
+| Version | Hashes | Consistent matches | Score | Applied shift (bins) | Detected | Applied tempo | Detected |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| original | 71871 | 73703 | 102.5 % | +0 | +0 | ×1.00 | ×1.000 |
+| pitch +2 semitones | 70946 | 8545 | 12.0 % | +4 | +4 | ×1.00 | ×1.000 |
+| pitch −1 semitone | 70099 | 8858 | 12.6 % | −2 | −2 | ×1.00 | ×1.000 |
+| tempo +12 % | 66670 | 8992 | 13.5 % | +0 | +0 | ×1.12 | ×1.120 |
+| tempo −8 % | 77192 | 9309 | 12.1 % | +0 | +0 | ×0.92 | ×0.921 |
+| speed +6 % (resampled) | 66570 | 26933 | 40.5 % | +2 | +2 | ×1.06 | ×1.060 |
+| hard clip at 0.2 | 72672 | 35302 | 48.6 % | +0 | +0 | ×1.00 | ×1.000 |
+| white noise, 10 dB SNR | 84696 | 12711 | 15.0 % | +0 | +0 | ×1.00 | ×1.000 |
+| control (other 30 s of the song) | 69710 | 491 | 0.7 % | +0 | +0 | ×1.00 | — |
+
+Every modified version is identified with a score 17× to 70× above the
+control, and the pitch shift and tempo factor recovered from the matched
+peaks equal the applied ones (a score above 100 % means several reference
+hashes matched the same query hash).
+
+<p align="center">
+  <img src="./plots/song_pitch_tempo_proof.png" width="98%" />
+</p>
+<p align="center">
+  <img src="./plots/song_match_scores.png" width="70%" />
+</p>
+
+Reproduce with:
+
+```console
+pip install numpy scipy soundfile librosa matplotlib
+python3 scripts/fingerprint_demo.py
+```
+
 ## References
 
 - J. C. Brown, "Calculation of a constant Q spectral transform", JASA 1991.

@@ -43,6 +43,10 @@ Breaking rewrite of the transform.
 - Integration tests for the transform definition, pitch-shift translation,
   tempo scaling, clipping and additive noise, and stream/batch parity.
 - Reproducible SVG figures via `cargo run --example generate_plots`.
+- `examples/cqt_dump.rs` and `scripts/fingerprint_demo.py`: validation on a
+  CC BY song against librosa's CQT (0.2 dB mean difference) and a
+  pitch/tempo-invariant fingerprint match of pitch-shifted, time-stretched,
+  resampled, clipped and noisy versions.
 
 ## Changed
 
