@@ -149,14 +149,16 @@ pub(crate) fn plan(params: &CqtParams) -> Result<Plan, CqtParamsError> {
                 .fold(0.0, f64::max);
             transition = transition.min(1.0 - 4.0 * edge / rate_in);
         }
-        let filter = HalfBand::design(transition, ATTENUATION_DB);
-        if filter.taps() > MAX_FILTER_TAPS {
+        // Reject before designing: a transition band near zero would
+        // otherwise allocate and evaluate millions of taps just to fail.
+        let taps = HalfBand::taps_for(transition, ATTENUATION_DB);
+        if taps > MAX_FILTER_TAPS {
             return Err(CqtParamsError::DecimationFilterTooLong {
-                taps: filter.taps(),
+                taps,
                 max: MAX_FILTER_TAPS,
             });
         }
-        Some(filter)
+        Some(HalfBand::design(transition, ATTENUATION_DB))
     } else {
         None
     };
@@ -223,6 +225,24 @@ mod tests {
         for pair in plan.groups.windows(2) {
             assert!(pair[0].level >= pair[1].level);
         }
+    }
+
+    #[test]
+    fn oversized_filter_is_rejected_without_being_built() {
+        // The top bin's pass-band nearly touches the Nyquist frequency, so
+        // the half-band transition collapses to the designer's clamp and
+        // the filter would need about ten million taps.
+        let params = CqtParams::builder(16_000, 62.415_375, 7_989.168)
+            .bins_per_octave(384)
+            .build();
+        let err = match params {
+            Ok(params) => plan(&params).unwrap_err(),
+            Err(err) => err,
+        };
+        assert!(
+            matches!(err, CqtParamsError::DecimationFilterTooLong { taps, .. } if taps > MAX_FILTER_TAPS),
+            "{err:?}"
+        );
     }
 
     #[test]

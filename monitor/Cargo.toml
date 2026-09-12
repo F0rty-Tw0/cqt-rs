@@ -19,3 +19,10 @@ parallel = ["cqt-rs/parallel"]
 
 [lints.rust]
 unsafe_code = "forbid"
+
+[dev-dependencies]
+criterion = "0.8"
+
+[[bench]]
+name = "index"
+harness = false

@@ -242,14 +242,25 @@ fn sparsity_threshold(atom: &[Complex<f64>], magnitudes: &mut Vec<f64>, sparsity
     magnitudes.sort_unstable_by(|a, b| a.total_cmp(b));
     let total: f64 = magnitudes.iter().sum();
     let budget = total * f64::from(sparsity);
+    // Every coefficient at or below the threshold is dropped, so a run of
+    // equal magnitudes is dropped as a whole or kept as a whole: spending
+    // the budget on part of a tie would discard more mass than allowed.
     let mut dropped = 0.0;
     let mut threshold = -1.0;
-    for &magnitude in magnitudes.iter() {
-        if dropped + magnitude > budget {
+    let mut start = 0;
+    while start < magnitudes.len() {
+        let magnitude = magnitudes[start];
+        let mut end = start;
+        while end < magnitudes.len() && magnitudes[end] == magnitude {
+            end += 1;
+        }
+        let run = magnitude * (end - start) as f64;
+        if dropped + run > budget {
             break;
         }
-        dropped += magnitude;
+        dropped += run;
         threshold = magnitude;
+        start = end;
     }
     threshold
 }
@@ -376,6 +387,31 @@ mod tests {
         for run in &kernel.runs {
             assert!(run.start as usize + run.len as usize <= fft_length / 2 + 1);
         }
+    }
+
+    #[test]
+    fn pruning_keeps_coefficients_tied_at_the_boundary() {
+        // A periodic two-sample Hann window is [0, 1]: the atom has two
+        // equal FFT magnitudes. A 50 % budget may drop one of them, but
+        // dropping "everything at or below" the first would drop both.
+        let kernel = Kernel::build(8_000.0, &[100.0], &[2], 2, 0.5);
+        assert_eq!(kernel.num_nonzeros(), 2);
+        // Three equal coefficients and a budget for one: none is dropped.
+        let mut magnitudes = Vec::new();
+        let atom = [Complex::new(2.0, 0.0); 3];
+        assert!(sparsity_threshold(&atom, &mut magnitudes, 0.34) < 0.0);
+        // Budget for two of them: still none, the run is indivisible.
+        assert!(sparsity_threshold(&atom, &mut magnitudes, 0.67) < 0.0);
+        // Budget for all three: all dropped.
+        assert_eq!(sparsity_threshold(&atom, &mut magnitudes, 1.0), 2.0);
+        // Mixed magnitudes: the run of ones fits, the run of twos does not.
+        let atom = [
+            Complex::new(1.0, 0.0),
+            Complex::new(2.0, 0.0),
+            Complex::new(1.0, 0.0),
+            Complex::new(2.0, 0.0),
+        ];
+        assert_eq!(sparsity_threshold(&atom, &mut magnitudes, 0.5), 1.0);
     }
 
     #[test]

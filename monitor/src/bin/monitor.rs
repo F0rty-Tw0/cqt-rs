@@ -11,7 +11,8 @@ use std::process::exit;
 use std::time::Instant;
 
 use cqt_monitor::{
-    Hash, Index, IndexBuilder, Matcher, MatcherConfig, Peak, PeakPicker, TripletHasher,
+    Candidate, Event, Hash, Index, IndexBuilder, Matcher, MatcherConfig, Peak, PeakPicker, Tracker,
+    TrackerConfig, TripletHasher,
 };
 use cqt_rs::{Cqt, CqtParams, CqtStream, magnitude_to_db};
 
@@ -272,8 +273,7 @@ fn fingerprint_file(opts: &Options, cqt: &Cqt, samples: &[f32]) -> (u64, u64, Ve
 
 fn main() {
     let opts = parse_args();
-    let stdout = std::io::stdout();
-    let mut out = BufWriter::new(stdout.lock());
+    let mut out: Out = BufWriter::new(std::io::stdout().lock());
 
     if let Some(path) = &opts.fingerprint {
         let (samples, sample_rate) = read_wav(path);
@@ -321,7 +321,8 @@ fn main() {
         builder.add_song(name, frames as u32, hashes);
         writeln!(
             out,
-            "{{\"event\":\"index\",\"song\":\"{name}\",\"seconds\":{:.2},\"frames\":{frames},\"peaks\":{peaks},\"hashes\":{count}}}",
+            "{{\"event\":\"index\",\"song\":{},\"seconds\":{:.2},\"frames\":{frames},\"peaks\":{peaks},\"hashes\":{count}}}",
+            json_string(name),
             samples.len() as f64 / f64::from(sample_rate)
         )
         .unwrap();
@@ -330,9 +331,10 @@ fn main() {
     let (cqt, sample_rate) = cqt.unwrap();
     writeln!(
         out,
-        "{{\"event\":\"index_done\",\"songs\":{},\"hashes\":{},\"bytes\":{},\"seconds\":{:.3}}}",
+        "{{\"event\":\"index_done\",\"songs\":{},\"hashes\":{},\"dropped\":{},\"bytes\":{},\"seconds\":{:.3}}}",
         index.names().len(),
         index.len(),
+        index.dropped(),
         index.memory_bytes(),
         index_start.elapsed().as_secs_f64()
     )
@@ -354,6 +356,17 @@ fn main() {
         half: opts.half,
         ..MatcherConfig::default()
     });
+    let mut tracker = Tracker::new(
+        index.names().len(),
+        TrackerConfig {
+            threshold: opts.threshold,
+            release_frames: (opts.release * frames_per_second).round() as u64,
+            confirm_frames: frames_per_second.round() as u64,
+            jump_shift: 2,
+            jump_tempo: 0.05,
+            jump_frames: 3.0 * frames_per_second,
+        },
+    );
     let mut fp = Fingerprinter::new(&opts, cqt.num_bins());
     let delay = fp.delay_frames();
     let report_every = (opts.report * frames_per_second).round().max(1.0) as u64;
@@ -363,7 +376,8 @@ fn main() {
     });
     writeln!(
         out,
-        "{{\"event\":\"stream\",\"file\":\"{stream_path}\",\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{}}}",
+        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{}}}",
+        json_string(stream_path),
         samples.len() as f64 / f64::from(sample_rate),
         cqt.latency_samples() as f64 / f64::from(sample_rate),
         delay as f64 / frames_per_second,
@@ -373,53 +387,122 @@ fn main() {
     )
     .unwrap();
 
-    /// One detection in progress.
-    #[derive(Clone, Copy)]
-    struct Active {
-        start: f64,
-        shift: i32,
-        tempo: f64,
-        /// Song position (frames) predicted for the last report frame.
-        position: f64,
-        frame: u64,
-        last_above: f64,
-        /// Consecutive reports whose hypothesis disagrees with this one.
-        jumps: u32,
+    let ctx = Context {
+        names: index.names(),
+        seconds_per_frame: opts.hop as f64 / f64::from(sample_rate),
+        sample_rate: f64::from(sample_rate),
+        delay,
+    };
+    let mut frames = 0u64;
+    let mut consumed = 0u64;
+    let mut delays = Histogram::new(delay as usize + 1);
+    let started = Instant::now();
+    let mut pending_report = false;
+    for block in samples.chunks(opts.block) {
+        consumed += block.len() as u64;
+        let (matcher_ref, fp_ref, frames_ref, delays_ref) =
+            (&mut matcher, &mut fp, &mut frames, &mut delays);
+        stream.push(&cqt, block, |magnitudes| {
+            fp_ref.push(
+                magnitudes,
+                |_| {},
+                |h| {
+                    delays_ref.record(*frames_ref - h.frame);
+                    matcher_ref.push(&index, &h);
+                },
+            );
+            *frames_ref += 1;
+            if frames_ref.is_multiple_of(report_every) {
+                pending_report = true;
+            }
+        });
+        if pending_report {
+            ctx.report(
+                &mut matcher,
+                &mut tracker,
+                frames,
+                consumed,
+                &mut out,
+                false,
+            );
+            pending_report = false;
+        }
     }
-    struct State {
-        active: Vec<Option<Active>>,
+    {
+        let (matcher_ref, fp_ref, frames_ref, delays_ref) =
+            (&mut matcher, &mut fp, &mut frames, &mut delays);
+        stream.flush(&cqt, |magnitudes| {
+            fp_ref.push(
+                magnitudes,
+                |_| {},
+                |h| {
+                    delays_ref.record(*frames_ref - h.frame);
+                    matcher_ref.push(&index, &h);
+                },
+            );
+            *frames_ref += 1;
+        });
+        fp_ref.flush(|_| {}, |h| matcher_ref.push(&index, &h));
+    }
+    ctx.report(&mut matcher, &mut tracker, frames, consumed, &mut out, true);
+    let cpu = started.elapsed().as_secs_f64();
+    let audio = samples.len() as f64 / ctx.sample_rate;
+    writeln!(
+        out,
+        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
+        cpu / audio,
+        fp.peaks,
+        matcher.lookups(),
+        matcher.matches(),
+        delays.quantile(0.5) as f64 * ctx.seconds_per_frame,
+        delays.max() as f64 * ctx.seconds_per_frame,
+    )
+    .unwrap();
+}
+
+type Out = BufWriter<std::io::StdoutLock<'static>>;
+
+/// What the report and event writers need to know about the stream.
+struct Context<'a> {
+    names: &'a [String],
+    seconds_per_frame: f64,
+    sample_rate: f64,
+    /// Worst-case frames between a pushed frame and its hashes.
+    delay: u64,
+}
+
+impl Context<'_> {
+    /// Writes a report line for the state after `frames` frames and
+    /// `consumed` samples, then feeds the tracker and writes its events.
+    /// With `final_flush` every play is ended instead.
+    fn report(
+        &self,
+        matcher: &mut Matcher,
+        tracker: &mut Tracker,
         frames: u64,
         consumed: u64,
-    }
-    let mut state = State {
-        active: vec![None; index.names().len()],
-        frames: 0,
-        consumed: 0,
-    };
-    let hop = opts.hop as f64;
-    let sr = f64::from(sample_rate);
-    let frames_per_second = sr / hop;
-    let names = index.names();
-
-    let report = |matcher: &mut Matcher,
-                  state: &mut State,
-                  out: &mut BufWriter<std::io::StdoutLock>,
-                  final_flush: bool| {
-        let frame = state.frames.saturating_sub(1);
-        matcher.advance(frame.saturating_sub(delay));
-        let t = frame as f64 * hop / sr;
-        let consumed = state.consumed as f64 / sr;
-        let candidates = matcher.best_per_song();
-        let best = candidates.iter().max_by_key(|c| c.evidence).copied();
+        out: &mut Out,
+        final_flush: bool,
+    ) {
+        let frame = frames.saturating_sub(1);
+        matcher.advance(frame.saturating_sub(self.delay));
+        let t = frame as f64 * self.seconds_per_frame;
+        let consumed = consumed as f64 / self.sample_rate;
+        let scored: Vec<(Candidate, f64)> = matcher
+            .best_per_song()
+            .into_iter()
+            .map(|c| (c, matcher.confidence(c.evidence)))
+            .collect();
         if !final_flush {
+            let best = scored.iter().max_by_key(|(c, _)| c.evidence);
             let (name, evidence, confidence, shift, tempo, position) = match best {
-                Some(c) => (
-                    format!("\"{}\"", names[usize::from(c.song)]),
+                Some((c, confidence)) => (
+                    json_string(&self.names[usize::from(c.song)]),
                     c.evidence,
-                    matcher.confidence(c.evidence),
+                    *confidence,
                     c.shift,
                     c.tempo,
-                    (c.tempo * frame as f64 + c.offset) * hop / sr,
+                    (c.tempo * frame as f64 + c.offset) * self.seconds_per_frame,
                 ),
                 None => ("null".to_owned(), 0, 0.0, 0, 1.0, 0.0),
             };
@@ -430,134 +513,125 @@ fn main() {
             )
             .unwrap();
         }
-        for (song, name) in names.iter().enumerate() {
-            let candidate = candidates
-                .iter()
-                .find(|c| usize::from(c.song) == song)
-                .copied();
-            let confidence = candidate.map_or(0.0, |c| matcher.confidence(c.evidence));
-            let above = confidence >= opts.threshold && !final_flush;
-            let end_line = |out: &mut BufWriter<std::io::StdoutLock>, a: &Active| {
-                writeln!(
-                    out,
-                    "{{\"event\":\"end\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":\"{name}\",\"start\":{:.3}}}",
-                    a.start
-                )
-                .unwrap();
-            };
-            match (state.active[song], above, candidate) {
-                (Some(mut a), true, Some(c)) => {
-                    // Same play, or a new play of the same song (the
-                    // hypothesis jumped)?
-                    let position = c.tempo * frame as f64 + c.offset;
-                    let predicted = a.position + a.tempo * (frame - a.frame) as f64;
-                    let jumped = (c.shift - a.shift).abs() > 2
-                        || (c.tempo - a.tempo).abs() > 0.05
-                        || (position - predicted).abs() > 3.0 * frames_per_second;
-                    // A new play of the same song is declared only when the
-                    // new hypothesis persists for a second; at the tail of a
-                    // play a repeated riff can briefly win the vote.
-                    a.last_above = consumed;
-                    if jumped {
-                        a.jumps += 1;
-                    } else {
-                        a.jumps = 0;
-                        a.position = position;
-                        a.frame = frame;
-                    }
-                    if a.jumps as f64 * opts.report < 1.0 {
-                        state.active[song] = Some(a);
-                        continue;
-                    }
-                    end_line(out, &a);
-                    state.active[song] = None;
-                    // Fall through to start the new play.
-                    let position = (c.tempo * frame as f64 + c.offset) * hop / sr;
-                    writeln!(
-                        out,
-                        "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":\"{name}\",\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{position:.2}}}",
-                        c.evidence, c.shift, c.tempo
-                    )
-                    .unwrap();
-                    state.active[song] = Some(Active {
-                        start: consumed,
-                        shift: c.shift,
-                        tempo: c.tempo,
-                        position: c.tempo * frame as f64 + c.offset,
-                        frame,
-                        last_above: consumed,
-                        jumps: 0,
-                    });
-                }
-                (None, true, Some(c)) => {
-                    let position = (c.tempo * frame as f64 + c.offset) * hop / sr;
-                    writeln!(
-                        out,
-                        "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":\"{name}\",\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{position:.2}}}",
-                        c.evidence, c.shift, c.tempo
-                    )
-                    .unwrap();
-                    state.active[song] = Some(Active {
-                        start: consumed,
-                        shift: c.shift,
-                        tempo: c.tempo,
-                        position: c.tempo * frame as f64 + c.offset,
-                        frame,
-                        last_above: consumed,
-                        jumps: 0,
-                    });
-                }
-                (Some(a), false, _) if consumed - a.last_above >= opts.release || final_flush => {
-                    end_line(out, &a);
-                    state.active[song] = None;
-                }
-                _ => {}
-            }
+        let on_event = |event: Event| self.write_event(out, &event, t, consumed);
+        if final_flush {
+            tracker.finish(frame, on_event);
+        } else {
+            tracker.update(frame, &scored, on_event);
         }
-    };
+    }
 
-    let started = Instant::now();
-    let mut pending_report = false;
-    for block in samples.chunks(opts.block) {
-        state.consumed += block.len() as u64;
-        let matcher_ref = &mut matcher;
-        let fp_ref = &mut fp;
-        let state_ref = &mut state;
-        let index_ref = &index;
-        stream.push(&cqt, block, |magnitudes| {
-            fp_ref.push(magnitudes, |_| {}, |h| matcher_ref.push(index_ref, &h));
-            state_ref.frames += 1;
-            if state_ref.frames.is_multiple_of(report_every) {
-                pending_report = true;
-            }
-        });
-        if pending_report {
-            report(&mut matcher, &mut state, &mut out, false);
-            pending_report = false;
+    fn write_event(&self, out: &mut Out, event: &Event, t: f64, consumed: f64) {
+        match *event {
+            Event::Start {
+                song,
+                candidate: c,
+                confidence,
+                position,
+                ..
+            } => writeln!(
+                out,
+                "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{:.2}}}",
+                json_string(&self.names[usize::from(song)]),
+                c.evidence,
+                c.shift,
+                c.tempo,
+                position * self.seconds_per_frame
+            ),
+            Event::End {
+                song, start_frame, ..
+            } => writeln!(
+                out,
+                "{{\"event\":\"end\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"start\":{:.3}}}",
+                json_string(&self.names[usize::from(song)]),
+                start_frame as f64 * self.seconds_per_frame
+            ),
+        }
+        .unwrap();
+    }
+}
+
+/// Counts of integer values `0..len`, larger values in the last slot.
+struct Histogram {
+    counts: Vec<u64>,
+    total: u64,
+}
+
+impl Histogram {
+    fn new(len: usize) -> Self {
+        Self {
+            counts: vec![0; len.max(1)],
+            total: 0,
         }
     }
-    {
-        let matcher_ref = &mut matcher;
-        let fp_ref = &mut fp;
-        let state_ref = &mut state;
-        let index_ref = &index;
-        stream.flush(&cqt, |magnitudes| {
-            fp_ref.push(magnitudes, |_| {}, |h| matcher_ref.push(index_ref, &h));
-            state_ref.frames += 1;
-        });
-        fp_ref.flush(|_| {}, |h| matcher_ref.push(index_ref, &h));
+
+    fn record(&mut self, value: u64) {
+        let slot = (value as usize).min(self.counts.len() - 1);
+        self.counts[slot] += 1;
+        self.total += 1;
     }
-    report(&mut matcher, &mut state, &mut out, true);
-    let cpu = started.elapsed().as_secs_f64();
-    let audio = samples.len() as f64 / sr;
-    writeln!(
-        out,
-        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{},\"peaks\":{},\"lookups\":{},\"matches\":{}}}",
-        cpu / audio,
-        state.frames,
-        fp.peaks,
-        matcher.lookups(),
-        matcher.matches()
-    )
-    .unwrap();
+
+    /// Smallest value with at least `q` of the counts at or below it.
+    fn quantile(&self, q: f64) -> usize {
+        let target = (q * self.total as f64).ceil() as u64;
+        let mut seen = 0;
+        for (value, &count) in self.counts.iter().enumerate() {
+            seen += count;
+            if seen >= target {
+                return value;
+            }
+        }
+        self.counts.len() - 1
+    }
+
+    fn max(&self) -> usize {
+        self.counts.iter().rposition(|&c| c > 0).unwrap_or(0)
+    }
+}
+
+/// Quotes `s` as a JSON string.
+fn json_string(s: &str) -> String {
+    let mut out = String::with_capacity(s.len() + 2);
+    out.push('"');
+    for c in s.chars() {
+        match c {
+            '"' => out.push_str("\\\""),
+            '\\' => out.push_str("\\\\"),
+            '\n' => out.push_str("\\n"),
+            '\r' => out.push_str("\\r"),
+            '\t' => out.push_str("\\t"),
+            c if (c as u32) < 0x20 => out.push_str(&format!("\\u{:04x}", c as u32)),
+            c => out.push(c),
+        }
+    }
+    out.push('"');
+    out
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn json_strings_are_escaped() {
+        assert_eq!(json_string("plain"), "\"plain\"");
+        assert_eq!(
+            json_string("The \"Live\" Mix\\ \n\u{1}"),
+            "\"The \\\"Live\\\" Mix\\\\ \\n\\u0001\""
+        );
+        assert_eq!(json_string("ünïcödé"), "\"ünïcödé\"");
+    }
+
+    #[test]
+    fn histogram_quantiles() {
+        let mut h = Histogram::new(10);
+        for v in [1, 1, 2, 3, 50] {
+            h.record(v);
+        }
+        assert_eq!(h.quantile(0.5), 2);
+        assert_eq!(h.quantile(0.0), 0);
+        assert_eq!(h.quantile(1.0), 9);
+        assert_eq!(h.max(), 9);
+        assert_eq!(Histogram::new(4).quantile(0.5), 0);
+    }
 }

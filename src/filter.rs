@@ -22,23 +22,13 @@ impl HalfBand {
     /// frequency) and stop-band attenuation in dB. The pass-band therefore
     /// extends to `(1 - transition) / 2` of the input Nyquist frequency.
     pub fn design(transition: f64, attenuation_db: f64) -> Self {
-        let transition = transition.clamp(1e-6, 1.0);
-        let delta_omega = transition * PI;
+        let taps = Self::taps_for(transition, attenuation_db);
         let beta = if attenuation_db > 50.0 {
             0.1102 * (attenuation_db - 8.7)
         } else if attenuation_db >= 21.0 {
             0.5842 * (attenuation_db - 21.0).powf(0.4) + 0.07886 * (attenuation_db - 21.0)
         } else {
             0.0
-        };
-        let taps = ((attenuation_db - 8.0) / (2.285 * delta_omega)).ceil() as usize + 1;
-        // Odd length so the delay is an integer; 4k + 3 keeps the outermost
-        // taps non-zero.
-        let taps = taps.max(3);
-        let taps = if taps % 4 == 3 {
-            taps
-        } else {
-            taps + (7 - taps % 4) % 4
         };
         let delay = (taps - 1) / 2;
 
@@ -64,6 +54,22 @@ impl HalfBand {
             centre: centre as f32,
             odd_taps: odd_taps.into_iter().map(|(m, h)| (m, h as f32)).collect(),
             delay,
+        }
+    }
+
+    /// Number of taps [`HalfBand::design`] would use for the given
+    /// transition width and attenuation, without building the filter.
+    pub fn taps_for(transition: f64, attenuation_db: f64) -> usize {
+        let transition = transition.clamp(1e-6, 1.0);
+        let delta_omega = transition * PI;
+        let taps = ((attenuation_db - 8.0) / (2.285 * delta_omega)).ceil() as usize + 1;
+        // Odd length so the delay is an integer; 4k + 3 keeps the outermost
+        // taps non-zero.
+        let taps = taps.max(3);
+        if taps % 4 == 3 {
+            taps
+        } else {
+            taps + (7 - taps % 4) % 4
         }
     }
 
@@ -178,6 +184,21 @@ mod tests {
     #[test]
     fn narrower_transition_needs_more_taps() {
         assert!(HalfBand::design(0.1, 80.0).taps() > HalfBand::design(0.4, 80.0).taps());
+    }
+
+    #[test]
+    fn tap_count_is_known_before_design() {
+        for &(transition, attenuation) in &[(0.1, 80.0), (0.4, 80.0), (0.9, 30.0), (1e-9, 80.0)] {
+            if transition < 1e-4 {
+                // Far too long to build; only the count is checked.
+                assert!(HalfBand::taps_for(transition, attenuation) > 1_000_000);
+                continue;
+            }
+            assert_eq!(
+                HalfBand::design(transition, attenuation).taps(),
+                HalfBand::taps_for(transition, attenuation)
+            );
+        }
     }
 
     #[test]

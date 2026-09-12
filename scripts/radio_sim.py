@@ -20,6 +20,7 @@ import json
 import math
 import os
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional
@@ -35,7 +36,11 @@ import librosa
 # ----------------------------------------------------------------------------------------------
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 RADIO_DIR = os.path.join(ROOT, "target", "radio")
-SCRATCH = os.environ.get("RADIO_SIM_TMP", os.path.join(RADIO_DIR, "_tmp"))
+# Scratch files (MP3 round trips) go into a directory created by this run
+# underneath RADIO_SIM_TMP (default target/radio), so cleanup only ever
+# removes what this run wrote.
+SCRATCH_PARENT = os.environ.get("RADIO_SIM_TMP", RADIO_DIR)
+SCRATCH = None  # set in main()
 
 SR = 44100
 
@@ -588,8 +593,11 @@ def print_summary(name: str, gt: dict):
 
 
 def main():
+    global SCRATCH
     t_all = time.time()
-    os.makedirs(SCRATCH, exist_ok=True)
+    os.makedirs(SCRATCH_PARENT, exist_ok=True)
+    scratch = tempfile.TemporaryDirectory(prefix="radio_sim_", dir=SCRATCH_PARENT)
+    SCRATCH = scratch.name
 
     print("Loading sources...")
     for sid in SOURCES:
@@ -611,10 +619,9 @@ def main():
     null_plan = build_null_plan(rng, NULL_MIN_S)
     gt_null, _, _ = build_stream("stream_null", null_plan, NULL_SEED)
 
-    # cleanup scratch mp3s
-    for fn in os.listdir(SCRATCH):
-        os.remove(os.path.join(SCRATCH, fn))
-    os.rmdir(SCRATCH)
+    # Remove only this run's scratch directory.
+    scratch.cleanup()
+    SCRATCH = None
 
     print_summary("stream_eval", gt_eval)
     print_summary("stream_null", gt_null)

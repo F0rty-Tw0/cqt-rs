@@ -41,10 +41,20 @@ struct Group {
 /// Reusable buffers for repeated batch calls.
 ///
 /// [`Cqt::process`] allocates and page-faults a few megabytes of decimation
-/// buffers per call; [`Cqt::process_with`] keeps them between calls.
+/// buffers per call; [`Cqt::process_with`] keeps them between calls. A
+/// workspace remembers the parameters of the transform that allocated it;
+/// a transform with other parameters rebuilds it on first use.
 #[derive(Debug, Clone)]
 pub struct CqtWorkspace {
+    params: CqtParams,
     levels: Levels,
+}
+
+impl CqtWorkspace {
+    /// Parameters of the transform this workspace currently belongs to.
+    pub fn params(&self) -> &CqtParams {
+        &self.params
+    }
 }
 
 /// Working memory for one frame: a real FFT input, output and scratch
@@ -224,7 +234,16 @@ impl Cqt {
     /// Allocates a workspace for [`Cqt::process_with`].
     pub fn workspace(&self) -> CqtWorkspace {
         CqtWorkspace {
+            params: self.params.clone(),
             levels: self.levels(),
+        }
+    }
+
+    /// Makes `workspace` usable with this transform, rebuilding its
+    /// decimation state when it was allocated by a different one.
+    fn adopt(&self, workspace: &mut CqtWorkspace) {
+        if workspace.params != self.params {
+            *workspace = self.workspace();
         }
     }
 
@@ -347,7 +366,9 @@ impl Cqt {
         self.process_complex_with(&mut self.workspace(), signal, hop_size)
     }
 
-    /// [`Cqt::process`] with caller-owned buffers, for repeated calls.
+    /// [`Cqt::process`] with caller-owned buffers, for repeated calls. A
+    /// workspace allocated by a transform with different parameters is
+    /// rebuilt first.
     pub fn process_with(
         &self,
         workspace: &mut CqtWorkspace,
@@ -360,6 +381,7 @@ impl Cqt {
         self.check_hop_size(hop_size)?;
         let num_frames = self.num_frames(signal.len(), hop_size);
         let num_bins = self.num_bins();
+        self.adopt(workspace);
         self.prepare(&mut workspace.levels, signal, hop_size, num_frames);
         let levels = &workspace.levels;
         let mut output = vec![0.0f32; num_frames * num_bins];
@@ -370,7 +392,8 @@ impl Cqt {
             .expect("output buffer matches the frame grid"))
     }
 
-    /// [`Cqt::process_complex`] with caller-owned buffers.
+    /// [`Cqt::process_complex`] with caller-owned buffers, see
+    /// [`Cqt::process_with`].
     pub fn process_complex_with(
         &self,
         workspace: &mut CqtWorkspace,
@@ -383,6 +406,7 @@ impl Cqt {
         self.check_hop_size(hop_size)?;
         let num_frames = self.num_frames(signal.len(), hop_size);
         let num_bins = self.num_bins();
+        self.adopt(workspace);
         self.prepare(&mut workspace.levels, signal, hop_size, num_frames);
         let levels = &workspace.levels;
         let mut output = vec![Complex::default(); num_frames * num_bins];

@@ -2,6 +2,7 @@
 
 use crate::cqt::{Cqt, CqtError, Scratch};
 use crate::levels::Levels;
+use crate::params::CqtParams;
 
 /// Incremental transform that consumes audio in arbitrary chunks and emits a
 /// frame every `hop_size` samples.
@@ -11,6 +12,10 @@ use crate::levels::Levels;
 /// soon as sample `i * hop_size + latency - 1` has been pushed, where
 /// `latency` is [`Cqt::latency_samples`]. Pushing performs no allocation
 /// once the internal buffers have grown to their steady-state size.
+///
+/// A stream is bound to the transform it was created with (or last
+/// [`reset`](CqtStream::reset) to): every other method panics when given
+/// a transform with different parameters.
 ///
 /// ```
 /// use cqt_rs::{Cqt, CqtParams, CqtStream};
@@ -26,11 +31,20 @@ use crate::levels::Levels;
 /// ```
 #[derive(Debug, Clone)]
 pub struct CqtStream {
+    /// Parameters of the transform this stream's state belongs to.
+    params: CqtParams,
     hop_size: usize,
     latency: usize,
     levels: Levels,
     /// Samples pushed since creation or the last reset.
     samples_in: u64,
+    /// Zeros appended by [`CqtStream::flush`] that audio has since been
+    /// pushed after; they are part of the frame timeline.
+    padding: u64,
+    /// Zeros appended by [`CqtStream::flush`] with no audio after them
+    /// yet. They join `padding` on the next push, so that repeating a
+    /// flush emits nothing new.
+    padding_pending: u64,
     frames_out: u64,
     scratch: Scratch,
     magnitudes: Vec<f32>,
@@ -41,14 +55,29 @@ impl CqtStream {
     pub fn new(cqt: &Cqt, hop_size: usize) -> Result<Self, CqtError> {
         cqt.check_hop_size(hop_size)?;
         Ok(Self {
+            params: cqt.params().clone(),
             hop_size,
             latency: cqt.latency_samples(),
             levels: cqt.levels(),
             samples_in: 0,
+            padding: 0,
+            padding_pending: 0,
             frames_out: 0,
             scratch: cqt.scratch(),
             magnitudes: vec![0.0; cqt.num_bins()],
         })
+    }
+
+    /// Parameters of the transform this stream is bound to.
+    pub fn params(&self) -> &CqtParams {
+        &self.params
+    }
+
+    fn check_bound(&self, cqt: &Cqt) {
+        assert!(
+            *cqt.params() == self.params,
+            "CqtStream used with a transform it was not created for; call reset first"
+        );
     }
 
     /// Hop between frames in samples.
@@ -66,24 +95,49 @@ impl CqtStream {
         self.frames_out
     }
 
-    /// Number of samples consumed so far.
+    /// Number of samples pushed so far, not counting the padding that
+    /// [`CqtStream::flush`] appends.
     pub fn samples_consumed(&self) -> u64 {
         self.samples_in
     }
 
-    /// Forgets all buffered audio and restarts frame numbering.
+    /// Number of zero samples appended by [`CqtStream::flush`] so far.
+    pub fn padding_samples(&self) -> u64 {
+        self.padding + self.padding_pending
+    }
+
+    /// Forgets all buffered audio, restarts frame numbering and binds the
+    /// stream to `cqt`, which may differ from the transform it was created
+    /// with; the hop size is kept.
     pub fn reset(&mut self, cqt: &Cqt) {
+        if *cqt.params() != self.params {
+            self.params = cqt.params().clone();
+            self.latency = cqt.latency_samples();
+            self.scratch = cqt.scratch();
+            self.magnitudes = vec![0.0; cqt.num_bins()];
+        }
         self.levels = cqt.levels();
         self.samples_in = 0;
+        self.padding = 0;
+        self.padding_pending = 0;
         self.frames_out = 0;
     }
 
     /// Feeds `samples` and calls `on_frame` with the magnitudes of every
     /// frame that became complete, in order.
+    ///
+    /// # Panics
+    ///
+    /// If `cqt` is not the transform the stream is bound to.
     pub fn push<F>(&mut self, cqt: &Cqt, samples: &[f32], mut on_frame: F)
     where
         F: FnMut(&[f32]),
     {
+        self.check_bound(cqt);
+        if !samples.is_empty() {
+            self.padding += self.padding_pending;
+            self.padding_pending = 0;
+        }
         self.samples_in += samples.len() as u64;
         self.feed(cqt, samples, &mut on_frame, u64::MAX);
     }
@@ -91,16 +145,25 @@ impl CqtStream {
     /// Emits the frames whose centre lies inside the audio pushed so far by
     /// zero padding the end, matching [`Cqt::process`] on the same signal.
     ///
-    /// The padding stays in the buffer: pushing more audio afterwards
-    /// behaves as if a short silence had been inserted. Call
+    /// Flushing again without pushing emits nothing. The padding stays in
+    /// the buffer, and pushing more audio afterwards behaves exactly as if
+    /// that silence had been pushed: it joins the frame timeline, so the
+    /// frames match [`Cqt::process`] on the audio with the silence
+    /// inserted (see [`CqtStream::padding_samples`]). Call
     /// [`CqtStream::reset`] before reusing the stream for unrelated audio.
+    ///
+    /// # Panics
+    ///
+    /// If `cqt` is not the transform the stream is bound to.
     pub fn flush<F>(&mut self, cqt: &Cqt, mut on_frame: F)
     where
         F: FnMut(&[f32]),
     {
-        let total_frames = 1 + self.samples_in / self.hop_size as u64;
+        self.check_bound(cqt);
+        let total_frames = 1 + (self.samples_in + self.padding) / self.hop_size as u64;
         let block = vec![0.0f32; cqt.hop_alignment()];
         while self.frames_out < total_frames {
+            self.padding_pending += block.len() as u64;
             self.feed(cqt, &block, &mut on_frame, total_frames);
         }
     }

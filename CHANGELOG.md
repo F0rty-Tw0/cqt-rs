@@ -20,14 +20,34 @@ Breaking rewrite of the transform.
 - The published 0.1 build depended on `hann-rs 0.1.0`, whose package ships a
   lowercase `cargo.toml` and cannot be built on case-sensitive file systems.
 
+- Kernel pruning (`sparsity`) no longer discards coefficients tied with
+  the last one inside the budget: a run of equal magnitudes is dropped
+  whole or kept whole, so the discarded mass never exceeds the limit.
+- Configurations whose decimation filter would exceed the tap limit are
+  rejected from the tap count alone, before the filter is designed.
+- `CqtStream::flush` padding is part of the frame timeline once more audio
+  is pushed: continuing after a flush now produces exactly the frames of
+  the audio with that silence inserted, and flushing twice emits nothing
+  new (`CqtStream::padding_samples`).
+- `CqtStream` is bound to its transform: `push`/`flush` panic on a
+  transform with different parameters and `reset` re-binds the stream;
+  `Cqt::process_with` rebuilds a `CqtWorkspace` allocated by a different
+  transform instead of reading it with the wrong layout.
+
 ## Added
 
 - `cqt-monitor` workspace crate (`monitor/`): streaming peak picker,
   pitch- and tempo-invariant triplet hasher, watch-list hash index,
-  sliding-window matcher with a calibrated confidence score, and a
-  `monitor` binary that reports detections on a stream as JSON lines.
-  Validated on a simulated radio programme (`scripts/radio_sim.py`,
-  `scripts/radio_eval.py`).
+  sliding-window matcher with a calibrated confidence score, a per-song
+  detection `Tracker`, and a `monitor` binary that reports detections on
+  a stream as JSON lines. Validated on a simulated radio programme
+  (`scripts/radio_sim.py`, `scripts/radio_eval.py`). The hasher releases
+  an anchor as soon as its candidate list is determined, which halves
+  the fingerprint delay in normal music; the index caps repetitive keys
+  per song; the matcher searches every occupied cell and removes expired
+  votes exactly.
+- `CqtStream::params`, `CqtStream::padding_samples`,
+  `CqtWorkspace::params`.
 - Multi-rate processing (Schörkhuber & Klapuri, 2010): each octave is
   analysed at its own sample rate, halved octave by octave with an 80 dB
   Kaiser half-band filter, so every octave uses a small FFT and a compact

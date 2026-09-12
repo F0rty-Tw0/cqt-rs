@@ -69,6 +69,16 @@ struct Cell {
     offset_sum: f64,
 }
 
+/// One match inside the window, kept so that its exact contribution can
+/// be removed from its cell when it expires.
+#[derive(Debug, Clone, Copy)]
+struct Vote {
+    frame: u64,
+    key: u64,
+    tempo: f64,
+    offset: f64,
+}
+
 /// Accumulates hash matches over a sliding window of the query and reports
 /// the best-supported `(song, shift, tempo, offset)` hypothesis.
 ///
@@ -87,7 +97,7 @@ struct Cell {
 pub struct Matcher {
     config: MatcherConfig,
     cells: HashMap<u64, Cell>,
-    votes: VecDeque<(u64, u64)>,
+    votes: VecDeque<Vote>,
     origin: u64,
     latest_frame: u64,
     lookups: u64,
@@ -159,7 +169,12 @@ impl Matcher {
             cell.count += 1;
             cell.tempo_sum += tempo;
             cell.offset_sum += offset;
-            self.votes.push_back((hash.frame, key));
+            self.votes.push_back(Vote {
+                frame: hash.frame,
+                key,
+                tempo,
+                offset,
+            });
             new_votes += 1;
         });
         self.matches += new_votes;
@@ -178,7 +193,8 @@ impl Matcher {
         let shift_frames = (new_origin - self.origin) as f64;
         let cfg = &self.config;
         let mut rekeyed: HashMap<u64, Cell> = HashMap::with_capacity(self.cells.len());
-        let mut mapping: HashMap<u64, u64> = HashMap::with_capacity(self.cells.len());
+        // Old key → (new key, offset delta of that cell).
+        let mut mapping: HashMap<u64, (u64, f64)> = HashMap::with_capacity(self.cells.len());
         for (&key, cell) in &self.cells {
             let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
             let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
@@ -192,14 +208,16 @@ impl Matcher {
                 tempo_idx,
                 (offset / cfg.offset_step).round() as i32,
             );
-            mapping.insert(key, new_key);
+            mapping.insert(key, (new_key, delta));
             let target = rekeyed.entry(new_key).or_default();
             target.count += cell.count;
             target.tempo_sum += cell.tempo_sum;
             target.offset_sum += cell.offset_sum + delta * f64::from(cell.count);
         }
         for vote in &mut self.votes {
-            vote.1 = mapping[&vote.1];
+            let (new_key, delta) = mapping[&vote.key];
+            vote.key = new_key;
+            vote.offset += delta;
         }
         self.cells = rekeyed;
         self.origin = new_origin;
@@ -215,21 +233,18 @@ impl Matcher {
 
     fn expire(&mut self) {
         let horizon = self.latest_frame.saturating_sub(self.config.window_frames);
-        while let Some(&(frame, key)) = self.votes.front() {
-            if frame >= horizon {
+        while let Some(vote) = self.votes.front().copied() {
+            if vote.frame >= horizon {
                 break;
             }
             self.votes.pop_front();
-            if let Some(cell) = self.cells.get_mut(&key) {
+            if let Some(cell) = self.cells.get_mut(&vote.key) {
                 if cell.count <= 1 {
-                    self.cells.remove(&key);
+                    self.cells.remove(&vote.key);
                 } else {
-                    // Remove the cell's average contribution; the sums are
-                    // only used for the estimates of the winning cell.
-                    let n = f64::from(cell.count);
-                    cell.tempo_sum -= cell.tempo_sum / n;
-                    cell.offset_sum -= cell.offset_sum / n;
                     cell.count -= 1;
+                    cell.tempo_sum -= vote.tempo;
+                    cell.offset_sum -= vote.offset;
                 }
             }
         }
@@ -253,40 +268,100 @@ impl Matcher {
 
     /// The best-supported hypothesis of every song that has any vote in
     /// the window, in song order.
+    ///
+    /// Every occupied cell is a candidate centre: a cell's own count says
+    /// nothing about its neighbourhood's, so no cell may be skipped on
+    /// its count alone. Instead each song keeps three marginal histograms
+    /// (votes per shift, per tempo index, per offset index); a
+    /// neighbourhood lies inside the ±1 slab of each, so its sum is at
+    /// most the smallest of the three slab sums, and a centre whose bound
+    /// cannot beat the incumbent is skipped without touching its 27
+    /// cells. The result is exactly the full scan's (tested against it).
+    /// Ties go to the centre with more votes of its own, then to the
+    /// smallest cell key, which keeps the result independent of hash-map
+    /// iteration order. The reported shift, tempo and offset are
+    /// vote-weighted means over the winning neighbourhood.
     pub fn best_per_song(&self) -> Vec<Candidate> {
-        // Only cells with at least two votes, and at least a third of the
-        // strongest cell of their song, are worth a neighbourhood sum.
-        let mut max_single: HashMap<u16, u32> = HashMap::new();
+        // Marginals keyed by the cell key with the other two fields
+        // masked out, and the strongest single cell per song as the seed.
+        let mut by_shift: HashMap<u64, u32> = HashMap::new();
+        let mut by_tempo: HashMap<u64, u32> = HashMap::new();
+        let mut by_offset: HashMap<u64, u32> = HashMap::new();
+        let mut seed: HashMap<u16, (u32, u64)> = HashMap::new();
         for (&key, cell) in &self.cells {
+            *by_shift.entry(key & MASK_SHIFT).or_default() += cell.count;
+            *by_tempo.entry(key & MASK_TEMPO).or_default() += cell.count;
+            *by_offset.entry(key & MASK_OFFSET).or_default() += cell.count;
             let song = (key >> 48) as u16;
-            let m = max_single.entry(song).or_default();
-            *m = (*m).max(cell.count);
+            let entry = seed.entry(song).or_insert((cell.count, key));
+            if (cell.count, std::cmp::Reverse(key)) > (entry.0, std::cmp::Reverse(entry.1)) {
+                *entry = (cell.count, key);
+            }
         }
-        let mut best: HashMap<u16, (u32, u64)> = HashMap::new();
+        let slab = |hist: &HashMap<u64, u32>, key: u64, step: u64| {
+            (0..3)
+                .map(|d| {
+                    hist.get(&(key.wrapping_add(d * step).wrapping_sub(step)))
+                        .copied()
+                        .unwrap_or(0)
+                })
+                .sum::<u32>()
+        };
+        let mut best: HashMap<u16, (u32, u32, u64)> = HashMap::new();
+        for (&song, &(count, key)) in &seed {
+            let total = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
+            best.insert(song, (total, count, key));
+        }
         for (&key, cell) in &self.cells {
             let song = (key >> 48) as u16;
-            let threshold = (max_single[&song] / 3).max(2);
-            if cell.count < threshold {
+            let entry = best.get_mut(&song).expect("seeded");
+            let bound = slab(&by_shift, key & MASK_SHIFT, 1 << 40)
+                .min(slab(&by_tempo, key & MASK_TEMPO, 1 << 32))
+                .min(slab(&by_offset, key & MASK_OFFSET, 1));
+            if bound < entry.0 {
                 continue;
             }
             let total = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
-            let entry = best.entry(song).or_insert((0, key));
-            if total > entry.0 {
-                *entry = (total, key);
+            if (total, cell.count, std::cmp::Reverse(key))
+                > (entry.0, entry.1, std::cmp::Reverse(entry.2))
+            {
+                *entry = (total, cell.count, key);
             }
         }
+        self.candidates(best)
+    }
+
+    /// The same search without the bound; the oracle for the tests.
+    #[cfg(test)]
+    fn best_per_song_full_scan(&self) -> Vec<Candidate> {
+        let mut best: HashMap<u16, (u32, u32, u64)> = HashMap::new();
+        for (&key, cell) in &self.cells {
+            let song = (key >> 48) as u16;
+            let total = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
+            let entry = best.entry(song).or_insert((total, cell.count, key));
+            if (total, cell.count, std::cmp::Reverse(key))
+                > (entry.0, entry.1, std::cmp::Reverse(entry.2))
+            {
+                *entry = (total, cell.count, key);
+            }
+        }
+        self.candidates(best)
+    }
+
+    fn candidates(&self, best: HashMap<u16, (u32, u32, u64)>) -> Vec<Candidate> {
         let mut out: Vec<Candidate> = best
             .into_iter()
-            .filter(|(_, (evidence, _))| *evidence > 0)
-            .map(|(song, (evidence, key))| {
-                let (_, shift, _, _) = decode_cell(&self.config, key);
-                let (mut n, mut tempo_sum, mut offset_sum) = (0u32, 0.0, 0.0);
-                for cell in self.neighbourhood(key) {
+            .filter(|(_, (evidence, _, _))| *evidence > 0)
+            .map(|(song, (evidence, _, key))| {
+                let (mut n, mut shift_sum, mut tempo_sum, mut offset_sum) = (0u32, 0i64, 0.0, 0.0);
+                for (shift, cell) in self.neighbourhood_with_shift(key) {
                     n += cell.count;
+                    shift_sum += i64::from(shift) * i64::from(cell.count);
                     tempo_sum += cell.tempo_sum;
                     offset_sum += cell.offset_sum;
                 }
                 let tempo = tempo_sum / f64::from(n.max(1));
+                let shift = (shift_sum as f64 / f64::from(n.max(1))).round() as i32;
                 Candidate {
                     song,
                     evidence,
@@ -303,18 +378,27 @@ impl Matcher {
     }
 
     fn neighbourhood(&self, key: u64) -> impl Iterator<Item = &Cell> {
+        self.neighbourhood_with_shift(key).map(|(_, cell)| cell)
+    }
+
+    /// The occupied cells among the 27 around `key`, with their shift.
+    fn neighbourhood_with_shift(&self, key: u64) -> impl Iterator<Item = (i32, &Cell)> {
         let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
-        let mut keys = [0u64; 27];
+        let mut keys = [(0i32, 0u64); 27];
         let mut i = 0;
         for ds in -1..=1 {
             for dt in -1..=1 {
                 for doff in -1..=1 {
-                    keys[i] = encode_cell_raw(song, shift + ds, tempo_idx + dt, offset_idx + doff);
+                    keys[i] = (
+                        shift + ds,
+                        encode_cell_raw(song, shift + ds, tempo_idx + dt, offset_idx + doff),
+                    );
                     i += 1;
                 }
             }
         }
-        keys.into_iter().filter_map(|k| self.cells.get(&k))
+        keys.into_iter()
+            .filter_map(|(shift, k)| self.cells.get(&k).map(|cell| (shift, cell)))
     }
 
     /// Maps an evidence count to a confidence in `0..=100`:
@@ -329,6 +413,13 @@ impl Matcher {
     }
 }
 
+/// Cell key layout: song in bits 48–63, `shift + 128` in bits 40–47,
+/// `tempo_idx + 128` in bits 32–39 and `offset_idx + 2³¹` in bits 0–31.
+/// The masks keep the song and one field.
+const MASK_SHIFT: u64 = 0xffff_ff00_0000_0000;
+const MASK_TEMPO: u64 = 0xffff_00ff_0000_0000;
+const MASK_OFFSET: u64 = 0xffff_0000_ffff_ffff;
+
 fn encode_cell_raw(song: u16, shift: i32, tempo_idx: i32, offset_idx: i32) -> u64 {
     (u64::from(song) << 48)
         | (((shift + 128) as u64 & 0xff) << 40)
@@ -342,16 +433,6 @@ fn decode_cell_raw(key: u64) -> (u16, i32, i32, i32) {
         ((key >> 40) & 0xff) as i32 - 128,
         ((key >> 32) & 0xff) as i32 - 128,
         ((key & 0xffff_ffff) as i64 - (1 << 31)) as i32,
-    )
-}
-
-fn decode_cell(cfg: &MatcherConfig, key: u64) -> (u16, i32, f64, f64) {
-    let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
-    (
-        song,
-        shift,
-        cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step,
-        f64::from(offset_idx) * cfg.offset_step,
     )
 }
 
@@ -502,6 +583,137 @@ mod tests {
             late as f64 > 0.8 * early as f64,
             "early {early} late {late}"
         );
+    }
+
+    fn inject(matcher: &mut Matcher, frame: u64, key: u64, tempo: f64, offset: f64) {
+        let cell = matcher.cells.entry(key).or_default();
+        cell.count += 1;
+        cell.tempo_sum += tempo;
+        cell.offset_sum += offset;
+        matcher.votes.push_back(Vote {
+            frame,
+            key,
+            tempo,
+            offset,
+        });
+    }
+
+    #[test]
+    fn a_strong_neighbourhood_beats_a_strong_single_cell() {
+        // One isolated cell with 30 votes against a 3×3×3 cluster of nine
+        // votes per cell: the cluster's centre has evidence 243 and must
+        // win, whatever its own count.
+        let mut matcher = Matcher::new(MatcherConfig::default());
+        for _ in 0..30 {
+            inject(&mut matcher, 0, encode_cell_raw(0, 10, 15, 50), 1.0, 0.0);
+        }
+        for ds in -1..=1 {
+            for dt in -1..=1 {
+                for doff in -1..=1 {
+                    for _ in 0..9 {
+                        inject(
+                            &mut matcher,
+                            0,
+                            encode_cell_raw(0, ds, 15 + dt, doff),
+                            1.0,
+                            0.0,
+                        );
+                    }
+                }
+            }
+        }
+        let best = matcher.best().unwrap();
+        assert_eq!(best.evidence, 243);
+        assert_eq!(best.shift, 0);
+        assert!(matcher.confidence(best.evidence) > 70.0);
+    }
+
+    #[test]
+    fn expiring_votes_removes_their_own_contribution() {
+        // Two early votes at (tempo 0.9, offset −40) and two late ones at
+        // (1.1, +40) share a cell. Once the early ones expire the estimate
+        // must be the late votes' mean, not the cell's old mean.
+        let mut matcher = Matcher::new(MatcherConfig {
+            window_frames: 100,
+            ..MatcherConfig::default()
+        });
+        let key = encode_cell_raw(0, 0, 15, 0);
+        inject(&mut matcher, 0, key, 0.9, -40.0);
+        inject(&mut matcher, 0, key, 0.9, -40.0);
+        inject(&mut matcher, 150, key, 1.1, 40.0);
+        inject(&mut matcher, 150, key, 1.1, 40.0);
+        matcher.latest_frame = 150;
+        let before = matcher.best().unwrap();
+        assert_eq!(before.evidence, 4);
+        assert!((before.tempo - 1.0).abs() < 1e-9);
+        assert!(before.offset.abs() < 1e-9);
+        matcher.advance(200);
+        let after = matcher.best().unwrap();
+        assert_eq!(after.evidence, 2);
+        assert!((after.tempo - 1.1).abs() < 1e-9, "tempo {}", after.tempo);
+        assert!(
+            (after.offset - 40.0).abs() < 1e-9,
+            "offset {}",
+            after.offset
+        );
+        matcher.advance(300);
+        assert!(matcher.best().is_none());
+    }
+
+    #[test]
+    fn bounded_search_matches_the_full_scan() {
+        // Random histograms: a sparse background, a few clusters, and
+        // repeated cells so that ties occur.
+        let mut seed = 0x9E37_79B9u64;
+        let mut next = |m: u64| {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed % m
+        };
+        for trial in 0..300 {
+            let mut matcher = Matcher::new(MatcherConfig::default());
+            let songs = 1 + next(3) as u16;
+            let background = next(400) as usize;
+            for _ in 0..background {
+                let key = encode_cell_raw(
+                    next(u64::from(songs)) as u16,
+                    next(49) as i32 - 24,
+                    next(36) as i32,
+                    next(60) as i32 - 30,
+                );
+                for _ in 0..=next(3) {
+                    inject(&mut matcher, 0, key, 1.0, 0.0);
+                }
+            }
+            for _ in 0..next(4) {
+                let (song, shift, tempo, offset) = (
+                    next(u64::from(songs)) as u16,
+                    next(45) as i32 - 22,
+                    2 + next(32) as i32,
+                    next(56) as i32 - 28,
+                );
+                let strength = 1 + next(12);
+                for ds in -1..=1 {
+                    for dt in -1..=1 {
+                        for doff in -1..=1 {
+                            if next(4) == 0 {
+                                continue;
+                            }
+                            let key = encode_cell_raw(song, shift + ds, tempo + dt, offset + doff);
+                            for _ in 0..strength {
+                                inject(&mut matcher, 0, key, 1.0, 0.0);
+                            }
+                        }
+                    }
+                }
+            }
+            assert_eq!(
+                matcher.best_per_song(),
+                matcher.best_per_song_full_scan(),
+                "trial {trial}"
+            );
+        }
     }
 
     #[test]

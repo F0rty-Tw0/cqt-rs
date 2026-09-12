@@ -47,6 +47,36 @@ def load_truth(name: str) -> dict:
     return json.load(open(WORK / f"{name}.json"))
 
 
+def git_commit() -> str:
+    try:
+        return subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, check=True,
+                              capture_output=True, text=True).stdout.strip()
+    except (subprocess.CalledProcessError, OSError):
+        return "unknown"
+
+
+def worst_cases(rows: list[dict], false_starts: list[dict], reports: list[dict], truth: dict,
+                keep: int = 3) -> list[dict]:
+    """The slowest (or missed) plays and every false start, each with its
+    ground-truth segment and the report trace around it, so that a case can
+    be replayed and plotted without rerunning the whole evaluation."""
+    def trace(t0: float, t1: float) -> list[dict]:
+        return [r for r in reports if t0 <= r["consumed"] <= t1]
+
+    ranked = sorted(rows, key=lambda r: (r["detected"], -r.get("latency", 0.0)))
+    cases = []
+    for r in ranked[:keep]:
+        end = r["start"] + r["latency"] + 2.0 if r["detected"] else r["end"]
+        cases.append(dict(kind="miss" if not r["detected"] else "slow", play=r,
+                          segment=next(s for s in truth["segments"] if s["start"] == r["start"]),
+                          reports=trace(r["start"] - 2.0, end)))
+    for fs in false_starts:
+        seg = next((s for s in truth["segments"] if s["start"] <= fs["consumed"] <= s["end"]), None)
+        cases.append(dict(kind="false_start", start=fs, segment=seg,
+                          reports=trace(fs["consumed"] - 6.0, fs["consumed"] + 2.0)))
+    return cases
+
+
 def evaluate(args) -> dict:
     extra = ["--half", str(args.half), "--threshold", str(args.threshold), "--window", str(args.window)]
     null_events = run_monitor(WORK / "stream_null.wav", extra)
@@ -89,21 +119,27 @@ def evaluate(args) -> dict:
             inside = [r for r in reports if seg["start"] <= r["consumed"] <= seg["end"] and r["song"] == seg["source"]]
             row["max_confidence"] = max((r["confidence"] for r in inside), default=det["confidence"])
             row["extra_starts"] = len(cands) - 1
-            end = ends.get((det["song"], det["consumed"]))
+            end = ends.get((det["song"], det["t"]))
             row["reported_end"] = end["consumed"] if end else None
         rows.append(row)
     false_starts = [s for s in starts if id(s) not in used]
     # A false start inside a play of the *other* song or in filler music.
     summary = dict(
         half=args.half, threshold=args.threshold, window=args.window,
+        commit=git_commit(),
+        stream=next(e for e in eval_events if e["event"] == "stream"),
         null=dict(seconds=null_done["audio_seconds"], reports=len(null_reports), max_evidence=int(null_evidence.max()),
                   p999_evidence=float(np.percentile(null_evidence, 99.9)), median_evidence=float(np.median(null_evidence)),
                   max_confidence=float(null_conf.max()), false_alarms=len(null_starts),
-                  realtime_fraction=null_done["realtime_fraction"]),
+                  realtime_fraction=null_done["realtime_fraction"],
+                  hash_delay_median_seconds=null_done["hash_delay_median_seconds"],
+                  hash_delay_max_seconds=null_done["hash_delay_max_seconds"]),
         eval=dict(seconds=done["audio_seconds"], plays=len(plays), detected=sum(r["detected"] for r in rows),
                   false_starts=len(false_starts), realtime_fraction=done["realtime_fraction"],
+                  hash_delay_median_seconds=done["hash_delay_median_seconds"],
                   index=[e for e in eval_events if e["event"] in ("index", "index_done")]),
         plays=rows,
+        worst=worst_cases(rows, false_starts, reports, eval_truth),
     )
     json.dump(summary, open(WORK / "eval_summary.json", "w"), indent=2)
 
@@ -113,7 +149,8 @@ def evaluate(args) -> dict:
           f"max confidence {null_conf.max():.1f}; false alarms at {args.threshold}: {len(null_starts)}; "
           f"CPU {100 * null_done['realtime_fraction']:.2f} % of one core")
     print(f"eval stream: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
-          f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %")
+          f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %; "
+          f"hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s")
     print("\n| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected | Position error |")
     print("| --- | --- | ---: | ---: | ---: | ---: | ---: |")
     for r in rows:

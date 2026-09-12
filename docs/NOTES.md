@@ -169,9 +169,18 @@ Design decisions and why:
   one cell; evidence went from ~900 to ~4000 on the same plays and no
   longer depends on how long the monitor has been running (unit test
   `evidence_does_not_decay_late_in_a_long_stream`).
-- **Evidence = best cell + 26 neighbours**, only for cells with ≥ 2 votes
-  and ≥ ⅓ of the song's strongest cell (the neighbourhood sum over every
-  cell cost 1 % CPU on the null stream, now 0.6 % in total).
+- **Evidence = best cell + 26 neighbours**, evaluated for every occupied
+  cell. A first version skipped cells with fewer than ⅓ of the song's
+  strongest cell to save CPU; review found the counterexample (an
+  isolated 30-vote cell hides a 27-cell cluster of nines whose
+  neighbourhood is 243), so the search is exact again and the cost is
+  measured instead (see §8). Ties go to the centre with more votes, then
+  the smallest key; shift, tempo and offset are vote-weighted means over
+  the winning neighbourhood.
+- **Votes remember their own tempo and offset** so that expiring a vote
+  subtracts exactly its contribution; subtracting the cell mean kept the
+  window's old mean alive (offsets `[−40, −40, +40, +40]` expiring the
+  first two would still report 0).
 - **Per-song tracking** so two songs can be active during a crossfade;
   a new play of the same song is declared when the predicted position
   jumps by > 3 s, the shift by > 2 bins or the tempo by > 0.05 for a full
@@ -180,8 +189,20 @@ Design decisions and why:
   null maximum over 31 min was 25 with absolute offsets and 51 with the
   rolling origin (true evidence rose 4×, null 2×), hence `half = 100`.
   Threshold 70 ⇔ evidence ≥ 233 ⇔ 4.6× the worst null cell.
-- **Bucket cap** 8 per song per key: keys shared by more entries are
-  skipped at lookup.
+- **Bucket cap** 8 per `(key, song)`, enforced when the index is built:
+  a key that occurs more than 8 times in one song loses that song's
+  entries and keeps every other song's. The first version compared the
+  whole bucket with `8 × songs`, which made one song's evidence depend on
+  how many unrelated songs were watched.
+- **Hashes are released early.** An anchor's hashes depend only on its
+  first `3·fan_out` candidates, so once that many later peaks inside the
+  zone are known the anchor is emitted (in order) instead of waiting for
+  the 320-frame zone to pass. The hash sequence is provably identical
+  (tests against brute force with random watermark steps, sparse and
+  dense peaks, fan-out 0–6); the worst case is still `zone`.
+- **Detection tracker** (`Tracker`) is a library type with unit tests for
+  start, release, brief versus persistent jumps and end-of-stream; the
+  binary only formats its events (strings JSON-escaped).
 
 Measured (4-core container, one thread):
 

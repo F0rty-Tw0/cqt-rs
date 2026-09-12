@@ -19,7 +19,13 @@ pub struct Entry {
 }
 
 /// Multiplicative hasher for the packed keys: the map is keyed by a `u32`
-/// only, so a single multiply is faster than SipHash.
+/// only, so a multiply and a fold are faster than SipHash.
+///
+/// The table uses the low bits of the hash for the bucket and the top
+/// seven bits as a tag that filters probes before any key comparison, so
+/// both ends must be well mixed. The high half of the product is; folding
+/// it into the low half mixes that too (the low bits of the product alone
+/// depend only on the low, structured bits of the key).
 #[derive(Default)]
 pub struct KeyHasher(u64);
 
@@ -33,7 +39,8 @@ impl Hasher for KeyHasher {
         }
     }
     fn write_u32(&mut self, key: u32) {
-        self.0 = (u64::from(key).wrapping_mul(0x9E37_79B9_7F4A_7C15)) >> 20;
+        let x = u64::from(key).wrapping_mul(0x9E37_79B9_7F4A_7C15);
+        self.0 = x ^ (x >> 32);
     }
 }
 
@@ -75,17 +82,21 @@ impl IndexBuilder {
         song
     }
 
-    /// Builds the index. Keys shared by more than `max_bucket_per_song`
-    /// entries per watched song carry too little information and are
-    /// skipped at lookup time.
+    /// Builds the index. A key that occurs more than `max_bucket_per_song`
+    /// times in one song says little about where in that song the stream
+    /// is, so those occurrences are dropped; the same key's occurrences in
+    /// other songs are kept. The cap is therefore independent of how many
+    /// songs are watched.
     pub fn build(mut self, max_bucket_per_song: usize) -> Index {
+        let cap = max_bucket_per_song.max(1);
         self.hashes
             .sort_unstable_by_key(|(key, e)| (*key, e.song, e.frame, e.bin));
         let mut table = HashMap::with_capacity_and_hasher(
             self.hashes.len() / 2 + 1,
             BuildHasherDefault::default(),
         );
-        let entries: Vec<Entry> = self.hashes.iter().map(|(_, e)| *e).collect();
+        let mut entries: Vec<Entry> = Vec::with_capacity(self.hashes.len());
+        let mut dropped = 0;
         let mut start = 0;
         while start < self.hashes.len() {
             let key = self.hashes[start].0;
@@ -93,16 +104,33 @@ impl IndexBuilder {
             while end < self.hashes.len() && self.hashes[end].0 == key {
                 end += 1;
             }
-            table.insert(key, (start as u32, (end - start) as u32));
+            let first = entries.len();
+            let mut song_start = start;
+            while song_start < end {
+                let song = self.hashes[song_start].1.song;
+                let mut song_end = song_start;
+                while song_end < end && self.hashes[song_end].1.song == song {
+                    song_end += 1;
+                }
+                if song_end - song_start <= cap {
+                    entries.extend(self.hashes[song_start..song_end].iter().map(|(_, e)| *e));
+                } else {
+                    dropped += song_end - song_start;
+                }
+                song_start = song_end;
+            }
+            if entries.len() > first {
+                table.insert(key, (first as u32, (entries.len() - first) as u32));
+            }
             start = end;
         }
-        let max_bucket = (max_bucket_per_song.max(1) * self.names.len().max(1)) as u32;
+        entries.shrink_to_fit();
         Index {
             names: self.names,
             frames: self.frames,
             table,
             entries,
-            max_bucket,
+            dropped,
         }
     }
 }
@@ -114,7 +142,7 @@ pub struct Index {
     frames: Vec<u32>,
     table: HashMap<HashKey, (u32, u32), BuildHasherDefault<KeyHasher>>,
     entries: Vec<Entry>,
-    max_bucket: u32,
+    dropped: usize,
 }
 
 impl Index {
@@ -138,6 +166,12 @@ impl Index {
         self.entries.is_empty()
     }
 
+    /// Number of hashes dropped at build time because their key occurred
+    /// more than the cap times in one song.
+    pub fn dropped(&self) -> usize {
+        self.dropped
+    }
+
     /// Approximate memory use in bytes.
     pub fn memory_bytes(&self) -> usize {
         self.entries.len() * std::mem::size_of::<Entry>() + self.table.capacity() * 16
@@ -145,7 +179,7 @@ impl Index {
 
     /// Calls `on_entry` for every stored entry whose key is within
     /// `±bin_tolerance` on both bin differences and `±ratio_tolerance` on
-    /// the ratio step of `key`, skipping over-full buckets.
+    /// the ratio step of `key`.
     pub fn lookup<F: FnMut(&Entry)>(
         &self,
         key: HashKey,
@@ -161,9 +195,6 @@ impl Index {
                         .wrapping_add((e2 << 10) as u32)
                         .wrapping_add(dr as u32);
                     if let Some(&(start, len)) = self.table.get(&probe) {
-                        if len > self.max_bucket {
-                            continue;
-                        }
                         for entry in &self.entries[start as usize..(start + len) as usize] {
                             on_entry(entry);
                         }
@@ -189,7 +220,7 @@ mod tests {
     }
 
     #[test]
-    fn lookup_probes_neighbouring_keys_and_skips_full_buckets() {
+    fn lookup_probes_neighbouring_keys_and_drops_repetitive_keys_per_song() {
         let mut builder = IndexBuilder::new();
         builder.add_song(
             "a",
@@ -197,9 +228,13 @@ mod tests {
             vec![hash(3, -2, 10, 5, 40, 100), hash(4, -2, 11, 9, 41, 120)],
         );
         builder.add_song("b", 500, (0..20).map(|i| hash(0, 0, 0, i, 1, 10)));
+        builder.add_song("c", 500, (0..3).map(|i| hash(0, 0, 0, 7 * i, 2, 11)));
         let index = builder.build(8);
-        assert_eq!(index.names(), &["a".to_string(), "b".to_string()]);
-        assert_eq!(index.len(), 22);
+        assert_eq!(index.names(), &["a", "b", "c"]);
+        // Song b's 20 occurrences of one key are dropped; song c's three
+        // occurrences of the same key stay.
+        assert_eq!(index.len(), 5);
+        assert_eq!(index.dropped(), 20);
         let mut found = Vec::new();
         index.lookup(encode_key(3, -2, 10), 1, 1, |e| found.push(*e));
         assert_eq!(found.len(), 2);
@@ -208,9 +243,49 @@ mod tests {
         index.lookup(encode_key(3, -2, 10), 0, 0, |e| found.push(*e));
         assert_eq!(found.len(), 1);
         assert_eq!(found[0].frame, 5);
-        // The bucket of 20 entries exceeds 8 per song × 2 songs.
         found.clear();
         index.lookup(encode_key(0, 0, 0), 1, 1, |e| found.push(*e));
-        assert!(found.is_empty());
+        assert_eq!(found.len(), 3);
+        assert!(found.iter().all(|e| e.song == 2));
+    }
+
+    #[test]
+    fn cap_does_not_depend_on_the_number_of_songs() {
+        // Nine occurrences in one song are dropped whether or not other
+        // songs are watched.
+        for others in [0, 1, 50] {
+            let mut builder = IndexBuilder::new();
+            builder.add_song("a", 100, (0..9).map(|i| hash(1, 1, 1, i, 1, 10)));
+            for o in 0..others {
+                builder.add_song(&format!("o{o}"), 100, vec![hash(2, 2, 2, 1, 1, 10)]);
+            }
+            let index = builder.build(8);
+            let mut found = 0;
+            index.lookup(encode_key(1, 1, 1), 0, 0, |_| found += 1);
+            assert_eq!(found, 0, "{others} other songs");
+            assert_eq!(index.dropped(), 9);
+        }
+    }
+
+    #[test]
+    fn hasher_spreads_the_tag_and_bucket_bits() {
+        // hashbrown takes its 7-bit control tag from the top of the hash
+        // and the bucket from the bottom; both must vary over the packed
+        // keys, which only differ in three narrow fields.
+        let mut tags = std::collections::HashSet::new();
+        let mut low = std::collections::HashSet::new();
+        for d12 in -60..60 {
+            for d23 in -60..60 {
+                for ratio in 0..32 {
+                    let mut h = KeyHasher::default();
+                    h.write_u32(encode_key(d12, d23, ratio));
+                    let hash = h.finish();
+                    tags.insert(hash >> 57);
+                    low.insert(hash & 0xffff);
+                }
+            }
+        }
+        assert_eq!(tags.len(), 128);
+        assert!(low.len() > 60_000, "{}", low.len());
     }
 }
