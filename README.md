@@ -89,7 +89,13 @@ regardless of how the audio is chunked.
 | `multirate(b)` | true | Analyse each octave at its own halved sample rate (see below) |
 
 `build()` validates everything, including that the highest filter's pass-band
-stays below the Nyquist frequency.
+stays below the Nyquist frequency. The window length per bin under the three
+settings that change it (the fingerprint grid at 44.1 kHz, `gamma` 20 Hz cuts
+the 55 Hz window from 33 000 to 4 000 samples, a cap flattens the low end):
+
+<p align="center">
+  <img src="./plots/kernel_lengths.svg" width="70%" />
+</p>
 
 ### Fingerprinting notes
 
@@ -138,6 +144,11 @@ the rayon pool.
 | Same grid, single-rate | 109 | 1 | 32768 | 70 990 | 45.4 ms | 158 µs | 15.7 ms (30 s) |
 | Same grid, kernels capped at 2048 | 109 | 9 | 8–128 | 1 038 | 0.53 ms | | 1.93 ms (30 s) |
 | Fingerprint (55–7040 Hz, 24/oct, 44.1 kHz, hop 512) | 169 | 8 | 256, 512 × 7 | 1 891 | 2.0 ms | 10.1 µs | 2.94 ms (10 s) |
+
+The monitor's index (`cargo bench -p cqt-monitor`, `monitor/benches/index.rs`)
+answers 4 096 tolerant lookups (27 probes each) in 2.8 ms when every key
+hits and 0.55 ms when none does, about 0.7 µs per lookup; the null stream
+performs about 1 400 lookups per second.
 
 For comparison, version 0.1 on the same machine and legacy grid needed
 1.50 ms to build its filterbank and 7.44 ms for the 30 s batch, while using
