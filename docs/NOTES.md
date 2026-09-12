@@ -210,7 +210,7 @@ Measured (4-core container, one thread, after review round 1):
 | --- | --- | --- |
 | Evidence | max 50, 99.9 % 46, median 17 | thousands during plays |
 | Confidence | max 33.3, no start event | 16/16 plays, 0 false starts |
-| Detection after play start | | median 2.2 s, max 13.6 s (talk-over), crossfade 6.8 s |
+| Detection after play start | | median 2.3 s (was 3.0 s), max 13.6 s (talk-over), crossfade 6.8 s |
 | Hash delay (anchor → hashes) | median 1.13 s, max 2.0 s (was a fixed 2.0 s) | median 1.02 s |
 | CPU | 0.9 % of one core (0.33 % without reports; the exact search per report is the rest) | 0.9 % |
 | Index | 169 k hashes (3 339 dropped by the per-song cap), 5.7 MB for 111 s of songs | |
@@ -283,7 +283,7 @@ measurements.
 | Flush padding not in the frame timeline | correct | padding joins the timeline once audio follows it (`padding_samples`); a repeated flush emits nothing; test compares the continuation with the batch transform of the padded signal |
 | JSON built by interpolation | correct | strings escaped; the start/end state machine is a library `Tracker` with unit tests |
 | `best_per_song` skips centres by their own count (30 vs 243 example) | correct | exact search over every occupied cell with an upper bound from a (song, shift, offset) histogram; oracle test against the full scan on 300 random histograms |
-| Early hash emission | adopted | anchor released when its `3·fan_out` candidates are known; hash delay median 2.0 → 1.0 s, every detection 0.6–0.9 s earlier, hash sequence unchanged |
+| Early hash emission | adopted | anchor released when its `3·fan_out` candidates are known; hash delay median 2.0 → 1.0 s, detections up to 1.0 s earlier (median 3.0 → 2.3 s, `plots/radio_compare.png`), hash sequence unchanged |
 | Grouped ratio directory (27 → 9 probes) | deferred | after the hasher fix a lookup costs about 0.7 µs and the null stream does 1 400 lookups/s, i.e. 0.1 % of a core; the bound-based search and the pipeline itself dominate. Worth revisiting only with hundreds of songs |
 | Correlated triplets, distinct-anchor evidence | next experiment | needs its own calibration; the replay bundle below is the tool for it |
 | Candidate generation + verification stage | next experiment | agreed as the way to make fan-out 4 the default; run observation-only first |
@@ -304,6 +304,16 @@ Two clarifications the review asked for:
   material, and the null set must be separate from the calibration set.
   The evidence margin (worst null cell 50 versus threshold 233) is the
   reason to expect the rate to be far lower than the bound, not proof.
+
+Reproducing the before/after figure (`plots/radio_compare.png`):
+
+```console
+git worktree add /tmp/before 09978b8
+(cd /tmp/before && CARGO_TARGET_DIR=$PWD/../target/before cargo build --release -p cqt-monitor)
+python3 scripts/radio_eval.py --monitor target/before/release/monitor --label 09978b8 --out eval_summary_before --no-plots
+python3 scripts/radio_eval.py --label f731b5d
+python3 scripts/radio_compare.py eval_summary_before eval_summary
+```
 
 What the exact search costs: on the null stream every report (4 per
 second) scans about 7 000 occupied cells. With the count-based pruning

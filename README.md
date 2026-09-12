@@ -319,6 +319,17 @@ is detected 1.6 s after the speech stops.
   <img src="./plots/radio_detection.png" width="98%" />
 </p>
 
+The evaluation records the commit, the monitor configuration and the
+report traces around the worst cases, and `scripts/radio_compare.py`
+plots two runs against each other. Below, the monitor before and after
+the first review round: the early release of hashes moves detections up
+to 1.0 s earlier (median 3.0 s → 2.3 s) at the same null-stream ceiling,
+and the exact hypothesis search costs 0.2–0.3 % of a core more.
+
+<p align="center">
+  <img src="./plots/radio_compare.png" width="98%" />
+</p>
+
 Resources: with two watched songs the whole chain runs at 0.9 % of
 one core on the null stream and 0.9 % on the programme (44.1 kHz
 mono, one thread), and the index costs 6–9 MB per 3 minutes of watched

@@ -129,6 +129,8 @@ def evaluate(args) -> dict:
     summary = dict(
         half=args.half, threshold=args.threshold, window=args.window,
         commit=git_commit(),
+        label=args.label or git_commit()[:7],
+        monitor=args.monitor or "target/release/monitor",
         stream=next(e for e in eval_events if e["event"] == "stream"),
         null=dict(seconds=null_done["audio_seconds"], reports=len(null_reports), max_evidence=int(null_evidence.max()),
                   p999_evidence=float(np.percentile(null_evidence, 99.9)), median_evidence=float(np.median(null_evidence)),
@@ -247,6 +249,7 @@ def main() -> None:
     parser.add_argument("--monitor", help="monitor binary to run instead of building the current tree")
     parser.add_argument("--out", default="eval_summary", help="summary name under target/radio (default eval_summary)")
     parser.add_argument("--no-plots", action="store_true", help="skip the figures (for comparison runs)")
+    parser.add_argument("--label", help="name of this run in comparisons (default: the short commit of the tree)")
     evaluate(parser.parse_args())
 
 
