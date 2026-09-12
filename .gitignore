@@ -16,3 +16,5 @@ Cargo.lock
 # IDE
 .vscode
 .editorconfig
+# Python
+__pycache__/

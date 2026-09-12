@@ -22,6 +22,12 @@ Breaking rewrite of the transform.
 
 ## Added
 
+- `cqt-monitor` workspace crate (`monitor/`): streaming peak picker,
+  pitch- and tempo-invariant triplet hasher, watch-list hash index,
+  sliding-window matcher with a calibrated confidence score, and a
+  `monitor` binary that reports detections on a stream as JSON lines.
+  Validated on a simulated radio programme (`scripts/radio_sim.py`,
+  `scripts/radio_eval.py`).
 - Multi-rate processing (Schörkhuber & Klapuri, 2010): each octave is
   analysed at its own sample rate, halved octave by octave with an 80 dB
   Kaiser half-band filter, so every octave uses a small FFT and a compact

@@ -146,3 +146,76 @@ Lessons:
 - Audio is downloaded at run time from the librosa data mirror with SHA-256
   checks; nothing copyrighted is committed. Attribution: Kevin MacLeod,
   CC BY 3.0 (*Vibe Ace*, *Dance of the Sugar Plum Fairy*).
+
+## 7. Radio monitoring (`monitor/`, `scripts/radio_sim.py`, `scripts/radio_eval.py`)
+
+Goal: a watch list of songs, a continuous stream with DJ treatment, a
+confidence score with "below 70 is not a match", real time on a small
+budget. This is the inverse of Shazam (few songs, endless query), which
+makes the index tiny and lets evidence accumulate in a sliding window.
+
+Design decisions and why:
+- **Rust port is bit-identical** to the Python picker/hasher (verified on
+  the 30 s excerpt: 617 peaks, 51 109 hashes, same sets). Edge handling
+  replicates SciPy `mode="nearest"` by repeating the first/last frame and
+  bin, so batch and stream agree; the picker delay is `time_radius`
+  frames, the hasher delay is `zone` frames.
+- **Votes use the cell's quantized tempo and a rolling origin.** With
+  `offset = t_ref − tempo·t_query` in absolute frames, the ~1 % tempo
+  error of a single match (integer spans) scatters votes over
+  `0.01·t_query` frames, i.e. 8 s after 800 s of stream. Computing the
+  offset with the cell tempo and against an origin that moves every four
+  windows (cells are re-keyed, `Matcher::rebase`) keeps the scatter under
+  one cell; evidence went from ~900 to ~4000 on the same plays and no
+  longer depends on how long the monitor has been running (unit test
+  `evidence_does_not_decay_late_in_a_long_stream`).
+- **Evidence = best cell + 26 neighbours**, only for cells with ≥ 2 votes
+  and ≥ ⅓ of the song's strongest cell (the neighbourhood sum over every
+  cell cost 1 % CPU on the null stream, now 0.6 % in total).
+- **Per-song tracking** so two songs can be active during a crossfade;
+  a new play of the same song is declared when the predicted position
+  jumps by > 3 s, the shift by > 2 bins or the tempo by > 0.05 for a full
+  second (a repeated riff briefly wins the vote at the tail of a play).
+- **Confidence** `100·n/(n+half)`, `half = 2 × max null evidence`. The
+  null maximum over 31 min was 25 with absolute offsets and 51 with the
+  rolling origin (true evidence rose 4×, null 2×), hence `half = 100`.
+  Threshold 70 ⇔ evidence ≥ 233 ⇔ 4.6× the worst null cell.
+- **Bucket cap** 8 per song per key: keys shared by more entries are
+  skipped at lookup.
+
+Measured (4-core container, one thread):
+
+| | Null stream (31 min) | Programme (15 min) |
+| --- | --- | --- |
+| Evidence | max 51, 99.9 % 46, median 17 | 90th percentile 4755 during plays |
+| Confidence | max 33.8, no start event | 16/16 plays, 0 false starts |
+| Detection after play start | | median 2.7 s (2.4 s is pipeline delay), max 14.3 s (talk-over) |
+| CPU | 0.63 % of one core | 0.69 % |
+| Index | 172 k hashes, 5.7 MB for 111 s of songs (≈ 9 MB per 3-min song) | |
+
+Fan-out trade-off (same streams): fan-out 4 → 2.7 MB, 0.35 % CPU, null
+max 21; recalibrated to `half = 42` it detects 16/16 at a median 3.0 s
+(max 14.8 s) with no null alarm but one extra start event inside a play.
+Fan-out 3 → 1.4 MB, 0.28 %, null max 10, but with `half = 100` one play
+is missed and latencies reach 33 s. The ratio of true to null evidence is
+~90 at every fan-out; what fan-out buys is absolute counts, i.e. speed and
+stability at the same margin. Default stays 6; use 4 for watch lists of
+hundreds of songs.
+
+Known limits:
+- Talk-over with speech louder than the music: evidence 50–70 (confidence
+  30–40) while the speech lasts, detection 2–3 s after it stops.
+- A crossfade is detected ~1.5 s after the fade-in completes.
+- `end` events lag the real end by window + delay (~8 s).
+- Only tested at 44.1 kHz mono; the binary refuses mismatched rates.
+
+Next steps for monitoring, in order:
+1. Speech-robust evidence: down-weight peaks in 100–1000 Hz during talk
+   (or two windows, 5 s and 15 s, and report the better confidence) to
+   catch the talk-over intro; measure on `pitch_fader_+4_talkover`.
+2. Index serialization (`Index` to/from a file) and a `--listen` mode that
+   reads PCM from stdin so the binary can sit behind an FM/stream decoder.
+3. Reduce `end` lag by ending on evidence decay slope rather than a fixed
+   release.
+4. A second real recording (phone mic in a room) to confirm the FM chain
+   simulation is not optimistic.

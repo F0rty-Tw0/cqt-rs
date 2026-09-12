@@ -236,6 +236,89 @@ pip install numpy scipy soundfile librosa matplotlib
 python3 scripts/fingerprint_demo.py
 ```
 
+## Radio monitoring with a watch list
+
+The `cqt-monitor` crate in [`monitor/`](./monitor) turns the transform into
+a real-time watch-list monitor: given the songs you want to catch, it
+listens to a stream and reports when one of them is playing, how the DJ
+pitched and stretched it, where in the song the stream is, and a
+confidence score. Everything is streaming with a bounded delay and no
+allocation per frame.
+
+| Stage | What it does | Delay |
+| --- | --- | ---: |
+| `CqtStream` | 55–7040 Hz, 24 bins per octave, hop 256 | 0.39 s |
+| `PeakPicker` | local maxima 15 dB above the mean of a ±24 frame × ±9 bin neighbourhood | 0.14 s |
+| `TripletHasher` | pitch- and tempo-invariant triplet hashes, zone 320 frames, fan-out 6 | 1.86 s |
+| `Index` | hash table over the watched songs, ±1 bin and ±1 ratio-step lookups | |
+| `Matcher` | 5 s sliding vote over (song, pitch shift, tempo, position) | |
+
+The evidence for a song is the number of consistent hash matches in the
+window. The confidence is `100 · n / (n + half)`, with `half` calibrated
+on audio that contains none of the watched songs: at twice the largest
+evidence ever seen there, false matches stay below 34 while a watched song
+reads above 70 within seconds. The `monitor` binary prints one JSON line
+per report interval and `start`/`end` events for every detection.
+
+```console
+cargo run --release -p cqt-monitor -- --watch song=song.wav --watch other=other.wav --stream radio.wav
+```
+
+### Simulated radio programme
+
+`scripts/radio_sim.py` builds two streams from CC-licensed tracks: a 15 min
+programme in which the two watched songs (*Vibe Ace*, *Sweet Waltz*) are
+played 16 times between other songs and speech, each play with a DJ
+treatment, and a 31 min null stream of other music and speech with the
+same treatments and no watched song. Both streams go through an FM-style
+chain (15 kHz low-pass, 4:1 broadcast compressor). `scripts/radio_eval.py`
+runs the monitor over both and compares the detections with the ground
+truth.
+
+On the null stream the evidence never exceeds 51 (median 17), so `half` is
+100; the highest confidence in 31 minutes is 33.8 and there is no false
+alarm at the threshold of 70. On the programme all 16 plays are detected
+with no false start:
+
+| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected |
+| --- | --- | ---: | ---: | ---: | ---: |
+| vibe_ace | clean | 2.8 s | 84 / 98 | +0 / +0 | ×1.000 / ×1.000 |
+| sweet_waltz | pitch fader +6 % | 3.0 s | 81 / 98 | +2 / +2 | ×1.060 / ×1.064 |
+| vibe_ace | pitch fader +6 % | 2.9 s | 75 / 98 | +2 / +2 | ×1.060 / ×1.062 |
+| vibe_ace | pitch fader −8 % | 2.8 s | 80 / 98 | −3 / −3 | ×0.920 / ×0.922 |
+| vibe_ace | key-locked tempo +10 % | 3.1 s | 79 / 96 | +0 / +0 | ×1.100 / ×1.095 |
+| sweet_waltz | key change −1 semitone | 3.7 s | 73 / 94 | −2 / −2 | ×1.000 / ×1.001 |
+| vibe_ace | key-locked tempo −8 % | 3.2 s | 72 / 94 | +0 / +0 | ×0.920 / ×0.918 |
+| vibe_ace | key change +2 semitones | 4.6 s | 91 / 97 | +4 / +4 | ×1.000 / ×0.999 |
+| vibe_ace | key change −1 semitone | 2.6 s | 73 / 94 | −2 / −2 | ×1.000 / ×0.999 |
+| vibe_ace | pitch fader +4 % with 12 s of DJ talk-over | 14.3 s | 70 / 98 | +1 / +1 | ×1.040 / ×1.038 |
+| vibe_ace | 6 s crossfade in and out | 7.5 s | 75 / 98 | +0 / +0 | ×1.000 / ×1.003 |
+| vibe_ace | bass cut, FM chain, MP3 128k | 3.6 s | 77 / 98 | +0 / +0 | ×1.000 / ×0.999 |
+| sweet_waltz | FM chain, MP3 128k | 2.7 s | 71 / 98 | +0 / +0 | ×1.000 / ×1.002 |
+| vibe_ace | FM chain, MP3 128k | 2.7 s | 85 / 98 | +0 / +0 | ×1.000 / ×1.001 |
+| vibe_ace | pitch fader +6 %, FM chain, MP3 | 3.7 s | 88 / 98 | +2 / +2 | ×1.060 / ×1.059 |
+| sweet_waltz | pitch fader +6 %, FM chain, MP3 | 2.6 s | 73 / 98 | +2 / +2 | ×1.060 / ×1.064 |
+
+The detection time includes the 2.4 s of pipeline delay, so a song is
+recognised from its first half-second of audible material; the reported
+position is within 0.1 s in every case. The two slow cases are honest: the
+crossfade play is detected 1.5 s after its 6 s fade-in completes, and the
+talk-over play, where speech sits 3 dB above the ducked music for 12 s,
+holds a confidence of 30–40 during the talking and is detected 2.3 s after
+the speech stops.
+
+<p align="center">
+  <img src="./plots/radio_timeline.png" width="98%" />
+</p>
+<p align="center">
+  <img src="./plots/radio_detection.png" width="98%" />
+</p>
+
+Resources: the whole chain runs at 0.6–0.7 % of one core for a 44.1 kHz
+stream, and the index costs about 9 MB per 3-minute watched song at
+fan-out 6 (fan-out 4 halves both memory and CPU at a similar detection
+time once `half` is recalibrated, see `docs/NOTES.md`).
+
 ## References
 
 - J. C. Brown, "Calculation of a constant Q spectral transform", JASA 1991.

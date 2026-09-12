@@ -48,3 +48,6 @@ unsafe_code = "forbid"
 
 [profile.bench]
 debug = false
+
+[workspace]
+members = ["monitor"]
