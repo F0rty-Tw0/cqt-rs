@@ -157,14 +157,16 @@ cargo run --release --example generate_plots
 
 `scripts/fingerprint_demo.py` runs the transform (through
 `examples/cqt_dump.rs`) on a 30 s excerpt of *Vibe Ace* by Kevin MacLeod
-(CC BY 3.0, fetched from the librosa example-data repository), on modified
-versions of it, on the other half of the same song, and on an unrelated
-piece (*Dance of the Sugar Plum Fairy*, Kevin MacLeod, CC BY 3.0) as the
-negative control. Each spectrogram (hop 256) is fingerprinted with pitch-
-and tempo-invariant peak triplets (two bin differences plus a quantized
-time ratio, as in Panako), looked up with ±1 bin and ±1 ratio step of
-tolerance, and matched against the original by voting for the densest
-(bin offset, tempo) cell.
+(CC BY 3.0, fetched from the librosa example-data repository), which serves
+as the reference. Modified versions of the excerpt, the other half of the
+same song, and an unrelated piece (*Dance of the Sugar Plum Fairy*, Kevin
+MacLeod, CC BY 3.0) are cut into 10 s chunks, and every chunk is matched
+against the reference on its own. Spectrograms use hop 256; fingerprints
+are pitch- and tempo-invariant peak triplets (two bin differences plus a
+quantized time ratio, as in Panako) looked up with ±1 bin and ±1 ratio step
+of tolerance; the tempo of a match is the ratio of the two triplets' time
+spans, the pitch shift and tempo are chosen by vote, and the position
+follows from `t_ref = tempo · t_query + offset`.
 
 Accuracy: after dividing out librosa's per-filter length scaling, the two
 spectrograms agree to a mean 0.20 dB (0.13 dB on components above −40 dB)
@@ -174,32 +176,39 @@ with a correlation of 0.9996, and the linear gain ratio is 1.009.
   <img src="./plots/song_cqt_vs_librosa.png" width="98%" />
 </p>
 
-| Version | Hashes | Consistent matches | Score | Applied shift (bins) | Detected | Applied tempo | Detected |
-| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| original | 76341 | 80141 | 105.0 % | +0 | +0 | ×1.00 | ×1.000 |
-| pitch +2 semitones | 75770 | 17169 | 22.7 % | +4 | +4 | ×1.00 | ×1.000 |
-| pitch −1 semitone | 75341 | 16434 | 21.8 % | −2 | −2 | ×1.00 | ×1.000 |
-| tempo +12 % | 69879 | 16521 | 23.6 % | +0 | +0 | ×1.12 | ×1.120 |
-| tempo −8 % | 81692 | 18322 | 22.4 % | +0 | +0 | ×0.92 | ×0.920 |
-| speed +6 % (resampled) | 72138 | 45519 | 63.1 % | +2 | +2 | ×1.06 | ×1.060 |
-| hard clip at 0.2 | 77315 | 41707 | 53.9 % | +0 | +0 | ×1.00 | ×1.000 |
-| white noise, 10 dB SNR | 89016 | 16730 | 18.8 % | +0 | +0 | ×1.00 | ×1.000 |
-| same song, other 30 s | 74482 | 5501 | 7.4 % | +0 | +0 | ×1.00 | ×1.046 |
-| control (unrelated piece) | 57285 | 204 | 0.4 % | +0 | — | ×1.00 | — |
+Score = consistent hashes / hashes of the chunk. "Located" is the detected
+start of the chunk in the reference, expected value in parentheses.
 
-Every modified version scores at least 47× the unrelated control, and the
-pitch shift and tempo factor recovered from the matched peaks equal the
-applied ones. The other half of the same song scores 7.4 % because it
-repeats the same riffs in the same key and tempo; that is real shared
-content, not a false positive. A score above 100 % means several reference
-hashes matched the same query hash.
+| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Shift applied / detected | Tempo applied / detected | Located at (expected) |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| original | 95.7 % | 48.9 % | 53.8 % | 66.1 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| pitch +2 semitones | 11.1 % | 9.8 % | 12.9 % | 11.3 % | +4 / +4/+4/+4 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| pitch −1 semitone | 16.4 % | 7.7 % | 7.6 % | 10.6 % | −2 / −2/−2/−2 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| tempo +12 % | 13.5 % | 9.6 % | 8.4 % | 10.5 % | +0 / +0/+0/+0 | ×1.12 / 1.115/1.118/1.099 | 0.0 (0.0), 11.2 (11.2), 22.5 (22.4) s |
+| tempo −8 % | 13.7 % | 6.2 % | 11.9 % | 10.6 % | +0 / +0/+0/+0 | ×0.92 / 0.931/0.918/0.918 | −0.1 (0.0), 9.2 (9.2), 18.4 (18.4) s |
+| speed +6 % (resampled) | 63.9 % | 51.3 % | 50.8 % | 55.3 % | +2 / +2/+2/+2 | ×1.06 / 1.060/1.059/1.059 | 0.0 (0.0), 10.6 (10.6), 21.2 (21.2) s |
+| hard clip at 0.2 | 57.4 % | 20.2 % | 24.0 % | 33.9 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| white noise, 10 dB SNR | 5.6 % | 14.5 % | 17.5 % | 12.5 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 0.0 (0.0), 10.0 (10.0), 20.0 (20.0) s |
+| same song, other 30 s | 9.8 % | 7.4 % | 9.0 % | 8.7 % | +0 / +0/+0/+0 | ×1.00 / 1.000/1.000/1.000 | 19.4, 14.7, 21.0 s (repeated riffs) |
+| control (unrelated piece) | 0.2 % | 0.2 % | 0.1 % | 0.2 % | +0 / — | ×1.00 / — | — |
+
+Every chunk of every modified version is identified at 30× to 300× the
+score of the unrelated piece, its pitch shift and tempo are recovered
+exactly, and its position in the reference is found to within 0.1 s. The
+chunks of the other half of the same song match at positions where the song
+repeats its riffs, which is real shared content rather than a false
+positive. Chunks 2 and 3 of the unmodified original score about 50 %
+because triplets crossing a chunk edge are lost.
 
 <p align="center">
   <img src="./plots/song_pitch_tempo_proof.png" width="98%" />
 </p>
 <p align="center">
-  <img src="./plots/song_match_scores.png" width="70%" />
+  <img src="./plots/song_match_scores.png" width="80%" />
 </p>
+
+Engineering notes with the reasoning behind these choices and the next
+steps for a fingerprinting layer are in [`docs/NOTES.md`](./docs/NOTES.md).
 
 Reproduce with:
 

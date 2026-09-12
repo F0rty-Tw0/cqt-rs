@@ -3,10 +3,12 @@
 
 Downloads a 30 s excerpt of "Vibe Ace" by Kevin MacLeod (CC BY 3.0, via the
 librosa example-data repository), creates pitch-shifted, tempo-changed,
-sped-up, clipped and noisy versions, runs `examples/cqt_dump.rs` on every
-version, fingerprints the spectrograms with pitch- and tempo-invariant peak
-triplets, and matches every version against the original. It also compares
-our spectrogram with librosa's CQT of the same excerpt.
+sped-up, clipped and noisy versions, cuts every version into 10 s chunks,
+runs `examples/cqt_dump.rs` on each chunk, fingerprints the spectrograms
+with pitch- and tempo-invariant peak triplets, and matches every chunk
+against the fingerprint of the full original, reporting the recovered pitch
+shift, tempo factor and position. It also compares our spectrogram with
+librosa's CQT of the same excerpt.
 
     pip install numpy scipy soundfile librosa matplotlib
     python3 scripts/fingerprint_demo.py
@@ -63,6 +65,7 @@ BINS_PER_OCTAVE = 24
 EXCERPT = (0.5, 30.5)  # seconds
 SAME_SONG = (31.0, 61.0)  # the other, non-overlapping half of the song
 CONTROL = (5.0, 35.0)  # window of the unrelated control piece
+CHUNK_SECONDS = 10.0
 
 
 def download(name: str, sha256: str) -> Path:
@@ -128,12 +131,13 @@ def triplet_hashes(points: np.ndarray, zone_frames: int = 240, fan_out: int = 6)
                     continue
                 ratio = (t2 - t1) / (t3 - t1)
                 key = (int(b2 - b1), int(b3 - b2), int(round(ratio * 24)))
-                hashes[key].append((int(t1), int(b1)))
+                hashes[key].append((int(t1), int(b1), int(t3 - t1)))
     return hashes
 
 
 def match(query: dict, reference: dict, ratio_tolerance: int = 1, bin_tolerance: int = 1):
-    """Returns matched (t_query, t_ref, b_query, b_ref) tuples.
+    """Returns matched (t_query, t_ref, b_query, b_ref, span_query, span_ref)
+    tuples, where the spans are the triplets' first-to-last peak distances.
 
     Keys are looked up within ±`ratio_tolerance` on the quantized ratio,
     which absorbs frame rounding after a tempo change, and within
@@ -149,26 +153,31 @@ def match(query: dict, reference: dict, ratio_tolerance: int = 1, bin_tolerance:
                     r_entries = reference.get((d1 + e1, d2 + e2, r + dr))
                     if not r_entries or len(r_entries) > 8:
                         continue
-                    for tq, bq in q_entries:
-                        for tr, br in r_entries:
-                            pairs.append((tq, tr, bq, br))
-    return np.array(pairs, dtype=float).reshape(-1, 4)
+                    for tq, bq, sq in q_entries:
+                        for tr, br, sr_ in r_entries:
+                            pairs.append((tq, tr, bq, br, sq, sr_))
+    return np.array(pairs, dtype=float).reshape(-1, 6)
 
 
-def estimate(pairs: np.ndarray):
-    """Estimates the pitch shift (query − reference, in bins) and the tempo
-    factor (reference duration / query duration) by voting: the densest
-    cell of a (bin offset, tempo) histogram wins, and the pairs within
-    ±1 bin and ±3 % of it count as consistent."""
+def estimate(pairs: np.ndarray, offset_tolerance_frames: float = SR / HOP):
+    """Estimates the pitch shift (query − reference, in bins), the tempo
+    factor (reference duration / query duration) and the position of the
+    query inside the reference (in reference frames) by voting.
+
+    The tempo of each match is the ratio of the two triplets' time spans,
+    which does not depend on where the query starts. The densest cell of a
+    (bin offset, tempo) histogram wins, the offset follows from
+    `t_ref = tempo * t_query + offset`, and the matches within ±1 bin, ±3 %
+    tempo and ±1 s offset of the estimate count as consistent."""
+    empty = dict(matches=len(pairs), consistent=0, bins=np.nan, tempo=np.nan, offset=np.nan)
     if len(pairs) < 10:
-        return dict(matches=len(pairs), consistent=0, bins=np.nan, tempo=np.nan)
-    pairs = pairs[(pairs[:, 0] > 0) & (pairs[:, 1] > 0)]
+        return empty
     d_bins = pairs[:, 2] - pairs[:, 3]
-    tempo = pairs[:, 1] / pairs[:, 0]  # t_ref / t_query: > 1 when the query is faster
+    tempo = pairs[:, 5] / pairs[:, 4]
     keep = (np.abs(d_bins) <= 24) & (tempo > 0.7) & (tempo < 1.4)
-    d_bins, tempo = d_bins[keep], tempo[keep]
+    pairs, d_bins, tempo = pairs[keep], d_bins[keep], tempo[keep]
     if len(d_bins) < 10:
-        return dict(matches=len(pairs), consistent=0, bins=np.nan, tempo=np.nan)
+        return empty
     votes, bin_edges, tempo_edges = np.histogram2d(
         d_bins, tempo, bins=[np.arange(-24.5, 25.5, 1.0), np.arange(0.7, 1.4001, 0.01)]
     )
@@ -176,8 +185,37 @@ def estimate(pairs: np.ndarray):
     est_bins = int(round(bin_edges[i] + 0.5))
     near = (np.abs(d_bins - est_bins) <= 1) & (np.abs(tempo - (tempo_edges[j] + 0.005)) <= 0.03)
     est_tempo = float(np.median(tempo[near]))
-    consistent = int(np.sum((np.abs(d_bins - est_bins) <= 1) & (np.abs(tempo - est_tempo) <= 0.03)))
-    return dict(matches=len(pairs), consistent=consistent, bins=est_bins, tempo=est_tempo)
+    offsets = pairs[:, 1] - est_tempo * pairs[:, 0]
+    # Vote for the offset among the pairs that agree on shift and tempo.
+    agree = (np.abs(d_bins - est_bins) <= 1) & (np.abs(tempo - est_tempo) <= 0.03)
+    if agree.sum() < 5:
+        return empty
+    hist, edges = np.histogram(offsets[agree], bins=np.arange(offsets[agree].min() - 1,
+                                                              offsets[agree].max() + offset_tolerance_frames,
+                                                              offset_tolerance_frames / 2))
+    centre = edges[np.argmax(hist)] + offset_tolerance_frames / 4
+    close = agree & (np.abs(offsets - centre) <= offset_tolerance_frames)
+    est_offset = float(np.median(offsets[close])) if close.any() else np.nan
+    consistent = agree & (np.abs(offsets - est_offset) <= offset_tolerance_frames)
+    return dict(matches=len(pairs), consistent=int(consistent.sum()), bins=est_bins,
+                tempo=est_tempo, offset=est_offset)
+
+
+def chunks(signal: np.ndarray, sr: int, seconds: float = CHUNK_SECONDS, minimum: float = 4.0):
+    """Consecutive chunks of `seconds`; a trailing chunk shorter than
+    `minimum` seconds is dropped."""
+    size = int(seconds * sr)
+    out = []
+    for start in range(0, len(signal), size):
+        piece = signal[start : start + size]
+        if len(piece) >= minimum * sr:
+            out.append((start / sr, piece))
+    return out
+
+
+def slug(name: str) -> str:
+    return (name.split(" (")[0].replace(" ", "_").replace("+", "plus").replace("-", "minus")
+            .replace("%", "pct").replace(",", ""))
 
 
 def main() -> None:
@@ -218,19 +256,22 @@ def main() -> None:
         "control (unrelated piece)": (control, 0, 1.0),
     }
 
-    spectrograms = {}
-    for name, (signal, _, _) in variants.items():
-        wav = WORK / (name.split(" (")[0].replace(" ", "_").replace("+", "plus").replace("-", "minus").replace("%", "pct").replace(",", "") + ".wav")
-        sf.write(wav, signal, sr, subtype="FLOAT")
-        spectrograms[name] = cqt_dump(wav)
-        print(f"{name:34} {spectrograms[name].shape}")
+    # Reference: the full original excerpt.
+    reference_wav = WORK / "original.wav"
+    sf.write(reference_wav, excerpt, sr, subtype="FLOAT")
+    reference_mag = cqt_dump(reference_wav)
+    reference_db = to_db(reference_mag)
+    reference_peaks = peaks(reference_db)
+    reference_hashes = triplet_hashes(reference_peaks)
+    print(f"reference: {reference_mag.shape}, {len(reference_peaks)} peaks, "
+          f"{sum(len(v) for v in reference_hashes.values())} hashes")
 
     # --- accuracy against librosa's CQT --------------------------------------
     # librosa's magnitudes scale with each filter's length (`scale=False`) or
     # its square root (`scale=True`); ours are calibrated so that a sinusoid
     # of amplitude A reads as A. Divide out the lengths and the factor two
     # between L1-normalized and amplitude-calibrated kernels to compare.
-    ours = spectrograms["original"]
+    ours = reference_mag
     librosa_freqs = librosa.cqt_frequencies(n_bins=ours.shape[1], fmin=MIN_FREQ, bins_per_octave=BINS_PER_OCTAVE)
     lengths, _ = librosa.filters.wavelet_lengths(freqs=librosa_freqs, sr=sr, window="hann", filter_scale=1, gamma=0)
     reference = np.abs(
@@ -277,81 +318,115 @@ def main() -> None:
     fig.savefig(PLOTS / "song_cqt_vs_librosa.png", dpi=80)
     plt.close(fig)
 
-    # --- fingerprints ---------------------------------------------------------
-    db = {name: to_db(m) for name, m in spectrograms.items()}
-    pk = {name: peaks(d) for name, d in db.items()}
-    hashes = {name: triplet_hashes(p) for name, p in pk.items()}
-    ref_hashes = hashes["original"]
+    # --- chunked queries --------------------------------------------------------
+    results = {}
+    for name, (signal, applied_bins, applied_rate) in variants.items():
+        rows = []
+        for k, (start_s, piece) in enumerate(chunks(signal, sr)):
+            wav = WORK / f"{slug(name)}_chunk{k + 1}.wav"
+            sf.write(wav, piece, sr, subtype="FLOAT")
+            mag = cqt_dump(wav)
+            db = to_db(mag)
+            pk = peaks(db)
+            hs = triplet_hashes(pk)
+            pairs = match(hs, reference_hashes)
+            est = estimate(pairs)
+            total = sum(len(v) for v in hs.values())
+            expected_offset = start_s * applied_rate
+            rows.append(dict(
+                chunk=k + 1, start=start_s, seconds=len(piece) / sr, hashes=total, pairs=pairs,
+                peaks=pk, db=db, score=100.0 * est["consistent"] / max(total, 1),
+                expected_offset=expected_offset,
+                located=est["offset"] * HOP / sr if not np.isnan(est["offset"]) else np.nan, **est,
+            ))
+        results[name] = (rows, applied_bins, applied_rate)
+        summary = ", ".join(f"{r['score']:.1f} %" for r in rows)
+        print(f"{name:34} {summary}")
 
-    rows = []
-    for name, (_, applied_bins, applied_rate) in variants.items():
-        pairs = match(hashes[name], ref_hashes)
-        est = estimate(pairs)
-        total = sum(len(v) for v in hashes[name].values())
-        rows.append((name, total, est, applied_bins, applied_rate, pairs))
+    def fmt(value, spec):
+        return "—" if value is None or (isinstance(value, float) and np.isnan(value)) else format(value, spec)
 
-    print("\n| Version | Hashes | Consistent matches | Score | Applied shift (bins) | Detected | Applied tempo | Detected |")
-    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |")
-    for name, total, est, applied_bins, applied_rate, _ in rows:
-        det_bins = "—" if np.isnan(est["bins"]) else f"{est['bins']:+d}"
-        det_tempo = "—" if np.isnan(est["tempo"]) else f"×{est['tempo']:.3f}"
-        score = 100.0 * est["consistent"] / max(total, 1)
-        print(f"| {name} | {total} | {est['consistent']} | {score:.1f} % | {applied_bins:+d} | {det_bins} | ×{applied_rate:.2f} | {det_tempo} |")
+    print("\n| Version | Chunk 1 | Chunk 2 | Chunk 3 | Mean | Shift applied / detected | Tempo applied / detected | Located at (expected) |")
+    print("| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |")
+    for name, (rows, applied_bins, applied_rate) in results.items():
+        scores = [f"{r['score']:.1f} %" for r in rows] + ["—"] * (3 - len(rows))
+        mean = np.mean([r["score"] for r in rows])
+        shifts = "/".join(fmt(r["bins"], "+d") for r in rows)
+        tempos = "/".join(fmt(r["tempo"], ".3f") for r in rows)
+        located = ", ".join(f"{fmt(r['located'], '.1f')} ({r['expected_offset']:.1f})" for r in rows)
+        print(f"| {name} | {' | '.join(scores)} | {mean:.1f} % | {applied_bins:+d} / {shifts} | "
+              f"×{applied_rate:.2f} / {tempos} | {located} s |")
 
-    # --- figure: pitch shift and tempo change proofs --------------------------
+    # --- figure: pitch shift and tempo change proofs on the middle chunk -----
     fig, axes = plt.subplots(2, 2, figsize=(14, 8.5), constrained_layout=True)
+    ref_extent = [0, len(reference_db) * HOP / sr, 0, reference_db.shape[1]]
     for row, (name, colour) in enumerate([("pitch +2 semitones", "tab:red"), ("tempo +12 %", "tab:blue")]):
-        _, _, est, applied_bins, applied_rate, pairs = next(r for r in rows if r[0] == name)
+        rows, applied_bins, applied_rate = results[name]
+        r = rows[1]
         ax = axes[row, 0]
-        d = db[name]
-        ax.imshow(d.T - d.max(), origin="lower", aspect="auto", cmap="magma", vmin=-80, vmax=0,
-                  extent=[0, len(d) * HOP / sr, 0, d.shape[1]])
-        p0 = pk["original"]
-        p1 = pk[name]
-        ax.scatter(p0[:, 0] * HOP / sr, p0[:, 1] + 0.5, s=6, c="white", label="peaks of the original")
-        ax.scatter(p1[:, 0] * HOP / sr, p1[:, 1] + 0.5, s=6, c=colour, label=f"peaks of «{name}»")
-        ax.set_title(f"«{name}»: CQT with peak constellations")
-        ax.set_xlabel("time (s)")
+        ax.imshow(reference_db.T - reference_db.max(), origin="lower", aspect="auto", cmap="magma",
+                  vmin=-80, vmax=0, extent=ref_extent)
+        ax.scatter(reference_peaks[:, 0] * HOP / sr, reference_peaks[:, 1] + 0.5, s=6, c="white",
+                   label="peaks of the original (reference)")
+        # Map the chunk's peaks into the reference through the detected
+        # tempo, offset and pitch shift.
+        t_mapped = (r["tempo"] * r["peaks"][:, 0] + r["offset"]) * HOP / sr
+        b_mapped = r["peaks"][:, 1] - r["bins"] + 0.5
+        ax.scatter(t_mapped, b_mapped, s=6, c=colour,
+                   label=f"peaks of chunk 2 of «{name}», mapped through the detected "
+                         f"shift {r['bins']:+d}, tempo ×{r['tempo']:.3f}, offset {r['located']:.1f} s")
+        ax.axvspan(r["located"], r["located"] + r["seconds"] * r["tempo"], color=colour, alpha=0.12)
+        ax.set_title(f"10 s chunk of «{name}» located in the original at {r['located']:.1f} s "
+                     f"(expected {r['expected_offset']:.1f} s)")
+        ax.set_xlabel("time in the original (s)")
         ax.set_ylabel("bin (24 per octave)")
-        ax.legend(loc="upper right", fontsize=8)
+        ax.legend(loc="upper right", fontsize=7)
 
         ax = axes[row, 1]
-        if len(pairs):
-            valid = (pairs[:, 0] > 0) & (pairs[:, 1] > 0)
-            if row == 0:
-                ax.hist(pairs[:, 2] - pairs[:, 3], bins=np.arange(-12.5, 13.5, 1), color=colour)
-                ax.axvline(applied_bins, color="k", ls="--", label=f"applied: {applied_bins:+d} bins")
-                ax.set_xlabel("bin offset of matched peaks (query − reference)")
-                ax.set_title(f"detected shift {est['bins']:+d} bins from {est['consistent']} consistent matches")
-            else:
-                ax.hist(pairs[valid, 1] / pairs[valid, 0], bins=np.linspace(0.8, 1.3, 51), color=colour)
-                ax.axvline(applied_rate, color="k", ls="--", label=f"applied: ×{applied_rate:.2f}")
-                ax.set_xlabel("tempo factor of matched peaks (reference time / query time)")
-                ax.set_title(f"detected tempo ×{est['tempo']:.3f} from {est['consistent']} consistent matches")
-            ax.legend()
-            ax.set_ylabel("matched triplet hashes")
-    fig.suptitle("Fingerprint invariance on real music (" + ATTRIBUTION + ")", fontsize=10)
+        pairs = r["pairs"]
+        if row == 0:
+            ax.hist(pairs[:, 2] - pairs[:, 3], bins=np.arange(-12.5, 13.5, 1), color=colour)
+            ax.axvline(applied_bins, color="k", ls="--", label=f"applied: {applied_bins:+d} bins")
+            ax.set_xlabel("bin offset of matched peaks (query − reference)")
+            ax.set_title(f"detected shift {r['bins']:+d} bins from {r['consistent']} consistent matches")
+        else:
+            ax.hist(pairs[:, 5] / pairs[:, 4], bins=np.linspace(0.8, 1.3, 51), color=colour)
+            ax.axvline(applied_rate, color="k", ls="--", label=f"applied: ×{applied_rate:.2f}")
+            ax.set_xlabel("tempo factor of matched triplets (reference span / query span)")
+            ax.set_title(f"detected tempo ×{r['tempo']:.3f} from {r['consistent']} consistent matches")
+        ax.legend()
+        ax.set_ylabel("matched triplet hashes")
+    fig.suptitle("Fingerprint invariance on real music, 10 s queries (" + ATTRIBUTION + ")", fontsize=10)
     fig.savefig(PLOTS / "song_pitch_tempo_proof.png", dpi=80)
     plt.close(fig)
 
-    # --- figure: match scores for every version -------------------------------
-    fig, ax = plt.subplots(figsize=(10, 4.8), constrained_layout=True)
-    names = [r[0] for r in rows]
-    scores = [100.0 * r[2]["consistent"] / max(r[1], 1) for r in rows]
-    colours = ["tab:gray" if "control" in n else "tab:olive" if "same song" in n else "tab:green" for n in names]
-    bars = ax.barh(names, scores, color=colours)
-    for bar, s in zip(bars, scores):
-        ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height() / 2, f"{s:.1f} %", va="center")
+    # --- figure: match scores of every chunk ------------------------------------
+    fig, ax = plt.subplots(figsize=(11, 6), constrained_layout=True)
+    names = list(results)
+    y = np.arange(len(names))
+    height = 0.26
+    chunk_colours = ["#2a9d8f", "#457b9d", "#8d5a97"]
+    for k in range(3):
+        vals = [results[nm][0][k]["score"] if len(results[nm][0]) > k else 0.0 for nm in names]
+        bars = ax.barh(y + (k - 1) * height, vals, height=height, color=chunk_colours[k],
+                       label=f"chunk {k + 1} ({k * 10}–{(k + 1) * 10} s of the version)")
+        for bar, v in zip(bars, vals):
+            if v > 0:
+                ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height() / 2, f"{v:.1f}", va="center", fontsize=7)
+    ax.set_yticks(y)
+    ax.set_yticklabels(names)
     ax.invert_yaxis()
-    ax.set_xlabel("triplet hashes matched consistently with the original (%)")
-    ax.set_title("Fingerprint match against the original 30 s excerpt (control: " + CONTROL_ATTRIBUTION.split(",")[0] + ")", fontsize=10)
-    ax.set_xlim(0, max(scores) * 1.2)
+    ax.set_xlabel("triplet hashes of the 10 s chunk matched consistently with the full original (%)")
+    ax.set_title("Fingerprint match of 10 s chunks against the original 30 s excerpt "
+                 "(control: " + CONTROL_ATTRIBUTION.split(",")[0] + ")", fontsize=10)
+    ax.legend(loc="lower right", fontsize=8)
     fig.savefig(PLOTS / "song_match_scores.png", dpi=100)
     plt.close(fig)
 
     json.dump(
-        {r[0]: dict(hashes=r[1], **{k: (None if isinstance(v, float) and np.isnan(v) else v) for k, v in r[2].items()},
-                    applied_bins=r[3], applied_rate=r[4]) for r in rows},
+        {name: dict(applied_bins=applied_bins, applied_rate=applied_rate,
+                    chunks=[{k: v for k, v in r.items() if k not in ("pairs", "peaks", "db")} for r in rows])
+         for name, (rows, applied_bins, applied_rate) in results.items()},
         open(WORK / "summary.json", "w"), indent=2, default=float,
     )
 
