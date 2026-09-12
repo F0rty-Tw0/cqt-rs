@@ -33,9 +33,11 @@ BINS_PER_OCTAVE = 24
 WATCH = {"vibe_ace": WORK / "watch_vibe_ace.wav", "sweet_waltz": WORK / "watch_sweet_waltz.wav"}
 
 
-def run_monitor(stream: Path, extra: list[str]) -> list[dict]:
-    subprocess.run(["cargo", "build", "--release", "--quiet", "-p", "cqt-monitor"], cwd=ROOT, check=True)
-    cmd = [str(ROOT / "target" / "release" / "monitor")]
+def run_monitor(stream: Path, extra: list[str], monitor: str | None = None) -> list[dict]:
+    if monitor is None:
+        subprocess.run(["cargo", "build", "--release", "--quiet", "-p", "cqt-monitor"], cwd=ROOT, check=True)
+        monitor = str(ROOT / "target" / "release" / "monitor")
+    cmd = [monitor]
     for name, path in WATCH.items():
         cmd += ["--watch", f"{name}={path}"]
     cmd += ["--stream", str(stream), *extra]
@@ -79,8 +81,8 @@ def worst_cases(rows: list[dict], false_starts: list[dict], reports: list[dict],
 
 def evaluate(args) -> dict:
     extra = ["--half", str(args.half), "--threshold", str(args.threshold), "--window", str(args.window)]
-    null_events = run_monitor(WORK / "stream_null.wav", extra)
-    eval_events = run_monitor(WORK / "stream_eval.wav", extra)
+    null_events = run_monitor(WORK / "stream_null.wav", extra, args.monitor)
+    eval_events = run_monitor(WORK / "stream_eval.wav", extra, args.monitor)
     null_truth = load_truth("stream_null")
     eval_truth = load_truth("stream_eval")
 
@@ -132,16 +134,16 @@ def evaluate(args) -> dict:
                   p999_evidence=float(np.percentile(null_evidence, 99.9)), median_evidence=float(np.median(null_evidence)),
                   max_confidence=float(null_conf.max()), false_alarms=len(null_starts),
                   realtime_fraction=null_done["realtime_fraction"],
-                  hash_delay_median_seconds=null_done["hash_delay_median_seconds"],
-                  hash_delay_max_seconds=null_done["hash_delay_max_seconds"]),
+                  hash_delay_median_seconds=null_done.get("hash_delay_median_seconds"),
+                  hash_delay_max_seconds=null_done.get("hash_delay_max_seconds")),
         eval=dict(seconds=done["audio_seconds"], plays=len(plays), detected=sum(r["detected"] for r in rows),
                   false_starts=len(false_starts), realtime_fraction=done["realtime_fraction"],
-                  hash_delay_median_seconds=done["hash_delay_median_seconds"],
+                  hash_delay_median_seconds=done.get("hash_delay_median_seconds"),
                   index=[e for e in eval_events if e["event"] in ("index", "index_done")]),
         plays=rows,
         worst=worst_cases(rows, false_starts, reports, eval_truth),
     )
-    json.dump(summary, open(WORK / "eval_summary.json", "w"), indent=2)
+    json.dump(summary, open(WORK / f"{args.out}.json", "w"), indent=2)
 
     # --- table --------------------------------------------------------------
     print(f"\nnull stream: {null_done['audio_seconds'] / 60:.1f} min, evidence max {null_evidence.max()}, "
@@ -149,8 +151,9 @@ def evaluate(args) -> dict:
           f"max confidence {null_conf.max():.1f}; false alarms at {args.threshold}: {len(null_starts)}; "
           f"CPU {100 * null_done['realtime_fraction']:.2f} % of one core")
     print(f"eval stream: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
-          f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %; "
-          f"hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s")
+          f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %"
+          + (f"; hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s"
+             if "hash_delay_median_seconds" in done else ""))
     print("\n| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected | Position error |")
     print("| --- | --- | ---: | ---: | ---: | ---: | ---: |")
     for r in rows:
@@ -159,6 +162,9 @@ def evaluate(args) -> dict:
                   f"{r['expected_shift']:+d} / {r['shift']:+d} | ×{r['expected_tempo']:.3f} / ×{r['tempo']:.3f} | {r['position_error']:+.1f} s |")
         else:
             print(f"| {r['source']} | {r['treatment']} | missed | — | {r['expected_shift']:+d} / — | ×{r['expected_tempo']:.3f} / — | — |")
+
+    if args.no_plots:
+        return summary
 
     # --- figure: timeline ---------------------------------------------------
     fig, axes = plt.subplots(2, 1, figsize=(16, 7.5), sharex=True, constrained_layout=True,
@@ -238,6 +244,9 @@ def main() -> None:
     parser.add_argument("--half", type=float, default=100.0)
     parser.add_argument("--threshold", type=float, default=70.0)
     parser.add_argument("--window", type=float, default=5.0)
+    parser.add_argument("--monitor", help="monitor binary to run instead of building the current tree")
+    parser.add_argument("--out", default="eval_summary", help="summary name under target/radio (default eval_summary)")
+    parser.add_argument("--no-plots", action="store_true", help="skip the figures (for comparison runs)")
     evaluate(parser.parse_args())
 
 
