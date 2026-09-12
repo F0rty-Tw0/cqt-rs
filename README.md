@@ -158,10 +158,13 @@ cargo run --release --example generate_plots
 `scripts/fingerprint_demo.py` runs the transform (through
 `examples/cqt_dump.rs`) on a 30 s excerpt of *Vibe Ace* by Kevin MacLeod
 (CC BY 3.0, fetched from the librosa example-data repository), on modified
-versions of it, and on a non-overlapping part of the same song as a control.
-Each spectrogram is fingerprinted with pitch- and tempo-invariant peak
-triplets (bin differences plus a quantized time ratio, as in Panako) and
-matched against the original.
+versions of it, on the other half of the same song, and on an unrelated
+piece (*Dance of the Sugar Plum Fairy*, Kevin MacLeod, CC BY 3.0) as the
+negative control. Each spectrogram (hop 256) is fingerprinted with pitch-
+and tempo-invariant peak triplets (two bin differences plus a quantized
+time ratio, as in Panako), looked up with ±1 bin and ±1 ratio step of
+tolerance, and matched against the original by voting for the densest
+(bin offset, tempo) cell.
 
 Accuracy: after dividing out librosa's per-filter length scaling, the two
 spectrograms agree to a mean 0.20 dB (0.13 dB on components above −40 dB)
@@ -173,20 +176,23 @@ with a correlation of 0.9996, and the linear gain ratio is 1.009.
 
 | Version | Hashes | Consistent matches | Score | Applied shift (bins) | Detected | Applied tempo | Detected |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
-| original | 71871 | 73703 | 102.5 % | +0 | +0 | ×1.00 | ×1.000 |
-| pitch +2 semitones | 70946 | 8545 | 12.0 % | +4 | +4 | ×1.00 | ×1.000 |
-| pitch −1 semitone | 70099 | 8858 | 12.6 % | −2 | −2 | ×1.00 | ×1.000 |
-| tempo +12 % | 66670 | 8992 | 13.5 % | +0 | +0 | ×1.12 | ×1.120 |
-| tempo −8 % | 77192 | 9309 | 12.1 % | +0 | +0 | ×0.92 | ×0.921 |
-| speed +6 % (resampled) | 66570 | 26933 | 40.5 % | +2 | +2 | ×1.06 | ×1.060 |
-| hard clip at 0.2 | 72672 | 35302 | 48.6 % | +0 | +0 | ×1.00 | ×1.000 |
-| white noise, 10 dB SNR | 84696 | 12711 | 15.0 % | +0 | +0 | ×1.00 | ×1.000 |
-| control (other 30 s of the song) | 69710 | 491 | 0.7 % | +0 | +0 | ×1.00 | — |
+| original | 76341 | 80141 | 105.0 % | +0 | +0 | ×1.00 | ×1.000 |
+| pitch +2 semitones | 75770 | 17169 | 22.7 % | +4 | +4 | ×1.00 | ×1.000 |
+| pitch −1 semitone | 75341 | 16434 | 21.8 % | −2 | −2 | ×1.00 | ×1.000 |
+| tempo +12 % | 69879 | 16521 | 23.6 % | +0 | +0 | ×1.12 | ×1.120 |
+| tempo −8 % | 81692 | 18322 | 22.4 % | +0 | +0 | ×0.92 | ×0.920 |
+| speed +6 % (resampled) | 72138 | 45519 | 63.1 % | +2 | +2 | ×1.06 | ×1.060 |
+| hard clip at 0.2 | 77315 | 41707 | 53.9 % | +0 | +0 | ×1.00 | ×1.000 |
+| white noise, 10 dB SNR | 89016 | 16730 | 18.8 % | +0 | +0 | ×1.00 | ×1.000 |
+| same song, other 30 s | 74482 | 5501 | 7.4 % | +0 | +0 | ×1.00 | ×1.046 |
+| control (unrelated piece) | 57285 | 204 | 0.4 % | +0 | — | ×1.00 | — |
 
-Every modified version is identified with a score 17× to 70× above the
-control, and the pitch shift and tempo factor recovered from the matched
-peaks equal the applied ones (a score above 100 % means several reference
-hashes matched the same query hash).
+Every modified version scores at least 47× the unrelated control, and the
+pitch shift and tempo factor recovered from the matched peaks equal the
+applied ones. The other half of the same song scores 7.4 % because it
+repeats the same riffs in the same key and tempo; that is real shared
+content, not a false positive. A score above 100 % means several reference
+hashes matched the same query hash.
 
 <p align="center">
   <img src="./plots/song_pitch_tempo_proof.png" width="98%" />

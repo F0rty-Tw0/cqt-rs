@@ -36,33 +36,43 @@ from scipy import ndimage  # noqa: E402
 ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "target" / "fingerprint_demo"
 PLOTS = ROOT / "plots"
+BASE_URL = "https://raw.githubusercontent.com/librosa/data/main/audio/"
 SOURCE = (
-    "https://raw.githubusercontent.com/librosa/data/main/audio/"
-    "Kevin_MacLeod_-_Vibe_Ace.hq.ogg"
+    "Kevin_MacLeod_-_Vibe_Ace.hq.ogg",
+    "73d6443ef90a7c022f164e5aa90e56c2291585930b39b1656d0765abbc1f1779",
 )
-SOURCE_SHA256 = "73d6443ef90a7c022f164e5aa90e56c2291585930b39b1656d0765abbc1f1779"
+# An unrelated piece by the same producer as the negative control.
+CONTROL_SOURCE = (
+    "Kevin_MacLeod_-_P_I_Tchaikovsky_Dance_of_the_Sugar_Plum_Fairy.hq.ogg",
+    "f062221a56a227cdb7c067cf2e6ac0e250a50012f7693ca0c8e31f05f83e49b1",
+)
 ATTRIBUTION = (
     "Vibe Ace by Kevin MacLeod, CC BY 3.0 "
     "(https://freemusicarchive.org/music/Kevin_MacLeod/Jazz_Sampler/Vibe_Ace)"
 )
+CONTROL_ATTRIBUTION = (
+    "Dance of the Sugar Plum Fairy by Kevin MacLeod, CC BY 3.0 "
+    "(https://freemusicarchive.org/music/Kevin_MacLeod/Classical_Sampler/Dance_of_the_Sugar_Plum_Fairy)"
+)
 
 SR = 44_100
-HOP = 512
+HOP = 256
 MIN_FREQ = 55.0
 MAX_FREQ = 7_040.0
 BINS_PER_OCTAVE = 24
 EXCERPT = (0.5, 30.5)  # seconds
-CONTROL = (31.0, 61.0)  # the other, non-overlapping half of the song
+SAME_SONG = (31.0, 61.0)  # the other, non-overlapping half of the song
+CONTROL = (5.0, 35.0)  # window of the unrelated control piece
 
 
-def download() -> Path:
+def download(name: str, sha256: str) -> Path:
     WORK.mkdir(parents=True, exist_ok=True)
-    path = WORK / "vibe_ace.ogg"
-    if not path.exists() or hashlib.sha256(path.read_bytes()).hexdigest() != SOURCE_SHA256:
-        print(f"downloading {SOURCE}")
-        urllib.request.urlretrieve(SOURCE, path)
+    path = WORK / name
+    if not path.exists() or hashlib.sha256(path.read_bytes()).hexdigest() != sha256:
+        print(f"downloading {BASE_URL + name}")
+        urllib.request.urlretrieve(BASE_URL + name, path)
         digest = hashlib.sha256(path.read_bytes()).hexdigest()
-        if digest != SOURCE_SHA256:
+        if digest != sha256:
             sys.exit(f"checksum mismatch: {digest}")
     return path
 
@@ -85,7 +95,7 @@ def to_db(magnitudes: np.ndarray, top_db: float = 80.0) -> np.ndarray:
     return np.maximum(db, db.max() - top_db)
 
 
-def peaks(db: np.ndarray, time_radius: int = 12, bin_radius: int = 6, min_db: float = -50.0):
+def peaks(db: np.ndarray, time_radius: int = 24, bin_radius: int = 6, min_db: float = -50.0):
     """Local maxima of the dB spectrogram, as (frame, bin) pairs."""
     footprint = np.ones((2 * time_radius + 1, 2 * bin_radius + 1), dtype=bool)
     local_max = ndimage.maximum_filter(db, footprint=footprint, mode="nearest") == db
@@ -94,7 +104,7 @@ def peaks(db: np.ndarray, time_radius: int = 12, bin_radius: int = 6, min_db: fl
     return np.stack([frames, bins], axis=1)
 
 
-def triplet_hashes(points: np.ndarray, zone_frames: int = 120, fan_out: int = 6):
+def triplet_hashes(points: np.ndarray, zone_frames: int = 240, fan_out: int = 6):
     """Pitch- and tempo-invariant hashes from peak triplets.
 
     For peaks p1 < p2 < p3 in time the key is the two bin differences and the
@@ -122,45 +132,60 @@ def triplet_hashes(points: np.ndarray, zone_frames: int = 120, fan_out: int = 6)
     return hashes
 
 
-def match(query: dict, reference: dict, tolerance: int = 1):
+def match(query: dict, reference: dict, ratio_tolerance: int = 1, bin_tolerance: int = 1):
     """Returns matched (t_query, t_ref, b_query, b_ref) tuples.
 
-    Keys are looked up within ±`tolerance` on the quantized ratio, which
-    absorbs frame rounding after a tempo change; bin differences must match
-    exactly.
+    Keys are looked up within ±`ratio_tolerance` on the quantized ratio,
+    which absorbs frame rounding after a tempo change, and within
+    ±`bin_tolerance` on each bin difference, which absorbs peaks that move by
+    one bin under distortion.
     """
     pairs = []
+    offsets = range(-bin_tolerance, bin_tolerance + 1)
     for (d1, d2, r), q_entries in query.items():
-        for dr in range(-tolerance, tolerance + 1):
-            r_entries = reference.get((d1, d2, r + dr))
-            if not r_entries or len(r_entries) > 8:
-                continue
-            for tq, bq in q_entries:
-                for tr, br in r_entries:
-                    pairs.append((tq, tr, bq, br))
+        for e1 in offsets:
+            for e2 in offsets:
+                for dr in range(-ratio_tolerance, ratio_tolerance + 1):
+                    r_entries = reference.get((d1 + e1, d2 + e2, r + dr))
+                    if not r_entries or len(r_entries) > 8:
+                        continue
+                    for tq, bq in q_entries:
+                        for tr, br in r_entries:
+                            pairs.append((tq, tr, bq, br))
     return np.array(pairs, dtype=float).reshape(-1, 4)
 
 
 def estimate(pairs: np.ndarray):
-    """Robustly estimates the pitch shift (query − reference, in bins) and
-    the tempo factor (reference duration / query duration) from matched
-    pairs, and counts the pairs that agree with both estimates."""
+    """Estimates the pitch shift (query − reference, in bins) and the tempo
+    factor (reference duration / query duration) by voting: the densest
+    cell of a (bin offset, tempo) histogram wins, and the pairs within
+    ±1 bin and ±3 % of it count as consistent."""
     if len(pairs) < 10:
         return dict(matches=len(pairs), consistent=0, bins=np.nan, tempo=np.nan)
     pairs = pairs[(pairs[:, 0] > 0) & (pairs[:, 1] > 0)]
     d_bins = pairs[:, 2] - pairs[:, 3]
     tempo = pairs[:, 1] / pairs[:, 0]  # t_ref / t_query: > 1 when the query is faster
-    est_bins = int(np.round(np.median(d_bins)))
-    est_tempo = float(np.median(tempo))
+    keep = (np.abs(d_bins) <= 24) & (tempo > 0.7) & (tempo < 1.4)
+    d_bins, tempo = d_bins[keep], tempo[keep]
+    if len(d_bins) < 10:
+        return dict(matches=len(pairs), consistent=0, bins=np.nan, tempo=np.nan)
+    votes, bin_edges, tempo_edges = np.histogram2d(
+        d_bins, tempo, bins=[np.arange(-24.5, 25.5, 1.0), np.arange(0.7, 1.4001, 0.01)]
+    )
+    i, j = np.unravel_index(np.argmax(votes), votes.shape)
+    est_bins = int(round(bin_edges[i] + 0.5))
+    near = (np.abs(d_bins - est_bins) <= 1) & (np.abs(tempo - (tempo_edges[j] + 0.005)) <= 0.03)
+    est_tempo = float(np.median(tempo[near]))
     consistent = int(np.sum((np.abs(d_bins - est_bins) <= 1) & (np.abs(tempo - est_tempo) <= 0.03)))
     return dict(matches=len(pairs), consistent=consistent, bins=est_bins, tempo=est_tempo)
 
 
 def main() -> None:
-    ogg = download()
-    y, sr = librosa.load(ogg, sr=SR, mono=True)
+    y, sr = librosa.load(download(*SOURCE), sr=SR, mono=True)
     excerpt = y[int(EXCERPT[0] * sr) : int(EXCERPT[1] * sr)]
-    control = y[int(CONTROL[0] * sr) : int(CONTROL[1] * sr)]
+    same_song = y[int(SAME_SONG[0] * sr) : int(SAME_SONG[1] * sr)]
+    other, _ = librosa.load(download(*CONTROL_SOURCE), sr=SR, mono=True)
+    control = other[int(CONTROL[0] * sr) : int(CONTROL[1] * sr)]
     rng = np.random.default_rng(7)
 
     semitone_bins = BINS_PER_OCTAVE // 12
@@ -189,7 +214,8 @@ def main() -> None:
             0,
             1.0,
         ),
-        "control (other 30 s of the song)": (control, 0, 1.0),
+        "same song, other 30 s": (same_song, 0, 1.0),
+        "control (unrelated piece)": (control, 0, 1.0),
     }
 
     spectrograms = {}
@@ -312,12 +338,13 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(10, 4.8), constrained_layout=True)
     names = [r[0] for r in rows]
     scores = [100.0 * r[2]["consistent"] / max(r[1], 1) for r in rows]
-    bars = ax.barh(names, scores, color=["tab:green" if "control" not in n else "tab:gray" for n in names])
+    colours = ["tab:gray" if "control" in n else "tab:olive" if "same song" in n else "tab:green" for n in names]
+    bars = ax.barh(names, scores, color=colours)
     for bar, s in zip(bars, scores):
         ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height() / 2, f"{s:.1f} %", va="center")
     ax.invert_yaxis()
     ax.set_xlabel("triplet hashes matched consistently with the original (%)")
-    ax.set_title("Fingerprint match against the original 30 s excerpt")
+    ax.set_title("Fingerprint match against the original 30 s excerpt (control: " + CONTROL_ATTRIBUTION.split(",")[0] + ")", fontsize=10)
     ax.set_xlim(0, max(scores) * 1.2)
     fig.savefig(PLOTS / "song_match_scores.png", dpi=100)
     plt.close(fig)
