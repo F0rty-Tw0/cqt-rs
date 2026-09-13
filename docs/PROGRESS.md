@@ -1,18 +1,69 @@
 # Goal progress and evidence
 
-## E013 running — two-second sequential confirmation
+## E013 completed — two-second sequence experiment
 
-User requested successive two-second observations and song start/end tracking.
-Protocol: [E013](experiments/E013-two-second-sequence.md). Opt-in native
-implementation uses disjoint anchor windows over continuous fingerprints,
-full-song identities, bounded trajectory-consistent accumulation, and coarse
-supported-boundary estimates separated from notification time. No measured
-acceptance yet. Local Cargo is unavailable; initial native build/tests and
-formatting assistance run on GitHub Actions. Defaults remain unchanged.
+[Complete DJ-mix experiment record](experiments/DJ-mix-fingerprinting-complete.md)
+consolidates the catalogue, E010–E013 history, algorithm, results and reproduction.
 
-Next command: `python3 scripts/sequence_eval.py --prepare`, then run the
-frozen protocol with the exported candidate and publish every regression.
+The consolidated report covers **205 native runs**. Detailed local files are
+`docs/experiments/E013-results.md` and `docs/evidence/E013/README.md`. The opt-in `--sequence-seconds 2` prototype uses
+continuous fingerprints, disjoint anchor windows, one identity/timeline per
+full song, and two to five compatible observations for confirmation. It
+reports supported boundary estimates separately from notification time.
 
+| Correct identities | Previous full mean | Sequence mean | Previous full modal | Sequence modal |
+| --- | ---: | ---: | ---: | ---: |
+| Exact clips | 20/22 | 19/22 | 22/22 | 22/22 |
+| Random clean | 22/22 | 16/22 | 22/22 | 21/22 |
+| Frozen mix | 15/22 | 11/22 | 16/22 | 14/22 |
+| Random mix | 16/22 | 14/22 | 17/22 | 16/22 |
+| Known negatives rejected | 8/8 | 8/8 | 8/8 | 8/8 |
+| Full-mix distinct songs | 21/22 | 18/22 | 21/22 | 19/22 |
+
+**Decision: reject a default switch.** No new correct query identities are
+recovered. Modal sequence mode loses clean-t16, frozen-t05/frozen-t13 and
+mix-t21. Full-mix output still has 63 segments in modal sequence mode, versus
+113 in modal baseline; this is not one reliable interval per playlist song.
+
+The 584-second controlled programme has 25 insertion intervals. Modal
+sequence finds 25/25, with duplicate/premature logical endings 3→1 and no
+false starts; median notification delay changes start 1.672→6.429 seconds,
+end 9.618→6.422 seconds. These boundaries align with the observation grid.
+A one-second phase shift retains 25/25 but gives typical boundary errors near
+one second, with a worst early end estimate of five seconds; the original
+programme has a six-second early end estimate. Do not claim exact boundaries
+or two-second detection. A correct song ID can still point to a repeated
+source passage; one exact modal control is misplaced by about 188 seconds.
+
+All 196 main sequence outputs conserve every emitted hash/peak in contiguous
+windows; every ten-second query contains five complete observations. Semantic
+output is invariant across 257/4096/65536-sample blocks. The live PCM/file
+check agrees on every observation/window/start/end field. All 20 Python
+regressions and the independent archive recount pass. Seven Rust sequence
+tests pass on the evaluated native source; the final test update exercises
+actual emitted-window behavior. Final-head CI is separately recorded in PR #4.
+
+Evaluated native source `44a7411d2df1f43056b4fba5ca9d3bd43b2eb7f6`, binary SHA
+`6450de94d60726f94ab156b7476e214fd09e2d7171e94fffe6c0f6e1fda4e613`;
+all 12 exact-source CI checks passed. Production code is unchanged in the
+documentation update. Default thresholds and behavior remain unchanged.
+
+Publication scope: the consolidated Markdown and this checkpoint are published.
+Automatic approval review rejected the additional binary archive upload because
+the user authorization covered Markdown, not the archive payload. All raw E013
+archives and final supporting scripts/test edits remain in this workspace;
+the tested implementation at the source above is already on PR #4. The local
+emitted-window test strengthening has not been submitted to CI.
+
+Exact audit command: `python3 scripts/recount_sequence_archives.py`.
+Next bounded research step: preserve longer retrieval context while verifying
+predicted continuation every two seconds, and separate fresh alignment from
+stale-vote release decisions. Begin by inspecting the early-end and repeated-
+position rows in `target/sequence/summary.json` and `target/sequence/audit.json`;
+record an E014 protocol before changing tracker rules. Fingerprint survival
+on the weak mixed-audio excerpts remains open. This is known development
+material, not recording-disjoint proof or a speed benchmark. The overall
+research goal remains incomplete; no merge or release.
 
 ## E011/E012 completed: coverage, alignment and source identity — 2026-09-13
 
