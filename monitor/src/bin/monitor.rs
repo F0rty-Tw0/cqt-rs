@@ -353,7 +353,7 @@ fn main() {
     });
     writeln!(
         out,
-        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
+        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
         json_string(stream_path),
         if live {
             "null".to_owned()

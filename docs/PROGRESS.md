@@ -24,7 +24,7 @@ merged. No algorithmic speedup or independent recognition gain is verified.
 | ID | Status | Claim supported | Proof and limits |
 | --- | --- | --- | --- |
 | E001 | verified | Seven evaluator/provenance regressions pass; the existing Rust correctness/release gates pass at `938215e` | [CI run 34752565983](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34752565983); [check snapshot](evidence/2026-09-13-pr5-ci.json). Nine checks re-read as completed/success for the exact SHA. Replayed events exercise evaluation behavior, not audio recognition quality. |
-| E002 | running | Fix undefined timing-ratio JSON for empty input | Candidate emits `null` when no samples are consumed. `scripts/prove_monitor_cli.py` will execute baseline/candidate on six edge cases; before/after CI proof is pending. See [experiment record](experiments/E002-empty-stream.md). |
+| E002 | running | Fix truncated stream metadata and undefined empty-input timing JSON | The first real CI run exposed an additional `seconds:nu` formatting bug. Both Rust fixes are now in the candidate; eight real-binary before/after cases are pending. See [experiment record](experiments/E002-empty-stream.md). |
 | E003 | blocked | Fresh representative runtime benchmark baseline | Local Cargo/rustc unavailable; the prior rustup attempt failed because `/proc/self/exe` is absent. CI compiled bench targets, but did not measure throughput. |
 | E004 | planned | Independent recognition evaluation | Corpus/splits and executable run not yet prepared; existing radio results remain development validation. |
 

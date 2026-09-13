@@ -2,6 +2,16 @@
 
 Status: running; real-binary CI proof pending.
 
+First executing proof (candidate `6cfd2e2`) failed as intended on an
+unexpected additional defect: [job 103713828212](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753483349/job/103713828212)
+captured `"event":"stream","file":"-","seconds":nu`. The baseline applies
+`{:.2}` to an already-formatted String, truncating it to two characters.
+The original ratio-only fix did not address this and was not accepted.
+The revised candidate fixes both observed formatting defects. The proof
+explicitly requires each known baseline defect; arbitrary invalid output
+still fails. Added 12.34 s and 123.45 s WAV cases catch parseable but wrong
+duration numbers, as well as malformed JSON on shorter WAV/live input.
+
 Baseline: PR #3, `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`.
 Candidate branch: `codex/monitor-empty-stream-json`, based on PR #5.
 
@@ -18,7 +28,7 @@ The legacy `cpu_seconds` field still reports wall time; this change does
 not claim to fix process CPU accounting or improve recognition/throughput.
 
 Cases: empty stdin, empty WAV, one-sample stdin, one-sample WAV, 2053-sample
-stdin (partial block), and a one-second WAV. Fixtures contain deterministic
+stdin (partial block), and 1 s, 12.34 s and 123.45 s WAVs. Fixtures contain deterministic
 mono s16 silence at 44100 Hz. Both binaries use the same reference WAV,
 fixture inputs, Rust 1.98 toolchain and copied Cargo.lock.
 
