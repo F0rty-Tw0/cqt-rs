@@ -1,0 +1,940 @@
+{
+  "h01": {
+    "track": {
+      "id": "h01",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Cipher",
+      "isrc": "USUAN1100844",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100844",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3",
+    "source_seconds": 231.26204081632653,
+    "clip_start": 110.63102040816327,
+    "file": {
+      "sha256": "d3d0614535a61d748e2fd8d5117fc4d781022a7624794802a2462d8af3fdd522",
+      "bytes": 9252699
+    },
+    "original": {
+      "sha256": "b3eded1429d639eecc5256e11bdb77a2c15308c36708952c5f8019fda73c8fb4",
+      "bytes": 20397504
+    },
+    "reference": {
+      "sha256": "037ad9f6751da6a7bf05436083fa13189ddb9bf5674f2b905aa3987029e02c7b",
+      "bytes": 882044
+    }
+  },
+  "h02": {
+    "track": {
+      "id": "h02",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Electrodoodle",
+      "isrc": "USUAN1200079",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Electrodoodle.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200079",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Electrodoodle.mp3",
+    "source_seconds": 166.0604081632653,
+    "clip_start": 78.03020408163265,
+    "file": {
+      "sha256": "75227ad153780ee0c57ae529caa7f8a891877a46596ff8800a16c90b34b6d18c",
+      "bytes": 6644624
+    },
+    "original": {
+      "sha256": "f719635f8c1d853348517599fb7e3915471c578bf9cb3ef3daf8caa97b40f941",
+      "bytes": 14646708
+    },
+    "reference": {
+      "sha256": "7d027e0a5f0f3cd75b69b415b2ff97be0deab8b75c5a502665a6e6c1166c5a90",
+      "bytes": 882044
+    }
+  },
+  "h03": {
+    "track": {
+      "id": "h03",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Cut and Run",
+      "isrc": "USUAN1100851",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cut%20and%20Run.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100851",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cut%20and%20Run.mp3",
+    "source_seconds": 214.83102040816325,
+    "clip_start": 102.41551020408163,
+    "file": {
+      "sha256": "ddfa5637036e97a313a2e7a01d37d00f85226469cf4df896c83da07f7f2c353e",
+      "bytes": 8595361
+    },
+    "original": {
+      "sha256": "caaddacafc7fe91f7bfc4045637992876b097716f21d33e4d186ff97a78cc03a",
+      "bytes": 18948294
+    },
+    "reference": {
+      "sha256": "6e9d229b85bc05ca896f59b610507c77c50096810aa4d8f345086e6b5dbcdc6e",
+      "bytes": 882044
+    }
+  },
+  "h04": {
+    "track": {
+      "id": "h04",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Wallpaper",
+      "isrc": "USUAN1100843",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wallpaper.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100843",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wallpaper.mp3",
+    "source_seconds": 220.05551020408163,
+    "clip_start": 105.02775510204081,
+    "file": {
+      "sha256": "9fa810e5193c88f1b360537366f210f16c2588106d5292f0659e9957fa274f96",
+      "bytes": 8804339
+    },
+    "original": {
+      "sha256": "bc355239bdb9ac7f39c5988ae0596918773d36725b778c0c8e5a77d4cae23f20",
+      "bytes": 19409092
+    },
+    "reference": {
+      "sha256": "be87c334afe4cd1afbfc879b7feabb6a02bc0962eb02984aa90a03d9f7576b95",
+      "bytes": 882044
+    }
+  },
+  "h05": {
+    "track": {
+      "id": "h05",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Funkorama",
+      "isrc": "USUAN1100474",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Funkorama.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100474",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Funkorama.mp3",
+    "source_seconds": 201.45632653061224,
+    "clip_start": 95.72816326530612,
+    "file": {
+      "sha256": "6be229815d85a0b99382b944d31098b882702c04ac7ad899e44ab7f8ba89b5ad",
+      "bytes": 8199078
+    },
+    "original": {
+      "sha256": "68a4836719a7a3084b286d9b766b5cb37b3ad879286d36508f344fb98079fa41",
+      "bytes": 17768630
+    },
+    "reference": {
+      "sha256": "f3fb8a1bbaf60bd36f112eede9741a99d195efa754035f6cba28a19c941b7df0",
+      "bytes": 882044
+    }
+  },
+  "h06": {
+    "track": {
+      "id": "h06",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Carefree",
+      "isrc": "USUAN1400037",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400037",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3",
+    "source_seconds": 205.1395918367347,
+    "clip_start": 97.56979591836735,
+    "file": {
+      "sha256": "8433b770a630d9b1594fd484442c677907ece899a4d149954cd2e74fd733e311",
+      "bytes": 6566713
+    },
+    "original": {
+      "sha256": "2f7af0d8f32f9e5c2f03cb4f32e58d9a3362c41472287d5a26d086078e21db5e",
+      "bytes": 18093532
+    },
+    "reference": {
+      "sha256": "c0f5b6b06f61d7ffd4766b1698fd66de2fcca533413b2c05d477c4497d034a66",
+      "bytes": 882044
+    }
+  },
+  "h07": {
+    "track": {
+      "id": "h07",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Hyperfun",
+      "isrc": "USUAN1400038",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hyperfun.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400038",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hyperfun.mp3",
+    "source_seconds": 233.3257142857143,
+    "clip_start": 111.66285714285715,
+    "file": {
+      "sha256": "ac3dcc688f183717cf3001a3250c2625ccaa2e97676aa9ab5cb3a8583b8611e1",
+      "bytes": 7468630
+    },
+    "original": {
+      "sha256": "dd266e3fcf63990591a010503faa59efa43952bb3964b1256c0920bf348e2fd0",
+      "bytes": 20579530
+    },
+    "reference": {
+      "sha256": "1c32d020138df480d372a746a477a8cf522b937c14ac61a9c19eca59f403a1e7",
+      "bytes": 882044
+    }
+  },
+  "h08": {
+    "track": {
+      "id": "h08",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Sneaky Snitch",
+      "isrc": "USUAN1100772",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sneaky%20Snitch.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100772",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sneaky%20Snitch.mp3",
+    "source_seconds": 136.6204081632653,
+    "clip_start": 63.310204081632655,
+    "file": {
+      "sha256": "db1710333d68a215277f77e4e17e1a64bf4ed38f87c70f8d0f56b16b6aa4f884",
+      "bytes": 5466943
+    },
+    "original": {
+      "sha256": "00cf4b96000dbfc6de1914362eaf3a3c08e0e465a544dbb7c29927c618c77c47",
+      "bytes": 12050100
+    },
+    "reference": {
+      "sha256": "3ea351ccaa53ce1c3d66443248a577900f5dc0d566a6499a454493b97612a4f1",
+      "bytes": 882044
+    }
+  },
+  "n01": {
+    "track": {
+      "id": "n01",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Cruising for Goblins",
+      "isrc": "USUAN1800002",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cruising%20for%20Goblins.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1800002",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cruising%20for%20Goblins.mp3",
+    "source_seconds": 148.71510204081633,
+    "clip_start": 69.35755102040817,
+    "file": {
+      "sha256": "13fb2bdf5457d579bc3a7227d2c7b4df35759d7ea8711cd762961a8c58ec1e27",
+      "bytes": 4761149
+    },
+    "original": {
+      "sha256": "393a844e14b53784ab4a72e61646e7533e2decd6a377f4d98ec15ea5bd128a9f",
+      "bytes": 13116916
+    },
+    "reference": {
+      "sha256": "39c1a5136d4208a234cedeebb7eb84c8f4e670e82842ad5cc50bc29c0fc77a0c",
+      "bytes": 882044
+    }
+  },
+  "n02": {
+    "track": {
+      "id": "n02",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Go Cart",
+      "isrc": "USUAN1300006",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Go%20Cart.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300006",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Go%20Cart.mp3",
+    "source_seconds": 212.92408163265307,
+    "clip_start": 101.46204081632654,
+    "file": {
+      "sha256": "22d8f376aa42c2d324e6062db9d71fdff087693efe7b6bfb5b731f9f1de4fa0c",
+      "bytes": 8519177
+    },
+    "original": {
+      "sha256": "68d245dd2fd9a1669001e3471bc534ebf23933646a2169f7517c8596da26a74a",
+      "bytes": 18780098
+    },
+    "reference": {
+      "sha256": "a6bd0b2f4327b8d4cf26afee13de561e1b488b62b3330013fcc9428ef86a9abd",
+      "bytes": 882044
+    }
+  },
+  "n03": {
+    "track": {
+      "id": "n03",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Jerry Five",
+      "isrc": "USUAN1700066",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jerry%20Five.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700066",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jerry%20Five.mp3",
+    "source_seconds": 160.05224489795918,
+    "clip_start": 75.02612244897959,
+    "file": {
+      "sha256": "dd763adc4f41dcbe62e5108d4de08a13b55b380cec96976cd2a3eabec74b5c8b",
+      "bytes": 5123914
+    },
+    "original": {
+      "sha256": "6cc785184aaf8511236402f1b25c4532c31a45b9d9ffce6ad96c981b7a906737",
+      "bytes": 14116832
+    },
+    "reference": {
+      "sha256": "b4bc81bb344160d9a68103579db98a57759b622c01c821cf839b692f9755ab78",
+      "bytes": 882044
+    }
+  },
+  "n04": {
+    "track": {
+      "id": "n04",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Raving Energy (faster)",
+      "isrc": "USUAN1900012",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Raving%20Energy%20%28faster%29.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900012",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Raving%20Energy%20%28faster%29.mp3",
+    "source_seconds": 243.64408163265307,
+    "clip_start": 116.82204081632653,
+    "file": {
+      "sha256": "048f03a2118b317bea2b99b31f435866a1263aa6a5d6a3a5f6bff8d084b82f76",
+      "bytes": 9749860
+    },
+    "original": {
+      "sha256": "c99dc0c4f099e235bdc223d8fed4cceed70314749565a12469e8d3f41dd85977",
+      "bytes": 21489598
+    },
+    "reference": {
+      "sha256": "a2337debaef1d1c333d4aaea2ca338790cbe7de2f31f486f253f78c79fe5ba61",
+      "bytes": 882044
+    }
+  },
+  "n05": {
+    "track": {
+      "id": "n05",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Reformat",
+      "isrc": "USUAN1500020",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Reformat.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500020",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Reformat.mp3",
+    "source_seconds": 219.4808163265306,
+    "clip_start": 104.7404081632653,
+    "file": {
+      "sha256": "40ca39de392138f581bdf6df728f1d7e22ba650c165d6ff22e1ae7f7767363da",
+      "bytes": 7025649
+    },
+    "original": {
+      "sha256": "6bcc1c978719e04d9614e9df6237ef644cf4239eb980a8a490fd836e8777c45a",
+      "bytes": 19358450
+    },
+    "reference": {
+      "sha256": "9281cfd543d2d841c6a6936982d80689477fcc54eba4bea4e741d725ad523208",
+      "bytes": 882044
+    }
+  },
+  "n06": {
+    "track": {
+      "id": "n06",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Shiny Tech II",
+      "isrc": "USUAN1100077",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shiny%20Tech2.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100077",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shiny%20Tech2.mp3",
+    "source_seconds": 222.66775510204081,
+    "clip_start": 106.33387755102041,
+    "file": {
+      "sha256": "de97706b8dcd97aa0638201ab5546deb31f7229a1ead8f16f7924eb871b27d18",
+      "bytes": 8908911
+    },
+    "original": {
+      "sha256": "0b029ddd5ae11b2d100a557935f58eff580fae69ddd1f2e6f421f86e648819a2",
+      "bytes": 19639472
+    },
+    "reference": {
+      "sha256": "76e0e451ec63618a0b4687f95ec20210d45b13b1451678e7b23c1331e1522ccc",
+      "bytes": 882044
+    }
+  },
+  "n07": {
+    "track": {
+      "id": "n07",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Pamgaea",
+      "isrc": "USUAN1300036",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pamgaea.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300036",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pamgaea.mp3",
+    "source_seconds": 168.5681632653061,
+    "clip_start": 79.28408163265306,
+    "file": {
+      "sha256": "9f0ad72567c49d9e1ab895937bef03058a6fc1cfcc20ba7fdd4b681f3c7b5586",
+      "bytes": 6744939
+    },
+    "original": {
+      "sha256": "f6d241b3ffb9d069cf6de61633154e1fc6b9de32c5be85c6b1c9d314dd86be1d",
+      "bytes": 14867906
+    },
+    "reference": {
+      "sha256": "0b2f0e7b6b2b481820f5cceaca3d4e27ddf9ccd73bfc058491252d7d85d02a2f",
+      "bytes": 882044
+    }
+  },
+  "n08": {
+    "track": {
+      "id": "n08",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Blippy Trance",
+      "isrc": "USUAN1900055",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Blippy%20Trance.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900055",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Blippy%20Trance.mp3",
+    "source_seconds": 120.00759637188209,
+    "clip_start": 55.003786848072565,
+    "file": {
+      "sha256": "68ab5625f1b723d7fcfeaa47b44379fddc7bb5ffcc9d71017fabd07b5c2ca93a",
+      "bytes": 4937089
+    },
+    "original": {
+      "sha256": "81dd877150160e359ce279a20a708c5eb7298b577bc5cd2531467fcd6f0b02fe",
+      "bytes": 10584826
+    },
+    "reference": {
+      "sha256": "cf3527ae0bfae5f08254fff8aa39e3e384dc23e6405ee0b8ce0e458de3507837",
+      "bytes": 882044
+    }
+  },
+  "t01": {
+    "track": {
+      "id": "t01",
+      "title": "Sleep Tight (Sergio's Last Remix)",
+      "artist": "Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=191"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=191",
+    "source_seconds": 385.30904761904765,
+    "clip_start": 187.65451247165532,
+    "file": {
+      "sha256": "bcc9f75c93392f6c16961304f9054377bc9ea3be39fda5e7705b546367950f7b",
+      "bytes": 12334746
+    },
+    "original": {
+      "sha256": "9cbb3d02d590e4c80098ad3511559556927f9ddc01515d7a3da1c8d9ae3c491a",
+      "bytes": 33984490
+    },
+    "reference": {
+      "sha256": "dcf840e5ecd8fd237ca564cbcb0cd0a971d32d0fcec73915c28a0907eed33666",
+      "bytes": 882044
+    }
+  },
+  "t02": {
+    "track": {
+      "id": "t02",
+      "title": "Proven Reality",
+      "artist": "JVS",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=282"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=282",
+    "source_seconds": 428.6132426303855,
+    "clip_start": 209.30662131519276,
+    "file": {
+      "sha256": "8dcc6441e902f74be6d5d306f1e6516a70adeaa5effc4eb3efc22dbfa9e8ee83",
+      "bytes": 13752840
+    },
+    "original": {
+      "sha256": "febdcddb8b2e5e6c6461520ed4550c9648cba690a52ec38927456c09a4661704",
+      "bytes": 37803868
+    },
+    "reference": {
+      "sha256": "4d2706a4261712793ec1025195c58cbc8bca3da22021c4d96a3781e0ba093d13",
+      "bytes": 882044
+    }
+  },
+  "t03": {
+    "track": {
+      "id": "t03",
+      "title": "Turbulence (2020 Remix)",
+      "artist": "Marc Burt",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=379"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=379",
+    "source_seconds": 439.7744671201814,
+    "clip_start": 214.8872335600907,
+    "file": {
+      "sha256": "68bc338344ca351739912ef17190f5779fa713e8824fa266febe332f2e81a18f",
+      "bytes": 14135104
+    },
+    "original": {
+      "sha256": "7526d4e691167364d0e49d606116de2d52e674d3c31d3eb2a7ac98f8543a20b9",
+      "bytes": 38788346
+    },
+    "reference": {
+      "sha256": "b210c17f56f7005f2777f2a3ff4bbe2be09b9bdeeaafeed6b687675e30ff31c6",
+      "bytes": 882044
+    }
+  },
+  "t04": {
+    "track": {
+      "id": "t04",
+      "title": "Beautiful Geometry",
+      "artist": "Phish Funk",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=257"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=257",
+    "source_seconds": 479.425306122449,
+    "clip_start": 234.7126530612245,
+    "file": {
+      "sha256": "97d984243dbe0c3866916ddb7a15b5fe0789e9fb7cb70260fd3783e6ba65f151",
+      "bytes": 11509760
+    },
+    "original": {
+      "sha256": "0f25efe143dd2b90f6136347c2d68e9dd93f0335ea145afafb7fac1b5ddf6b7e",
+      "bytes": 42285620
+    },
+    "reference": {
+      "sha256": "730a0ce9c7cb76b3666143d8b571f4d8b96506d71a19d7432c2e52f873c47f1e",
+      "bytes": 882044
+    }
+  },
+  "t05": {
+    "track": {
+      "id": "t05",
+      "title": "Roots and Shoots",
+      "artist": "Dave Kent",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=4"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=4",
+    "source_seconds": 513.4628571428572,
+    "clip_start": 251.73142857142858,
+    "file": {
+      "sha256": "14f56f2f8312eeb2a90f808792e932f324610cffc8cbed2ade50a9ed6cba0855",
+      "bytes": 12324864
+    },
+    "original": {
+      "sha256": "1abbd7cd2ea9aa8fdf4b5ea20114844c94210a7edc38706f686426072f948bbc",
+      "bytes": 45287662
+    },
+    "reference": {
+      "sha256": "83a568a71f3b1ce8f90461a90e2cfdd689c35c46346e701e085b3f72e26762dc",
+      "bytes": 882044
+    }
+  },
+  "t06": {
+    "track": {
+      "id": "t06",
+      "title": "Scratching The Surface (Phish Funk Disco Mix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=296"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=296",
+    "source_seconds": 257.63489795918366,
+    "clip_start": 123.81743764172336,
+    "file": {
+      "sha256": "62e08836dde023f5b5af9c07ddc9ebd34705a2eb4d5e197357d5f7974eae7a78",
+      "bytes": 8248945
+    },
+    "original": {
+      "sha256": "0bbf540cc0795275ec75c15bac05c62d3d8af2557d092f1342661b5b666ec9ae",
+      "bytes": 22723612
+    },
+    "reference": {
+      "sha256": "21928873c934512b1dccb17d2a2818b35da8906747dbf0aef1b62981782773db",
+      "bytes": 882044
+    }
+  },
+  "t07": {
+    "track": {
+      "id": "t07",
+      "title": "Chasing Rainbows (Marc Burt and Notch remix)",
+      "artist": "Frau Holle",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=257"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=257",
+    "source_seconds": 434.8321768707483,
+    "clip_start": 212.41607709750568,
+    "file": {
+      "sha256": "9688319fe8c8534e509bebe73d2cf5cd430deeab9c6a7953779d32c6ead3fb19",
+      "bytes": 13918890
+    },
+    "original": {
+      "sha256": "a87fca56b57ddea5d06565c330dcde8e752b8641426df46438d526b5c8f8f8e1",
+      "bytes": 38352426
+    },
+    "reference": {
+      "sha256": "2cacf784496a74169abcf2e35d033fe56122f2c389b70b0cd5182a0b861d6fd2",
+      "bytes": 882044
+    }
+  },
+  "t08": {
+    "track": {
+      "id": "t08",
+      "title": "Flaw 24 (extended mix)",
+      "artist": "Notch",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=299"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=299",
+    "source_seconds": 340.49578231292514,
+    "clip_start": 165.24789115646257,
+    "file": {
+      "sha256": "b79fd5e01c14339cff8325e9f388496f674f705b97959549cec1c0777722b2c2",
+      "bytes": 10900404
+    },
+    "original": {
+      "sha256": "6a81f316e37810a676b21267d83800f10002e16a1b97c761019334f9e691d8b1",
+      "bytes": 30031926
+    },
+    "reference": {
+      "sha256": "abfd89d15f3a369fe52a2cbcc55166f01e9e31b4b9f3e2c25ebdcaa0be01585f",
+      "bytes": 882044
+    }
+  },
+  "t09": {
+    "track": {
+      "id": "t09",
+      "title": "Turn The Corner (Notch remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=240"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=240",
+    "source_seconds": 350.7170068027211,
+    "clip_start": 170.35850340136054,
+    "file": {
+      "sha256": "2554e549627fd8d598270c4a5ec60d8b7494893d09ffce46953ad20ba122dbab",
+      "bytes": 11227178
+    },
+    "original": {
+      "sha256": "64de0b344e166195ab0b7aa654fd86f4fbf02256ef8b76a0df892e7dc070cfca",
+      "bytes": 30933462
+    },
+    "reference": {
+      "sha256": "82cc8b19becfd3c7301a4e1ffb316167cb154530cce47ee0e5895b2543a34106",
+      "bytes": 882044
+    }
+  },
+  "t10": {
+    "track": {
+      "id": "t10",
+      "title": "Pioneers",
+      "artist": "Marc Burt",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=253"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=253",
+    "source_seconds": 330.71020408163264,
+    "clip_start": 160.35510204081632,
+    "file": {
+      "sha256": "1b71495a7dfe8e2722bb6bbdf2a608b36516ff3a00b35b5ec7aad4abdc5076b8",
+      "bytes": 7940096
+    },
+    "original": {
+      "sha256": "281032280c719b8bf31b6bfd07bd6d239c4316451316fcc1c9ae77505fcc375f",
+      "bytes": 29168930
+    },
+    "reference": {
+      "sha256": "c85c543bb5fa7c3137f600b02e0323cac71b08ced0355404a9b0bd1af57dafeb",
+      "bytes": 882044
+    }
+  },
+  "t11": {
+    "track": {
+      "id": "t11",
+      "title": "Tears In My Heart (Notch remix)",
+      "artist": "Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=265"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=265",
+    "source_seconds": 427.7519274376417,
+    "clip_start": 208.87596371882086,
+    "file": {
+      "sha256": "e4e5b43fb2761113a04fc74bf64da4f090d3f6ad698a454de428c21a68a9fbac",
+      "bytes": 13691882
+    },
+    "original": {
+      "sha256": "2b4d5234578a27fee317177b66fab5b3344ce6add2acbf5e83597b790289ab85",
+      "bytes": 37727904
+    },
+    "reference": {
+      "sha256": "734d2c78b05781c4108a149a0506b84d70af4e4dba41f59ec15b44c0a472f1a6",
+      "bytes": 882044
+    }
+  },
+  "t12": {
+    "track": {
+      "id": "t12",
+      "title": "Beast",
+      "artist": "Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=289"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=289",
+    "source_seconds": 388.4669387755102,
+    "clip_start": 189.2334693877551,
+    "file": {
+      "sha256": "0dca2b13e0dc89341b33f21015d2739e1e811a42cd44f32ba5a2024b394b7851",
+      "bytes": 9325383
+    },
+    "original": {
+      "sha256": "38a23b012090bf3f0859691ed6cc7424f58fb1072aa6f7037aa575e1d141e9e8",
+      "bytes": 34263032
+    },
+    "reference": {
+      "sha256": "340dd315efce18f20717a06256808552cd7fb871dfe60558e698eb3bc43c2160",
+      "bytes": 882044
+    }
+  },
+  "t13": {
+    "track": {
+      "id": "t13",
+      "title": "The Piano Tune",
+      "artist": "Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=251"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=251",
+    "source_seconds": 424.22857142857146,
+    "clip_start": 207.11428571428573,
+    "file": {
+      "sha256": "5d588272889ed6ec36185f1fac8b272174c05ea0bbe887fadd20fdc37614cc52",
+      "bytes": 10184704
+    },
+    "original": {
+      "sha256": "ba975aec72d78e102442cea236f12c67cff186148459275df167924ae557a3e7",
+      "bytes": 37417236
+    },
+    "reference": {
+      "sha256": "b68de600e9c9bb0288e19db6bc55106a274b607ffb8f124f5ca9f410124557f3",
+      "bytes": 882044
+    }
+  },
+  "t14": {
+    "track": {
+      "id": "t14",
+      "title": "Baby Crying",
+      "artist": "Fioko",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=298"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=298",
+    "source_seconds": 555.9379591836735,
+    "clip_start": 272.9689795918367,
+    "file": {
+      "sha256": "39d61078b5511e34f4271751255881603b01a0ffb5d4f4c857b3d78246b46e36",
+      "bytes": 13324416
+    },
+    "original": {
+      "sha256": "6971bcf3bb92b49ba889fd8df82526b8c151b45f3f56e0a680f6627a51dd5021",
+      "bytes": 49034024
+    },
+    "reference": {
+      "sha256": "80204f344713499224fab10036614530e13a05f52bc87db60c409f1d35d2daa5",
+      "bytes": 882044
+    }
+  },
+  "t15": {
+    "track": {
+      "id": "t15",
+      "title": "Electronaut (edit)",
+      "artist": "Aerologic",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=159"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=159",
+    "source_seconds": 360.74519274376416,
+    "clip_start": 175.3725850340136,
+    "file": {
+      "sha256": "f6bbedd357bda90fd0d483de47f66bd24c081a4ffa784fd0dac9e992acac1010",
+      "bytes": 11547751
+    },
+    "original": {
+      "sha256": "30b7bdf2cbdf9b9405f1324c8038991f5795cbee1125fe23625a2999b55a118f",
+      "bytes": 31817906
+    },
+    "reference": {
+      "sha256": "ad9599237bab4c42d1b0ba18a1ee7c6e2aa74130089e847ddad320a42faf6c26",
+      "bytes": 882044
+    }
+  },
+  "t16": {
+    "track": {
+      "id": "t16",
+      "title": "Dancefloor Virus 2007",
+      "artist": "Silverknight & Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=215"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=215",
+    "source_seconds": 439.6930612244898,
+    "clip_start": 214.8465306122449,
+    "file": {
+      "sha256": "79620382cf3221654296b812de88f1fe5ca81208a86c99fab9a847bd10077949",
+      "bytes": 10555392
+    },
+    "original": {
+      "sha256": "929a3d1f7c6923866549d5ad99a2944a776e14eb19a54b4deb6ba4dddb55f781",
+      "bytes": 38781226
+    },
+    "reference": {
+      "sha256": "b7fc32b8a83c651d7daf9f6177a67df859179670b133dcd1b593932d6d7a28b3",
+      "bytes": 882044
+    }
+  },
+  "t17": {
+    "track": {
+      "id": "t17",
+      "title": "Plastic Explosive (Aerologic Remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=7"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=7",
+    "source_seconds": 298.31836734693877,
+    "clip_start": 144.15918367346939,
+    "file": {
+      "sha256": "7915e5b1d390997aa0b8e4c5ef3df2de2f87e0eea8eb450ab2394adf14323c66",
+      "bytes": 9548494
+    },
+    "original": {
+      "sha256": "daaa326205f7434d638dab6a828f2f59c62162be49c19f982165982443573864",
+      "bytes": 26311894
+    },
+    "reference": {
+      "sha256": "bc997de1b1b3076f5f65338f7d8fffa71fdf1d176a86e7e79bdaff84ce43108a",
+      "bytes": 882044
+    }
+  },
+  "t18": {
+    "track": {
+      "id": "t18",
+      "title": "Aquarius (JMD Remix)",
+      "artist": "Phish Funk",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=340"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=340",
+    "source_seconds": 324.88489795918366,
+    "clip_start": 157.44244897959183,
+    "file": {
+      "sha256": "62d19612420fc3e15ffcf54bd445e72bb535df04d1efd41e9f06e3be6078ca05",
+      "bytes": 10398666
+    },
+    "original": {
+      "sha256": "28ee0139ccaff3722701a600ecae0e7d6a05caec22d2504ffcf07f8d1a451e26",
+      "bytes": 28655110
+    },
+    "reference": {
+      "sha256": "8feaac82b727749e95b2c0d4bcc1dda13dfc8007f69fd1f7c02bd459a5022bb2",
+      "bytes": 882044
+    }
+  },
+  "t19": {
+    "track": {
+      "id": "t19",
+      "title": "Body Sensations (original mix)",
+      "artist": "Base II",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=305"
+    },
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=305",
+    "source_seconds": 355.0185487528345,
+    "clip_start": 172.50927437641724,
+    "file": {
+      "sha256": "5e14abcf805d6ce5f5278948ef73182ef7d5ca372a55f28dc0fc855cf82f97d6",
+      "bytes": 11456376
+    },
+    "original": {
+      "sha256": "4d77042f602c15de59ae73ff66884fce78feff9a28ed79c6e159b750664f1262",
+      "bytes": 31312820
+    },
+    "reference": {
+      "sha256": "b5aee94696cf280b36f054376d69e6e7e7d0323cba56ff4a52382c14e53046fa",
+      "bytes": 882044
+    }
+  },
+  "t20": {
+    "track": {
+      "id": "t20",
+      "title": "By The Water (Aerologic remix)",
+      "artist": "Space Invaderz & Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=372"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=372",
+    "source_seconds": 414.66167800453513,
+    "clip_start": 202.33083900226757,
+    "file": {
+      "sha256": "dd2ec4edd4d550c9efb370f9ef57c20c697f5b04fa49d73d759ba886c5d8402a",
+      "bytes": 13273384
+    },
+    "original": {
+      "sha256": "5973cac8f1ce65ace8db1df94cb5d3ea00b7783f1140eabd2f16a9bba2465212",
+      "bytes": 36573386
+    },
+    "reference": {
+      "sha256": "b698b1a14e62727dc3ec78871cff5b7fd7cc467386456591aa0970674ad38d25",
+      "bytes": 882044
+    }
+  },
+  "t21": {
+    "track": {
+      "id": "t21",
+      "title": "On Target (Remix)",
+      "artist": "JMD",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=333"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=333",
+    "source_seconds": 398.08,
+    "clip_start": 194.04,
+    "file": {
+      "sha256": "8d09c6d17b54f0f80d0d440f8e3c60cded6fe1f9a82ebdf2ff67a6bb0ecf696e",
+      "bytes": 12740849
+    },
+    "original": {
+      "sha256": "25226881003b48d80476dfc8a9ea0277ed42ebc0392b06ba44bf109b28421144",
+      "bytes": 35110934
+    },
+    "reference": {
+      "sha256": "961e05da8d5d7e67dd5e6a36e35de195c9be66c5f24391c8dff43fe0095030a1",
+      "bytes": 882044
+    }
+  },
+  "t22": {
+    "track": {
+      "id": "t22",
+      "title": "Are You Feeling It? (Rawbase Remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=133"
+    },
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=133",
+    "source_seconds": 354.690612244898,
+    "clip_start": 172.345306122449,
+    "file": {
+      "sha256": "4e53781afbc2e0e92f2d9b9ef746d933b708b0f62f8fd36c27125ba88229a657",
+      "bytes": 8515584
+    },
+    "original": {
+      "sha256": "bc6b0f2f83c34c01f21bc24dc5e6a10ff636118e180cb69a5be62904e94e928d",
+      "bytes": 31283922
+    },
+    "reference": {
+      "sha256": "f2308802eeb0aaf56aa33e2fe46db9da8f04c1b14992aacfc868639a4e953977",
+      "bytes": 882044
+    }
+  }
+}

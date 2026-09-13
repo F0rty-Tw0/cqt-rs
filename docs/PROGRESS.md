@@ -11,14 +11,25 @@ PR #5. Two Rust CLI defects are fixed and verified in PR #6. PR #7 implements a 
 synthetic cases, with exact exhaustive-oracle parity. This is exploratory
 stage performance; independent accuracy and end-to-end gains are unproved.
 
+PR #9 now implements an experimental `--modal-fit` and completes E008/E009.
+The 90.61-minute mix improves from 14→15/22 clean, 12→12 pitch, 12→13 slowed,
+and 5→8 combined. There are no lost baseline identities. Twelve isolated EQ
+filters each recover all 22 development and eight held-out snippets; the
+held-out baseline already recovers all eight. Held-out voice and combined
+outcomes remain 6/8 and 5/8. The candidate stays opt-in because unseen-recording
+gains, robust position estimates and production false-alarm rates are unproved.
+See [E009 results](experiments/E009-results.md) and [proof](evidence/E009/README.md).
+
 - Tracking issue: <https://github.com/F0rty-Tw0/cqt-rs/issues/4>
 - CLI PR: <https://github.com/F0rty-Tw0/cqt-rs/pull/6>
 - Verifier experiment: <https://github.com/F0rty-Tw0/cqt-rs/pull/7>
 - Fixed baseline: `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`
 - Validated CLI implementation: `73d19401fb68b3b167814ec18466ae76cd7dfd41`
 - Validated verifier: `7e529dc8d73454e56b8c283d0a53ab7c56ca68eb`
-- This checkpoint changes documentation/evidence only; evidence belongs
-  to the explicitly identified implementation commit, not automatically HEAD.
+- Tested modal candidate: `69c09c4be5fb391a9e3d93ff4465cc4864d0ddf4`
+- CLI proof cache setup fix: `2ccb2f6b4259ffc8181021f5841b3c0f896d4481`
+- Accuracy evidence belongs to the explicitly identified binary/source,
+  not automatically HEAD. No default behavior change, merge or release.
 
 ## Evidence register
 
@@ -30,8 +41,13 @@ stage performance; independent accuracy and end-to-end gains are unproved.
 | E004 | planned | Independent recognition evaluation | Corpus/splits and executable run not yet prepared; existing radio results remain development validation. |
 | E005 | verified | Verifier searches a bounded reference interval with exact count parity; large synthetic cases use 31–34% less time | Five alternating process pairs, 3,030 oracle combinations, ten checks at `7e529dc8`; all raw results/hash review in [experiment](experiments/E005-verifier-window.md). Whole-reference cases regress about 0.1%; real-monitor benefit remains unproved. |
 
-E007 primary counts are reviewed with explicit incomplete diagnostics and
-missing binary identities; E008 is planned only. See the records below.
+E007 primary counts retain incomplete diagnostics and missing binary identities.
+E008/E009 now have 162 fully audited cases, including eight replayed outputs
+whose non-timing events match the original recorded digests. Nine auxiliary
+audio caches and two fingerprint dumps required exact-hash restoration.
+All actual detector inputs retained their hashes. The incident and original
+damaged logs are preserved, alongside 324 checked output hashes, 44 baseline
+parity pairs, default parity and 390 native fingerprint comparisons.
 
 The CI snapshot records observed GitHub metadata, not copies of compiler
 or test logs. Follow the run/job URLs for logs; preserve logs/artifacts
@@ -72,9 +88,9 @@ evaluation step inside a 65-minute job; the heavier experiment has not
 been rerun. Normal correctness CI passed all nine checks at `64bc53d`.
 Do not transfer that green status automatically to this later repair.
 
-The user also asked about EQ. [E008](experiments/E008-eq-plan.md) records
-architectural expectations and an explicit planned EQ sweep. EQ robustness
-is unmeasured; confidence scores are not calibrated probabilities.
+The later [E008/E009 EQ sweep](experiments/E009-results.md) supplies the
+measurements missing from E007. Confidence remains an evidence score,
+not a calibrated probability.
 
 Exact proof recheck (download/extract the original linked artifact first):
 
@@ -83,15 +99,20 @@ python3 scripts/report_real_mix.py target/real-mix-first --allow-incomplete --re
 python3 -m unittest discover -s scripts -p 'test_real_mix_checkpoint.py' -v
 ```
 
-Next bounded execution: reproduce E007 with the repaired harness and the
-same pinned binaries/sources/settings on a Rust-capable host, allowing the
-full 65-minute job budget; use the build/run commands in the evidence
-README. Do not reclassify unfinished full-reference cases as completed.
-The observed t01 original-snippet miss is the next detector-debugging case:
-confidence reaches 94.8 while high-confidence reports never reach the
-0.4 alignment start gate. Preserve this failure and investigate its position
-hypotheses without tuning on the frozen mix. EQ needs its own frozen
-parameters and unwatched-music controls before any reliability claim.
+E009 repeats the requested short-reference mix matrix with recorded binary
+identities; it does not complete E007's full-reference diagnostics. The t01
+miss was reproduced and its competing alignment offsets investigated.
+Modal fitting recovers the identity but can choose a repeated passage about
+8.7 seconds away from the true position.
+
+Next bounded experiment: freeze multiple reference excerpts per song and
+new artist-disjoint recordings before evaluation. Compare one midpoint,
+several distributed excerpts and full-track references at unchanged gates;
+score song identities and duplicate starts after explicit excerpt-to-song
+mapping, with independent mix cue times and held-out music negatives. Then
+separately test speech-resistant peak selection/verification. Do not choose
+the new setup on the existing eight held-out recordings; those outcomes are
+now known. Full CQT numerical/performance goals remain open.
 
 ## Remaining gates and unblock actions
 
@@ -101,8 +122,8 @@ parameters and unwatched-music controls before any reliability claim.
 | Broader CQT numerical/streaming matrix | Planned | Add a bounded parameter grid against the dense oracle and identify uncovered boundaries |
 | Process CPU, hop latency and peak RSS measurements | Planned | Define timing scopes and instrumentation independently of wall time |
 | Repeated baseline runtime measurements | Blocked locally | Use an available representative Rust host; exploratory CI timing must be labeled accordingly |
-| Recording-disjoint corpus | Planned | Assemble source/recording/license/hash manifest and freeze splits before tuning |
-| Recognition/performance experiments | Planned | Follow the order and acceptance rules in GOAL.md after their prerequisites |
+| Recording-disjoint corpus | Small frozen test completed | Eight held-out and eight negative recordings; expand artists/genres and preserve a fresh split before the next candidate |
+| Recognition/performance experiments | E009 recognition completed; broader goals open | Keep modal fit opt-in; test reference coverage and speech robustness with new data; no end-to-end speedup claim |
 
 Do not stop other useful work just because the benchmark host is missing.
 Do not claim that CI smoke measurements meet the representative-host gate.

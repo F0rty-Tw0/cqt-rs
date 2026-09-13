@@ -1,7 +1,10 @@
 # E009: alignment diagnosis and EQ evaluation
 
-Status: planned, 2026-09-13. User authorized implementation toward higher
-matches and actual EQ testing. Stack on PR #8; preserve its prior results.
+Status: executed and independently validated, 2026-09-13. User authorized
+implementation toward higher matches and actual EQ testing. Draft PR #9
+stacks on PR #8 and preserves its prior results. The text below is the frozen
+pre-evaluation protocol. See [results](E009-results.md) and
+[proof](../evidence/E009/README.md) for outcomes and retained failures.
 
 Hypothesis to investigate before claiming a defect: high hash evidence can
 select an incorrect temporal alignment for repetitive short references.

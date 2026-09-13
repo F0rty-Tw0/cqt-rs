@@ -1,8 +1,21 @@
-# E008: EQ robustness (planned, not executed)
+# E008: EQ robustness (measured in E009)
+
+Executed on 2026-09-13 under the frozen E009 protocol. The opt-in modal
+candidate detects 22/22 development snippets and 8/8 held-out snippets under
+each of twelve separately applied EQ filters. Baseline development detection
+ranges from 19/22 to 22/22; held-out detection is already 8/8 throughout.
+No new held-out EQ gain is demonstrated. EQ-negative controls produce no
+starts. [Results and filter-specific peak/hash measurements](E009-results.md)
+and [proof](../evidence/E009/README.md) preserve all outcomes.
+
+This supports tolerance of the tested shelf, notch and band-limiting settings.
+It does not guarantee arbitrary EQ, combined EQ-plus-speech treatments or
+clipping, nor calibrate the confidence score as a probability. The original
+pre-execution rationale and plan follow.
 
 The user asked during E007 whether EQ-distorted songs can be matched
-confidently. Current answer: moderate EQ tolerance is plausible; a reliable
-success rate for this implementation is not yet established.
+confidently. Before this execution, EQ tolerance was an architectural
+expectation without a measured success rate for this implementation.
 
 `PeakPicker` selects dB maxima relative to a local mean. Uniform gain
 cancels from that prominence calculation, except at the absolute floor.

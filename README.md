@@ -307,6 +307,17 @@ it arrives and flushes every report line, so it sits behind any decoder;
 the events are the same as for a file (verified on the same audio both
 ways).
 
+`--modal-fit` enables an experimental alignment estimate for short, repetitive
+references. In the frozen DJ-mix test it increased combined pitch/tempo/voice
+coverage from 5/22 to 8/22, with no lost baseline identities. The eight held-out
+recordings showed unchanged detection outcomes; repeated-passage position errors
+remain. It is disabled by default. See the [measured EQ and recognition results](docs/experiments/E009-results.md)
+and [validation and reproduction](docs/evidence/E009/README.md) before relying on it.
+
+```console
+cargo run --release -p cqt-monitor -- --modal-fit --watch song=song.wav --stream radio.wav
+```
+
 ### Simulated radio programme
 
 `scripts/radio_sim.py` builds two streams from CC-licensed tracks: a 15 min

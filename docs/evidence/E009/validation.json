@@ -1,0 +1,867 @@
+{
+  "status": "complete",
+  "runs": 162,
+  "raw_output_hashes_checked": 324,
+  "unique_file_identities_checked": 1538,
+  "baseline_parity_pairs": [
+    [
+      "development",
+      "self"
+    ],
+    [
+      "development",
+      "clean"
+    ],
+    [
+      "development",
+      "bass_-12"
+    ],
+    [
+      "development",
+      "bass_-6"
+    ],
+    [
+      "development",
+      "bass_+6"
+    ],
+    [
+      "development",
+      "bass_+12"
+    ],
+    [
+      "development",
+      "treble_-12"
+    ],
+    [
+      "development",
+      "treble_-6"
+    ],
+    [
+      "development",
+      "treble_+6"
+    ],
+    [
+      "development",
+      "treble_+12"
+    ],
+    [
+      "development",
+      "notch_broad"
+    ],
+    [
+      "development",
+      "notch_narrow"
+    ],
+    [
+      "development",
+      "highpass"
+    ],
+    [
+      "development",
+      "lowpass"
+    ],
+    [
+      "development",
+      "pitch"
+    ],
+    [
+      "development",
+      "tempo"
+    ],
+    [
+      "development",
+      "pitch_tempo"
+    ],
+    [
+      "development",
+      "voice"
+    ],
+    [
+      "development",
+      "combined"
+    ],
+    [
+      "development",
+      "clipping"
+    ],
+    [
+      "heldout",
+      "self"
+    ],
+    [
+      "heldout",
+      "clean"
+    ],
+    [
+      "heldout",
+      "bass_-12"
+    ],
+    [
+      "heldout",
+      "bass_-6"
+    ],
+    [
+      "heldout",
+      "bass_+6"
+    ],
+    [
+      "heldout",
+      "bass_+12"
+    ],
+    [
+      "heldout",
+      "treble_-12"
+    ],
+    [
+      "heldout",
+      "treble_-6"
+    ],
+    [
+      "heldout",
+      "treble_+6"
+    ],
+    [
+      "heldout",
+      "treble_+12"
+    ],
+    [
+      "heldout",
+      "notch_broad"
+    ],
+    [
+      "heldout",
+      "notch_narrow"
+    ],
+    [
+      "heldout",
+      "highpass"
+    ],
+    [
+      "heldout",
+      "lowpass"
+    ],
+    [
+      "heldout",
+      "pitch"
+    ],
+    [
+      "heldout",
+      "tempo"
+    ],
+    [
+      "heldout",
+      "pitch_tempo"
+    ],
+    [
+      "heldout",
+      "voice"
+    ],
+    [
+      "heldout",
+      "combined"
+    ],
+    [
+      "heldout",
+      "clipping"
+    ],
+    [
+      "mix",
+      "clean"
+    ],
+    [
+      "mix",
+      "pitch"
+    ],
+    [
+      "mix",
+      "tempo"
+    ],
+    [
+      "mix",
+      "combined"
+    ]
+  ],
+  "default_parity": true,
+  "track_changes": [
+    {
+      "split": "development",
+      "treatment": "self",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 115,
+        "confidence": 74.2,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.5,
+        "verify_r": 0.667,
+        "query_peaks": 24,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "clean",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 115,
+        "confidence": 74.2,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.5,
+        "verify_r": 0.667,
+        "query_peaks": 24,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_-12",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 111,
+        "confidence": 73.5,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.462,
+        "verify_r": 0.667,
+        "query_peaks": 26,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_-6",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 111,
+        "confidence": 73.5,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.462,
+        "verify_r": 0.667,
+        "query_peaks": 26,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_+6",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 115,
+        "confidence": 74.2,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.5,
+        "verify_r": 0.667,
+        "query_peaks": 24,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_+6",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 530.971,
+        "consumed": 531.365,
+        "song": "t22",
+        "evidence": 175,
+        "confidence": 81.4,
+        "shift": 0,
+        "tempo": 1.0004,
+        "position": 0.97,
+        "verify_q": 0.864,
+        "verify_r": 1.0,
+        "query_peaks": 22,
+        "query_matched": 19,
+        "reference_peaks": 19,
+        "reference_matched": 19
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_+12",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 7.314,
+        "consumed": 7.709,
+        "song": "t01",
+        "evidence": 125,
+        "confidence": 75.8,
+        "shift": 0,
+        "tempo": 1.0004,
+        "position": 5.22,
+        "verify_q": 0.654,
+        "verify_r": 0.773,
+        "query_peaks": 26,
+        "query_matched": 17,
+        "reference_peaks": 22,
+        "reference_matched": 17
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "bass_+12",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 530.971,
+        "consumed": 531.365,
+        "song": "t22",
+        "evidence": 145,
+        "confidence": 78.4,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 0.97,
+        "verify_q": 0.783,
+        "verify_r": 0.947,
+        "query_peaks": 23,
+        "query_matched": 18,
+        "reference_peaks": 19,
+        "reference_matched": 18
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "treble_-12",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 98,
+        "confidence": 71.0,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.522,
+        "verify_r": 0.667,
+        "query_peaks": 23,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "treble_-6",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 530.971,
+        "consumed": 531.365,
+        "song": "t22",
+        "evidence": 117,
+        "confidence": 74.5,
+        "shift": 0,
+        "tempo": 1.0007,
+        "position": 0.97,
+        "verify_q": 0.818,
+        "verify_r": 0.947,
+        "query_peaks": 22,
+        "query_matched": 18,
+        "reference_peaks": 19,
+        "reference_matched": 18
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "treble_+6",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 530.971,
+        "consumed": 531.365,
+        "song": "t22",
+        "evidence": 140,
+        "confidence": 77.8,
+        "shift": 0,
+        "tempo": 1.0004,
+        "position": 0.97,
+        "verify_q": 0.9,
+        "verify_r": 0.947,
+        "query_peaks": 20,
+        "query_matched": 18,
+        "reference_peaks": 19,
+        "reference_matched": 18
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "notch_broad",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 7.779,
+        "consumed": 8.173,
+        "song": "t01",
+        "evidence": 105,
+        "confidence": 72.4,
+        "shift": 0,
+        "tempo": 1.0002,
+        "position": 5.68,
+        "verify_q": 0.684,
+        "verify_r": 0.542,
+        "query_peaks": 19,
+        "query_matched": 13,
+        "reference_peaks": 24,
+        "reference_matched": 13
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "notch_broad",
+      "song": "t05",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 106.603,
+        "consumed": 106.998,
+        "song": "t05",
+        "evidence": 126,
+        "confidence": 75.9,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 1.6,
+        "verify_q": 0.786,
+        "verify_r": 0.647,
+        "query_peaks": 28,
+        "query_matched": 22,
+        "reference_peaks": 34,
+        "reference_matched": 22
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "notch_broad",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 531.249,
+        "consumed": 531.644,
+        "song": "t22",
+        "evidence": 157,
+        "confidence": 79.7,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 1.25,
+        "verify_q": 0.864,
+        "verify_r": 0.864,
+        "query_peaks": 22,
+        "query_matched": 19,
+        "reference_peaks": 22,
+        "reference_matched": 19
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "notch_narrow",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 7.314,
+        "consumed": 7.709,
+        "song": "t01",
+        "evidence": 114,
+        "confidence": 74.0,
+        "shift": 0,
+        "tempo": 1.0009,
+        "position": 5.22,
+        "verify_q": 0.708,
+        "verify_r": 0.773,
+        "query_peaks": 24,
+        "query_matched": 17,
+        "reference_peaks": 22,
+        "reference_matched": 17
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "notch_narrow",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 530.971,
+        "consumed": 531.365,
+        "song": "t22",
+        "evidence": 118,
+        "confidence": 74.7,
+        "shift": 0,
+        "tempo": 1.0009,
+        "position": 0.97,
+        "verify_q": 0.773,
+        "verify_r": 0.895,
+        "query_peaks": 22,
+        "query_matched": 17,
+        "reference_peaks": 19,
+        "reference_matched": 17
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "highpass",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 6.757,
+        "consumed": 7.152,
+        "song": "t01",
+        "evidence": 115,
+        "confidence": 74.2,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 10.47,
+        "verify_q": 0.5,
+        "verify_r": 0.667,
+        "query_peaks": 24,
+        "query_matched": 12,
+        "reference_peaks": 18,
+        "reference_matched": 12
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "pitch",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 7.314,
+        "consumed": 7.709,
+        "song": "t01",
+        "evidence": 116,
+        "confidence": 74.4,
+        "shift": 4,
+        "tempo": 1.0013,
+        "position": 2.32,
+        "verify_q": 0.6,
+        "verify_r": 0.783,
+        "query_peaks": 30,
+        "query_matched": 18,
+        "reference_peaks": 23,
+        "reference_matched": 18
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "tempo",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 8.057,
+        "consumed": 8.452,
+        "song": "t01",
+        "evidence": 182,
+        "confidence": 82.0,
+        "shift": 0,
+        "tempo": 0.901,
+        "position": 10.5,
+        "verify_q": 0.483,
+        "verify_r": 0.778,
+        "query_peaks": 29,
+        "query_matched": 14,
+        "reference_peaks": 18,
+        "reference_matched": 14
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "tempo",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 552.705,
+        "consumed": 553.099,
+        "song": "t22",
+        "evidence": 111,
+        "confidence": 73.5,
+        "shift": 0,
+        "tempo": 0.8998,
+        "position": 1.41,
+        "verify_q": 0.639,
+        "verify_r": 0.786,
+        "query_peaks": 36,
+        "query_matched": 23,
+        "reference_peaks": 28,
+        "reference_matched": 22
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "pitch_tempo",
+      "song": "t01",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 7.779,
+        "consumed": 8.173,
+        "song": "t01",
+        "evidence": 123,
+        "confidence": 75.5,
+        "shift": 4,
+        "tempo": 0.9006,
+        "position": 6.38,
+        "verify_q": 0.7,
+        "verify_r": 0.737,
+        "query_peaks": 20,
+        "query_matched": 14,
+        "reference_peaks": 19,
+        "reference_matched": 14
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "pitch_tempo",
+      "song": "t05",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 111.154,
+        "consumed": 111.549,
+        "song": "t05",
+        "evidence": 148,
+        "confidence": 78.7,
+        "shift": 4,
+        "tempo": 0.9002,
+        "position": 1.55,
+        "verify_q": 0.625,
+        "verify_r": 0.735,
+        "query_peaks": 40,
+        "query_matched": 25,
+        "reference_peaks": 34,
+        "reference_matched": 25
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "voice",
+      "song": "t03",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 61.185,
+        "consumed": 61.579,
+        "song": "t03",
+        "evidence": 104,
+        "confidence": 72.2,
+        "shift": 0,
+        "tempo": 1.0,
+        "position": 6.18,
+        "verify_q": 0.409,
+        "verify_r": 0.474,
+        "query_peaks": 44,
+        "query_matched": 18,
+        "reference_peaks": 38,
+        "reference_matched": 18
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "combined",
+      "song": "t05",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 114.126,
+        "consumed": 114.521,
+        "song": "t05",
+        "evidence": 95,
+        "confidence": 70.4,
+        "shift": 4,
+        "tempo": 0.9006,
+        "position": 4.22,
+        "verify_q": 0.404,
+        "verify_r": 0.432,
+        "query_peaks": 47,
+        "query_matched": 19,
+        "reference_peaks": 44,
+        "reference_matched": 19
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "combined",
+      "song": "t17",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 430.103,
+        "consumed": 430.498,
+        "song": "t17",
+        "evidence": 94,
+        "confidence": 70.1,
+        "shift": 4,
+        "tempo": 0.9,
+        "position": 6.6,
+        "verify_q": 0.432,
+        "verify_r": 0.64,
+        "query_peaks": 37,
+        "query_matched": 16,
+        "reference_peaks": 25,
+        "reference_matched": 16
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "combined",
+      "song": "t20",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 508.029,
+        "consumed": 508.424,
+        "song": "t20",
+        "evidence": 109,
+        "confidence": 73.2,
+        "shift": 4,
+        "tempo": 0.9003,
+        "position": 6.24,
+        "verify_q": 0.412,
+        "verify_r": 0.538,
+        "query_peaks": 34,
+        "query_matched": 14,
+        "reference_peaks": 26,
+        "reference_matched": 14
+      }
+    },
+    {
+      "split": "development",
+      "treatment": "clipping",
+      "song": "t22",
+      "baseline": false,
+      "candidate": true,
+      "baseline_start": null,
+      "candidate_start": {
+        "event": "start",
+        "t": 532.921,
+        "consumed": 533.316,
+        "song": "t22",
+        "evidence": 101,
+        "confidence": 71.6,
+        "shift": 0,
+        "tempo": 1.001,
+        "position": 2.91,
+        "verify_q": 0.577,
+        "verify_r": 0.417,
+        "query_peaks": 26,
+        "query_matched": 15,
+        "reference_peaks": 36,
+        "reference_matched": 15
+      }
+    }
+  ],
+  "peak_cases_checked": 390,
+  "candidate_commit": "69c09c4be5fb391a9e3d93ff4465cc4864d0ddf4",
+  "replayed_outputs": 8,
+  "replay_event_parity": true,
+  "e007_reference_and_self_hash_parity": true
+}
