@@ -388,7 +388,8 @@ impl Matcher {
                 } else {
                     None
                 };
-                for (i, (shift, tempo_idx, cell)) in self.neighbourhood_with_shift(key).enumerate() {
+                for (i, (shift, tempo_idx, cell)) in self.neighbourhood_with_shift(key).enumerate()
+                {
                     if modal_index.is_some_and(|wanted| i != wanted) {
                         continue;
                     }
@@ -611,7 +612,13 @@ mod tests {
     fn modal_fit_preserves_a_single_alignment_through_expiry_and_rebase() {
         let mut matcher = Matcher::new(MatcherConfig::default());
         for frame in 4200..4300 {
-            inject(&mut matcher, frame, encode_cell_raw(0, 0, 15, -1), 1.0, -86.0);
+            inject(
+                &mut matcher,
+                frame,
+                encode_cell_raw(0, 0, 15, -1),
+                1.0,
+                -86.0,
+            );
         }
         let original = matcher.best_per_song_modal();
         assert_eq!(original, matcher.best_per_song());
