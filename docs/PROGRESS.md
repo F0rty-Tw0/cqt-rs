@@ -1,5 +1,34 @@
 # Goal progress and evidence
 
+## PR consolidation checkpoint — 2026-09-13
+
+At the user's request, issue #4 was converted in place into the
+[consolidated draft PR #4](https://github.com/F0rty-Tw0/cqt-rs/pull/4).
+Continue follow-on work on `codex/pr4-consolidated-updates`, based on
+PR #3's branch `claude/cqt-library-analysis-update-87jyuu`.
+PR references #5–#9 below are historical experiment/review records.
+
+The consolidated branch starts at
+`245fdf8c2566e4b9f9b61774c2577bcc4841d2bf` (the original PR #9 head).
+GitHub comparisons verified that PR #3 and every head from #5–#8 are
+ancestors, with zero commits behind. All 16 follow-on commits, source,
+tests and checked-in evidence are preserved. The original branches are
+retained. This checkpoint is the only file change for the consolidation.
+
+All 11 checks completed successfully at that original head:
+[nine normal CI checks](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34766780813),
+[CLI before/after proof](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34766780788),
+and [binary export](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34766780800).
+Those results belong to the stated SHA; this documentation checkpoint
+does not claim another audio experiment or extend the research evidence.
+The broader goal and previously recorded limitations remain incomplete.
+
+Next research action remains the fresh-recording/distributed-reference
+experiment described below. Before resuming, check the live PR #4 head,
+then use `git fetch origin codex/pr4-consolidated-updates` and read this
+checkpoint and `docs/GOAL.md` from that branch. Keep the PR #3 comparison
+baseline pinned. No main-branch merge or release is part of consolidation.
+
 ## Current state
 
 The user requested the goal workflow directly in this chat on 2026-09-13.
@@ -20,7 +49,7 @@ outcomes remain 6/8 and 5/8. The candidate stays opt-in because unseen-recording
 gains, robust position estimates and production false-alarm rates are unproved.
 See [E009 results](experiments/E009-results.md) and [proof](evidence/E009/README.md).
 
-- Tracking issue: <https://github.com/F0rty-Tw0/cqt-rs/issues/4>
+- Consolidated draft PR: <https://github.com/F0rty-Tw0/cqt-rs/pull/4>
 - CLI PR: <https://github.com/F0rty-Tw0/cqt-rs/pull/6>
 - Verifier experiment: <https://github.com/F0rty-Tw0/cqt-rs/pull/7>
 - Fixed baseline: `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`
