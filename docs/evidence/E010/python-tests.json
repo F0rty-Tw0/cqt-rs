@@ -1,0 +1,16 @@
+{
+  "command": [
+    "python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "scripts",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "returncode": 0,
+  "sha256": "b9ecd0465f35271e10d5a33af77c18dc47a088a9f90568bd878a203402454bcc",
+  "python": "3.12.14"
+}

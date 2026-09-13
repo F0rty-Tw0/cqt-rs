@@ -1,0 +1,15 @@
+{
+  "native_logs": 44,
+  "zip_crc": "passed",
+  "method": "Read ZIP directly with stdlib; verify single accepted parent per query; recount membership without importing evaluator/scorer",
+  "counts": {
+    "midpoint": {
+      "no-match": 19,
+      "correct": 2
+    },
+    "chunks": {
+      "no-match": 8,
+      "correct": 13
+    }
+  }
+}

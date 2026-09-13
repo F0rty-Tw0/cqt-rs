@@ -1,0 +1,1248 @@
+{
+  "status": "verified-execution-with-one-annotation-gap",
+  "native_runs": 44,
+  "supported_queries": 21,
+  "unverified_queries": [
+    "t05"
+  ],
+  "counts": {
+    "midpoint": {
+      "no-match": 19,
+      "correct": 2
+    },
+    "chunks": {
+      "no-match": 8,
+      "correct": 13
+    }
+  },
+  "gains": [
+    "t02",
+    "t03",
+    "t06",
+    "t07",
+    "t08",
+    "t09",
+    "t12",
+    "t14",
+    "t16",
+    "t17",
+    "t19"
+  ],
+  "losses": [],
+  "paired_correct_fraction_delta": 0.5238095238095238,
+  "paired_bootstrap_95_interval": [
+    0.3333333333333333,
+    0.7142857142857143
+  ],
+  "uncertainty_scope": "21 tracks in one known mix; not independent mixes or human-verified annotations",
+  "exploratory_acceptance": true,
+  "index": {
+    "midpoint": {
+      "event": "index_done",
+      "songs": 22,
+      "hashes": 128110,
+      "dropped": 10,
+      "bytes": 3372328,
+      "seconds": 0.67
+    },
+    "chunks": {
+      "event": "index_done",
+      "songs": 880,
+      "hashes": 5069409,
+      "dropped": 3834,
+      "bytes": 119553164,
+      "seconds": 25.848
+    }
+  },
+  "accepted_starts": {
+    "midpoint": 2,
+    "chunks": 35
+  },
+  "wrong_parent_starts": {
+    "midpoint": 0,
+    "chunks": 0
+  },
+  "repeated_parent_starts": {
+    "midpoint": 0,
+    "chunks": 22
+  },
+  "per_query": [
+    {
+      "song": "t01",
+      "title": "Sleep Tight (Sergio's Last Remix)",
+      "mix_start_seconds": 37.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 15,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 217,
+          "max_reported_alignment_when_confident": 0.125
+        }
+      }
+    },
+    {
+      "song": "t02",
+      "title": "Proven Reality",
+      "mix_start_seconds": 218.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 17,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t02",
+        "best": {
+          "event": "start",
+          "t": 2.299,
+          "consumed": 2.694,
+          "song": "t02-c028",
+          "evidence": 94,
+          "confidence": 70.1,
+          "shift": 0,
+          "tempo": 0.9969,
+          "position": 2.4,
+          "verify_q": 0.7,
+          "verify_r": 0.568,
+          "query_peaks": 30,
+          "query_matched": 21,
+          "reference_peaks": 37,
+          "reference_matched": 21,
+          "parent_song": "t02",
+          "chunk_id": "t02-c028",
+          "original_position": 282.4
+        },
+        "diagnostics": {
+          "max_reported_evidence": 574,
+          "max_reported_alignment_when_confident": 0.727
+        }
+      }
+    },
+    {
+      "song": "t03",
+      "title": "Turbulence (2020 Remix)",
+      "mix_start_seconds": 406.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 144,
+          "max_reported_alignment_when_confident": 0.051
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t03",
+        "best": {
+          "event": "start",
+          "t": 2.299,
+          "consumed": 2.694,
+          "song": "t03-c007",
+          "evidence": 115,
+          "confidence": 74.2,
+          "shift": 0,
+          "tempo": 1.015,
+          "position": 5.78,
+          "verify_q": 0.639,
+          "verify_r": 0.59,
+          "query_peaks": 36,
+          "query_matched": 23,
+          "reference_peaks": 39,
+          "reference_matched": 23,
+          "parent_song": "t03",
+          "chunk_id": "t03-c007",
+          "original_position": 75.78
+        },
+        "diagnostics": {
+          "max_reported_evidence": 392,
+          "max_reported_alignment_when_confident": 0.727
+        }
+      }
+    },
+    {
+      "song": "t04",
+      "title": "Beautiful Geometry",
+      "mix_start_seconds": 648.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 13,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 91,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    },
+    {
+      "song": "t05",
+      "title": "Roots and Shoots",
+      "mix_start_seconds": 835.0,
+      "annotation": "unverified-publisher-order-gap",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 12,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 23,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    },
+    {
+      "song": "t06",
+      "title": "Scratching The Surface (Phish Funk Disco Mix)",
+      "mix_start_seconds": 971.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 29,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t06",
+        "best": {
+          "event": "start",
+          "t": 8.057,
+          "consumed": 8.452,
+          "song": "t06-c015",
+          "evidence": 121,
+          "confidence": 75.2,
+          "shift": 1,
+          "tempo": 1.0366,
+          "position": 2.54,
+          "verify_q": 0.613,
+          "verify_r": 0.559,
+          "query_peaks": 31,
+          "query_matched": 19,
+          "reference_peaks": 34,
+          "reference_matched": 19,
+          "parent_song": "t06",
+          "chunk_id": "t06-c015",
+          "original_position": 152.54
+        },
+        "diagnostics": {
+          "max_reported_evidence": 635,
+          "max_reported_alignment_when_confident": 0.742
+        }
+      }
+    },
+    {
+      "song": "t07",
+      "title": "Chasing Rainbows (Marc Burt and Notch remix)",
+      "mix_start_seconds": 1224.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 63,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t07",
+        "best": {
+          "event": "start",
+          "t": 1.277,
+          "consumed": 1.672,
+          "song": "t07-c026",
+          "evidence": 192,
+          "confidence": 82.8,
+          "shift": 1,
+          "tempo": 1.0298,
+          "position": 5.5,
+          "verify_q": 0.857,
+          "verify_r": 0.8,
+          "query_peaks": 28,
+          "query_matched": 24,
+          "reference_peaks": 30,
+          "reference_matched": 24,
+          "parent_song": "t07",
+          "chunk_id": "t07-c026",
+          "original_position": 265.5
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1477,
+          "max_reported_alignment_when_confident": 0.905
+        }
+      }
+    },
+    {
+      "song": "t08",
+      "title": "Flaw 24 (extended mix)",
+      "mix_start_seconds": 1508.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 9,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t08",
+        "best": {
+          "event": "start",
+          "t": 2.02,
+          "consumed": 2.415,
+          "song": "t08-c019",
+          "evidence": 124,
+          "confidence": 75.6,
+          "shift": 1,
+          "tempo": 1.0413,
+          "position": 1.42,
+          "verify_q": 0.515,
+          "verify_r": 0.895,
+          "query_peaks": 33,
+          "query_matched": 17,
+          "reference_peaks": 19,
+          "reference_matched": 17,
+          "parent_song": "t08",
+          "chunk_id": "t08-c019",
+          "original_position": 191.42
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1245,
+          "max_reported_alignment_when_confident": 0.833
+        }
+      }
+    },
+    {
+      "song": "t09",
+      "title": "Turn The Corner (Notch remix)",
+      "mix_start_seconds": 1763.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 7,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t09",
+        "best": {
+          "event": "start",
+          "t": 2.299,
+          "consumed": 2.694,
+          "song": "t09-c019",
+          "evidence": 160,
+          "confidence": 80.0,
+          "shift": 1,
+          "tempo": 1.0259,
+          "position": 2.02,
+          "verify_q": 0.857,
+          "verify_r": 0.818,
+          "query_peaks": 21,
+          "query_matched": 18,
+          "reference_peaks": 22,
+          "reference_matched": 18,
+          "parent_song": "t09",
+          "chunk_id": "t09-c019",
+          "original_position": 192.02
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1776,
+          "max_reported_alignment_when_confident": 1.0
+        }
+      }
+    },
+    {
+      "song": "t10",
+      "title": "Pioneers",
+      "mix_start_seconds": 1980.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 19,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 30,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    },
+    {
+      "song": "t11",
+      "title": "Tears In My Heart (Notch remix)",
+      "mix_start_seconds": 2266.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "correct",
+        "predicted": "t11",
+        "best": {
+          "event": "start",
+          "t": 6.293,
+          "consumed": 6.687,
+          "song": "t11",
+          "evidence": 141,
+          "confidence": 77.9,
+          "shift": 1,
+          "tempo": 1.0389,
+          "position": 2.24,
+          "verify_q": 0.733,
+          "verify_r": 0.667,
+          "query_peaks": 30,
+          "query_matched": 22,
+          "reference_peaks": 33,
+          "reference_matched": 22,
+          "parent_song": "t11",
+          "chunk_id": "t11",
+          "original_position": 211.11596371882086
+        },
+        "diagnostics": {
+          "max_reported_evidence": 644,
+          "max_reported_alignment_when_confident": 0.825
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t11",
+        "best": {
+          "event": "start",
+          "t": 6.293,
+          "consumed": 6.687,
+          "song": "t11-c021",
+          "evidence": 128,
+          "confidence": 76.2,
+          "shift": 1,
+          "tempo": 1.046,
+          "position": 1.12,
+          "verify_q": 0.567,
+          "verify_r": 0.895,
+          "query_peaks": 30,
+          "query_matched": 17,
+          "reference_peaks": 19,
+          "reference_matched": 17,
+          "parent_song": "t11",
+          "chunk_id": "t11-c021",
+          "original_position": 211.12
+        },
+        "diagnostics": {
+          "max_reported_evidence": 871,
+          "max_reported_alignment_when_confident": 0.972
+        }
+      }
+    },
+    {
+      "song": "t12",
+      "title": "Beast",
+      "mix_start_seconds": 2604.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 54,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t12",
+        "best": {
+          "event": "start",
+          "t": 6.757,
+          "consumed": 7.152,
+          "song": "t12-c022",
+          "evidence": 182,
+          "confidence": 82.0,
+          "shift": 1,
+          "tempo": 1.0098,
+          "position": 9.88,
+          "verify_q": 0.606,
+          "verify_r": 0.588,
+          "query_peaks": 33,
+          "query_matched": 20,
+          "reference_peaks": 34,
+          "reference_matched": 20,
+          "parent_song": "t12",
+          "chunk_id": "t12-c022",
+          "original_position": 229.88
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1062,
+          "max_reported_alignment_when_confident": 0.897
+        }
+      }
+    },
+    {
+      "song": "t13",
+      "title": "The Piano Tune",
+      "mix_start_seconds": 2874.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 51,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 136,
+          "max_reported_alignment_when_confident": 0.079
+        }
+      }
+    },
+    {
+      "song": "t14",
+      "title": "Baby Crying",
+      "mix_start_seconds": 3117.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 21,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t14",
+        "best": {
+          "event": "start",
+          "t": 7.036,
+          "consumed": 7.43,
+          "song": "t14-c024",
+          "evidence": 142,
+          "confidence": 78.0,
+          "shift": -1,
+          "tempo": 0.9786,
+          "position": 1.62,
+          "verify_q": 0.655,
+          "verify_r": 0.704,
+          "query_peaks": 29,
+          "query_matched": 19,
+          "reference_peaks": 27,
+          "reference_matched": 19,
+          "parent_song": "t14",
+          "chunk_id": "t14-c024",
+          "original_position": 241.62
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1061,
+          "max_reported_alignment_when_confident": 0.95
+        }
+      }
+    },
+    {
+      "song": "t15",
+      "title": "Electronaut (edit)",
+      "mix_start_seconds": 3404.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 81,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 75,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    },
+    {
+      "song": "t16",
+      "title": "Dancefloor Virus 2007",
+      "mix_start_seconds": 3653.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 57,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t16",
+        "best": {
+          "event": "start",
+          "t": 2.02,
+          "consumed": 2.415,
+          "song": "t16-c019",
+          "evidence": 188,
+          "confidence": 82.5,
+          "shift": 1,
+          "tempo": 1.0154,
+          "position": 1.62,
+          "verify_q": 0.558,
+          "verify_r": 0.694,
+          "query_peaks": 43,
+          "query_matched": 24,
+          "reference_peaks": 36,
+          "reference_matched": 25,
+          "parent_song": "t16",
+          "chunk_id": "t16-c019",
+          "original_position": 191.62
+        },
+        "diagnostics": {
+          "max_reported_evidence": 819,
+          "max_reported_alignment_when_confident": 0.775
+        }
+      }
+    },
+    {
+      "song": "t17",
+      "title": "Plastic Explosive (Aerologic Remix)",
+      "mix_start_seconds": 3892.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 37,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t17",
+        "best": {
+          "event": "start",
+          "t": 6.014,
+          "consumed": 6.409,
+          "song": "t17-c017",
+          "evidence": 930,
+          "confidence": 95.9,
+          "shift": 1,
+          "tempo": 1.0378,
+          "position": 10.88,
+          "verify_q": 0.433,
+          "verify_r": 0.591,
+          "query_peaks": 30,
+          "query_matched": 13,
+          "reference_peaks": 22,
+          "reference_matched": 13,
+          "parent_song": "t17",
+          "chunk_id": "t17-c017",
+          "original_position": 180.88
+        },
+        "diagnostics": {
+          "max_reported_evidence": 1010,
+          "max_reported_alignment_when_confident": 0.622
+        }
+      }
+    },
+    {
+      "song": "t18",
+      "title": "Aquarius (JMD Remix)",
+      "mix_start_seconds": 4108.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 573,
+          "max_reported_alignment_when_confident": 0.125
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 638,
+          "max_reported_alignment_when_confident": 0.231
+        }
+      }
+    },
+    {
+      "song": "t19",
+      "title": "Body Sensations (original mix)",
+      "mix_start_seconds": 4349.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 31,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t19",
+        "best": {
+          "event": "start",
+          "t": 3.32,
+          "consumed": 3.715,
+          "song": "t19-c025",
+          "evidence": 304,
+          "confidence": 88.4,
+          "shift": 1,
+          "tempo": 1.0402,
+          "position": 2.95,
+          "verify_q": 0.645,
+          "verify_r": 0.629,
+          "query_peaks": 31,
+          "query_matched": 20,
+          "reference_peaks": 35,
+          "reference_matched": 22,
+          "parent_song": "t19",
+          "chunk_id": "t19-c025",
+          "original_position": 252.95
+        },
+        "diagnostics": {
+          "max_reported_evidence": 666,
+          "max_reported_alignment_when_confident": 0.75
+        }
+      }
+    },
+    {
+      "song": "t20",
+      "title": "By The Water (Aerologic remix)",
+      "mix_start_seconds": 4615.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "correct",
+        "predicted": "t20",
+        "best": {
+          "event": "start",
+          "t": 2.02,
+          "consumed": 2.415,
+          "song": "t20",
+          "evidence": 184,
+          "confidence": 82.1,
+          "shift": 2,
+          "tempo": 1.0415,
+          "position": 3.75,
+          "verify_q": 0.679,
+          "verify_r": 0.731,
+          "query_peaks": 28,
+          "query_matched": 19,
+          "reference_peaks": 26,
+          "reference_matched": 19,
+          "parent_song": "t20",
+          "chunk_id": "t20",
+          "original_position": 206.08083900226757
+        },
+        "diagnostics": {
+          "max_reported_evidence": 892,
+          "max_reported_alignment_when_confident": 0.8
+        }
+      },
+      "chunks": {
+        "outcome": "correct",
+        "predicted": "t20",
+        "best": {
+          "event": "start",
+          "t": 2.02,
+          "consumed": 2.415,
+          "song": "t20-c020",
+          "evidence": 165,
+          "confidence": 80.5,
+          "shift": 2,
+          "tempo": 1.0412,
+          "position": 6.08,
+          "verify_q": 0.75,
+          "verify_r": 0.7,
+          "query_peaks": 28,
+          "query_matched": 21,
+          "reference_peaks": 30,
+          "reference_matched": 21,
+          "parent_song": "t20",
+          "chunk_id": "t20-c020",
+          "original_position": 206.08
+        },
+        "diagnostics": {
+          "max_reported_evidence": 699,
+          "max_reported_alignment_when_confident": 0.815
+        }
+      }
+    },
+    {
+      "song": "t21",
+      "title": "On Target (Remix)",
+      "mix_start_seconds": 4957.0,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 68,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 64,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    },
+    {
+      "song": "t22",
+      "title": "Are You Feeling It? (Rawbase Remix)",
+      "mix_start_seconds": 5274.5,
+      "annotation": "algorithmically-supported",
+      "midpoint": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 25,
+          "max_reported_alignment_when_confident": null
+        }
+      },
+      "chunks": {
+        "outcome": "no-match",
+        "predicted": null,
+        "best": null,
+        "diagnostics": {
+          "max_reported_evidence": 60,
+          "max_reported_alignment_when_confident": null
+        }
+      }
+    }
+  ],
+  "checks": [
+    {
+      "song": "t01",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "db7ac06212c75633835894d5166afd7117c802cf5e50808169fc9dcbdeee2795"
+    },
+    {
+      "song": "t01",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "db7ac06212c75633835894d5166afd7117c802cf5e50808169fc9dcbdeee2795"
+    },
+    {
+      "song": "t02",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "e6bc62c0473aec78c07803f16e256bfd32b57f01c7fc63c6a6c3248f1dd76e4b"
+    },
+    {
+      "song": "t02",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "e6bc62c0473aec78c07803f16e256bfd32b57f01c7fc63c6a6c3248f1dd76e4b"
+    },
+    {
+      "song": "t03",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "5ad3dbb6b8dcee2fec61fed76eb20a4c9edbf91544c724d9fd572acf732f0e2f"
+    },
+    {
+      "song": "t03",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "5ad3dbb6b8dcee2fec61fed76eb20a4c9edbf91544c724d9fd572acf732f0e2f"
+    },
+    {
+      "song": "t04",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "b05028026b1d5dee56be9fac96b10a9b7c4084b73f25e40e32166a7a6be0bc74"
+    },
+    {
+      "song": "t04",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "b05028026b1d5dee56be9fac96b10a9b7c4084b73f25e40e32166a7a6be0bc74"
+    },
+    {
+      "song": "t05",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "99a395f65e00b375bfc97e50238f3f7933be2171bfa910f81804041f40f6ea03"
+    },
+    {
+      "song": "t05",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "99a395f65e00b375bfc97e50238f3f7933be2171bfa910f81804041f40f6ea03"
+    },
+    {
+      "song": "t06",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "ba337d8099bd0da3159c9cea5b4219c0dea3cd3d714533a055d15e4405cae709"
+    },
+    {
+      "song": "t06",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "ba337d8099bd0da3159c9cea5b4219c0dea3cd3d714533a055d15e4405cae709"
+    },
+    {
+      "song": "t07",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "3f2d46d5abc146da57ae793aceb75d691f6091c7f5c9bcb2f833861017dc5984"
+    },
+    {
+      "song": "t07",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "3f2d46d5abc146da57ae793aceb75d691f6091c7f5c9bcb2f833861017dc5984"
+    },
+    {
+      "song": "t08",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "9dca967a5dbd8971204970b79b3c5f2442968e381839c343462a5fa7f6338ff6"
+    },
+    {
+      "song": "t08",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "9dca967a5dbd8971204970b79b3c5f2442968e381839c343462a5fa7f6338ff6"
+    },
+    {
+      "song": "t09",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "4ec2e6fe30de2caddf0ab8a486f4d520f64685c4cf924dfbe6e8133c3fc19381"
+    },
+    {
+      "song": "t09",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "4ec2e6fe30de2caddf0ab8a486f4d520f64685c4cf924dfbe6e8133c3fc19381"
+    },
+    {
+      "song": "t10",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "0e025660c8d17dfd9a97f587a2408c95c9fea6a5f58144981af6fa1d5fd6246c"
+    },
+    {
+      "song": "t10",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "0e025660c8d17dfd9a97f587a2408c95c9fea6a5f58144981af6fa1d5fd6246c"
+    },
+    {
+      "song": "t11",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "7060a2f547dc30916b3e0f790d757c392de2a4d50a617da37ec28db955504c7d"
+    },
+    {
+      "song": "t11",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "7060a2f547dc30916b3e0f790d757c392de2a4d50a617da37ec28db955504c7d"
+    },
+    {
+      "song": "t12",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "88888f0f696a48d4d5b6d2f312028ec1d02143f548ed970607947c08fd3a7cda"
+    },
+    {
+      "song": "t12",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "88888f0f696a48d4d5b6d2f312028ec1d02143f548ed970607947c08fd3a7cda"
+    },
+    {
+      "song": "t13",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "ae4dfcc56544f4fff974cc1581bd90f15aead348734aa0a125320fbc9717de33"
+    },
+    {
+      "song": "t13",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "ae4dfcc56544f4fff974cc1581bd90f15aead348734aa0a125320fbc9717de33"
+    },
+    {
+      "song": "t14",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "609a0109c79d19eb21098c8a13d42d2f0000c311eee9b047f24cbb100a295fcc"
+    },
+    {
+      "song": "t14",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "609a0109c79d19eb21098c8a13d42d2f0000c311eee9b047f24cbb100a295fcc"
+    },
+    {
+      "song": "t15",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "76cc2baa204a6bdfff27a57b0fb5c65a65ceac5f2d3cfd11776cf60d3f0d0c76"
+    },
+    {
+      "song": "t15",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "76cc2baa204a6bdfff27a57b0fb5c65a65ceac5f2d3cfd11776cf60d3f0d0c76"
+    },
+    {
+      "song": "t16",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "8e63dc1061bb5a55a3cd8e21d580daed516b78d093b9b5f8a11994561db11917"
+    },
+    {
+      "song": "t16",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "8e63dc1061bb5a55a3cd8e21d580daed516b78d093b9b5f8a11994561db11917"
+    },
+    {
+      "song": "t17",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "653a1033f816768ced554ee15faaee34bf2a7ac44403f39ada8d6d940dfcc47d"
+    },
+    {
+      "song": "t17",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "653a1033f816768ced554ee15faaee34bf2a7ac44403f39ada8d6d940dfcc47d"
+    },
+    {
+      "song": "t18",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "4be2e7ca7583231ff7ccaa24a7d6ba671702d9572c2c081841004d159c6fbe01"
+    },
+    {
+      "song": "t18",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "4be2e7ca7583231ff7ccaa24a7d6ba671702d9572c2c081841004d159c6fbe01"
+    },
+    {
+      "song": "t19",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "d945565891639eae9864d5672c6df02c8444f16b5a29a3689d514390aa7f569c"
+    },
+    {
+      "song": "t19",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "d945565891639eae9864d5672c6df02c8444f16b5a29a3689d514390aa7f569c"
+    },
+    {
+      "song": "t20",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "5ace6f81fb5c79993d99b965d6717385802bbcfbf246dfe51e15fa6d03a361b4"
+    },
+    {
+      "song": "t20",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "5ace6f81fb5c79993d99b965d6717385802bbcfbf246dfe51e15fa6d03a361b4"
+    },
+    {
+      "song": "t21",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "1d7f66a520047a71976c5a8b115f699902524d8e3c88d1b36fa8e454c44bc88a"
+    },
+    {
+      "song": "t21",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "1d7f66a520047a71976c5a8b115f699902524d8e3c88d1b36fa8e454c44bc88a"
+    },
+    {
+      "song": "t22",
+      "side": "chunks",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 880,
+      "input_hash": "ecaa426595b633d0c3409122f9f73068eca89249ed8bf75bf5f7861205858247"
+    },
+    {
+      "song": "t22",
+      "side": "midpoint",
+      "output_hashes": true,
+      "event_replay": true,
+      "references": 22,
+      "input_hash": "ecaa426595b633d0c3409122f9f73068eca89249ed8bf75bf5f7861205858247"
+    }
+  ],
+  "reporter": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/scripts/chunk_query_report.py",
+    "bytes": 9812,
+    "sha256": "d7641009437e971cbfbc761660426288ea4c1c03548673dd18c574702d835cc9"
+  },
+  "metadata": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/chunk-query/runs/default-a/metadata.json",
+    "bytes": 1443,
+    "sha256": "8081591a91f60c0f7016350f49a000e22cc1832adae3ba07fafdc1f6852f7477"
+  }
+}

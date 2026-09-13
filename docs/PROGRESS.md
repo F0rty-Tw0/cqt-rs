@@ -1,5 +1,49 @@
 # Goal progress and evidence
 
+## E010 execution verified; one annotation gate remains — 2026-09-13
+
+The user requested the same DJ mix with all originals split into ten-second
+reference chunks and one ten-second mix query per song. See
+[E010 protocol](experiments/E010-chunk-queries.md). Query cuts are frozen
+before native evaluation. There are 880 chunk references mapped to 22 songs;
+21 query labels have independent STFT-alignment support, while t05 remains
+an explicitly unverified publisher-order gap sample. Preserve all 22 outputs
+and exclude t05 from the supported accuracy denominator.
+
+Both sides use the pinned PR #4 executable at
+`bace1a92feb7d9e862c21d295fd84df6a6df6626`, default gates, modal fit off.
+Only the reference configuration changes (22 midpoint files versus 880
+chunks). No matcher implementation change or broader reliability claim.
+
+All 44 native runs completed. On the 21 supported query labels, correct
+top identities improve **2/21 → 13/21** (11 gains, no losses); neither side
+has a wrong-song accepted start. Eight supported chunk queries still miss.
+t05 produces no match in both configurations, but its cue remains
+unverified and it is excluded from accuracy. The predeclared exploratory
+subset rule passes; full 22-labelled-query acceptance remains blocked.
+
+Chunks emit 35 accepted starts across 13 parent songs, including 22 repeated
+parent starts, so excerpt-to-song aggregation is essential. Approximate
+native index storage grows from 3,372,328 to 119,553,164 bytes. This is a
+coverage/segmentation experiment on a known mix, not an unseen-recording
+accuracy or performance claim. Full results and every miss are in
+[E010 results](experiments/E010-results.md); the
+[evidence](evidence/E010/README.md) preserves all raw outputs, inputs and
+annotations by identity. Four scoring regressions and all 14 Python tests
+pass locally. Native code and default gates are unchanged.
+
+All prepared chunk/query hashes and 88 raw stdout/stderr hashes passed a
+second audit. The 23 final annotation feature arrays were rebuilt from
+hash-verified originals and match exactly after repairing four truncated
+decoded caches. Both short-template annotation sets replay exactly.
+
+Exact recheck after reproducing/materializing `target/chunk-query`:
+`python3 scripts/chunk_query_report.py --label default-a`.
+Next research work is to verify t05's real cue/version and then separately
+test overlapping windows or coherent parent-song evidence on the eight
+supported misses. Keep this test's query bytes/gates frozen. The research
+goal remains incomplete; no merge or release is authorized.
+
 ## PR consolidation checkpoint — 2026-09-13
 
 At the user's request, issue #4 was converted in place into the
