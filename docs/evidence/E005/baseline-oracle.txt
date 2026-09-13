@@ -1,0 +1,77 @@
+[1m[92m   Compiling[0m proc-macro2 v1.0.107
+[1m[92m   Compiling[0m unicode-ident v1.0.24
+[1m[92m   Compiling[0m quote v1.0.47
+[1m[92m   Compiling[0m autocfg v1.5.1
+[1m[92m   Compiling[0m crossbeam-utils v0.8.23
+[1m[92m   Compiling[0m crossbeam-epoch v0.9.21
+[1m[92m   Compiling[0m crossbeam-deque v0.8.8
+[1m[92m   Compiling[0m num-traits v0.2.19
+[1m[92m   Compiling[0m serde_core v1.0.229
+[1m[92m   Compiling[0m rayon-core v1.13.0
+[1m[92m   Compiling[0m either v1.18.0
+[1m[92m   Compiling[0m matrixmultiply v0.3.11
+[1m[92m   Compiling[0m syn v3.0.5
+[1m[92m   Compiling[0m syn v2.0.119
+[1m[92m   Compiling[0m num-integer v0.1.47
+[1m[92m   Compiling[0m num-complex v0.4.6
+[1m[92m   Compiling[0m strength_reduce v0.2.4
+[1m[92m   Compiling[0m zerocopy v0.8.57
+[1m[92m   Compiling[0m transpose v0.2.3
+[1m[92m   Compiling[0m primal-check v0.3.4
+[1m[92m   Compiling[0m zmij v1.0.23
+[1m[92m   Compiling[0m shlex v2.0.1
+[1m[92m   Compiling[0m rawpointer v0.2.1
+[1m[92m   Compiling[0m serde v1.0.229
+[1m[92m   Compiling[0m thiserror v2.0.20
+[1m[92m   Compiling[0m find-msvc-tools v0.1.12
+[1m[92m   Compiling[0m cc v1.4.6
+[1m[92m   Compiling[0m zerocopy-derive v0.8.57
+[1m[92m   Compiling[0m serde_derive v1.0.229
+[1m[92m   Compiling[0m thiserror-impl v2.0.20
+[1m[92m   Compiling[0m rayon v1.12.0
+[1m[92m   Compiling[0m rustfft v6.4.1
+[1m[92m   Compiling[0m serde_json v1.0.151
+[1m[92m   Compiling[0m cfg-if v1.0.4
+[1m[92m   Compiling[0m libc v0.2.189
+[1m[92m   Compiling[0m alloca v0.4.0
+[1m[92m   Compiling[0m ndarray v0.17.2
+[1m[92m   Compiling[0m hann-rs v0.2.0
+[1m[92m   Compiling[0m plotters-backend v0.3.7
+[1m[92m   Compiling[0m ciborium-io v0.2.2
+[1m[92m   Compiling[0m itoa v1.0.18
+[1m[92m   Compiling[0m clap_lex v1.1.0
+[1m[92m   Compiling[0m half v2.7.1
+[1m[92m   Compiling[0m anstyle v1.0.14
+[1m[92m   Compiling[0m regex-syntax v0.8.11
+[1m[92m   Compiling[0m memchr v2.8.3
+[1m[92m   Compiling[0m realfft v3.5.0
+[1m[92m   Compiling[0m regex-automata v0.4.18
+[1m[92m   Compiling[0m cqt-rs v0.2.0 (/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline)
+[1m[92m   Compiling[0m ciborium-ll v0.2.2
+[1m[92m   Compiling[0m clap_builder v4.6.6
+[1m[92m   Compiling[0m plotters-svg v0.3.7
+[1m[92m   Compiling[0m itertools v0.13.0
+[1m[92m   Compiling[0m same-file v1.0.6
+[1m[92m   Compiling[0m cast v0.3.0
+[1m[92m   Compiling[0m hound v3.5.1
+[1m[92m   Compiling[0m cqt-monitor v0.1.0 (/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline/monitor)
+[1m[92m   Compiling[0m criterion-plot v0.8.2
+[1m[92m   Compiling[0m walkdir v2.5.0
+[1m[92m   Compiling[0m page_size v0.6.0
+[1m[92m   Compiling[0m plotters v0.3.7
+[1m[92m   Compiling[0m clap v4.6.6
+[1m[92m   Compiling[0m ciborium v0.2.2
+[1m[92m   Compiling[0m regex v1.13.1
+[1m[92m   Compiling[0m tinytemplate v1.2.1
+[1m[92m   Compiling[0m anes v0.1.6
+[1m[92m   Compiling[0m oorandom v11.1.5
+[1m[92m   Compiling[0m criterion v0.8.2
+[1m[92m    Finished[0m `release` profile [optimized] target(s) in 40.22s
+[1m[92m     Running[0m tests/verify_oracle.rs (target/verify-baseline-build/release/deps/verify_oracle-0ae8eb81cd5523a0)
+
+running 2 tests
+test empty_boundaries_and_extreme_frames_match_oracle ... ok
+test seeded_grid_matches_exhaustive_oracle ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

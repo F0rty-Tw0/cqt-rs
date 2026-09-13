@@ -1,8 +1,8 @@
 # E002: valid monitor JSON on empty streams
 
-Status: running; real-binary CI proof pending.
+Status: verified at `73d19401fb68b3b167814ec18466ae76cd7dfd41`.
 
-First executing proof (candidate `6cfd2e2`) failed as intended on an
+First executing proof (candidate `6cfd2e2`) rejected the candidate on an
 unexpected additional defect: [job 103713828212](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753483349/job/103713828212)
 captured `"event":"stream","file":"-","seconds":nu`. The baseline applies
 `{:.2}` to an already-formatted String, truncating it to two characters.
@@ -48,3 +48,35 @@ normal monitor CI gate, so this becomes an ongoing regression check.
 
 Budget: one two-build CI proof plus normal correctness gates, with a
 10-minute proof-job timeout. Re-run only to debug a concrete failure.
+
+## Verified result
+
+All eight before/after cases passed in
+[proof run 34753834958](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834958).
+All ten checks completed successfully for candidate
+`73d19401fb68b3b167814ec18466ae76cd7dfd41`, including the full Rust release
+gates, monitor end-to-end detection and Python evaluation regressions.
+See [exact check snapshot](../evidence/E002/checks.json).
+
+Baseline raw output reproduces `seconds:nu` for live input, `seconds:1.`
+for a one-second WAV, and `seconds:12` for a 123.45-second WAV. Empty
+input also reproduces `realtime_fraction:inf`. The candidate returns the
+correct metadata and a null empty-duration ratio. Every other non-timing
+event matches after normalizing only the two demonstrated baseline defects.
+
+The downloaded [artifact](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834958/artifacts/10316404060)
+was opened and its ZIP SHA-256 verified:
+`1a10db17f2e1ce964b492c59b66fa52abb7965192d7e8b51e89e81a4ae470e46`.
+All eight fixture hashes and 32 stdout/stderr hashes matched the manifest;
+both source identity files matched the intended commits. The manifest is preserved in [E002](../evidence/E002/proof.json), alongside
+the Rust version and shared lockfile (stored as `Cargo.lock.txt`). The
+complete original [ZIP](../evidence/E002/raw-proof.zip) preserves raw events
+and fixtures in 42 KB; no uncompressed audio is added to Git. Binary hashes identify the executed files:
+
+- Baseline: `7be033019cd97b1658927cd4665515d88e4e37ebf350bc7374eced810090ce0e`.
+- Candidate: `cf3ec0ac1b6ba181ea8ed95a8c5a0d3c803655226579fd91c81ff6ee18e440ae`.
+
+Decision: retain the CLI correctness fix in draft PR #6. This evidence
+establishes JSON validity and event compatibility on the stated fixtures;
+it does not establish recognition or performance improvement. A later
+documentation-only checkpoint does not change the tested source identity.

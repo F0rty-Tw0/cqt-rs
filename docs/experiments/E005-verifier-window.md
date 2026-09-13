@@ -1,6 +1,6 @@
 # E005: restrict verifier searches to the query's reference interval
 
-Status: running, 2026-09-13. This is an exploratory stage benchmark.
+Status: verified exploratory improvement, 2026-09-13. Retain in draft PR #7.
 
 Baseline: PR #3, `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`.
 Candidate parent: `73d19401fb68b3b167814ec18466ae76cd7dfd41`.
@@ -45,5 +45,62 @@ with the two release `verify_probe` executables and
 
 ## Result
 
-Pending real compilation, oracle execution and measurements. No performance
-gain is currently claimed.
+Candidate: `7e529dc8d73454e56b8c283d0a53ab7c56ca68eb`. All ten checks
+passed, including full Rust release gates, monitor end-to-end detection,
+evaluation tests and the [uncached proof run](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34754375559).
+[Exact check snapshot](../evidence/E005/checks.json).
+
+The independent oracle passed all 2,400 seeded parameter combinations and
+630 empty/extreme combinations, plus an explicit inclusive-boundary check.
+It ran against the baseline and candidate, and the candidate's
+no-default-features build. Every timed case preserved all four counts.
+
+Five alternating process pairs on the same runner gave:
+
+| Case | Baseline median ns | Candidate median ns | Time reduction | Paired reduction range |
+| --- | ---: | ---: | ---: | ---: |
+
+| large_match | 28555.3 | 18758.8 | 34.31% | 34.23% to 34.35% |
+| large_wrong_shift | 29653.3 | 20565.5 | 30.65% | 30.52% to 30.76% |
+| medium_match | 24097.9 | 18667.2 | 22.54% | 21.95% to 22.66% |
+| medium_wrong_shift | 25271.9 | 20498.0 | 18.89% | 18.86% to 19.01% |
+| small_match | 3583.3 | 3284.7 | 8.34% | 5.75% to 9.24% |
+| small_wrong_shift | 3880.0 | 3425.0 | 11.73% | 11.58% to 12.53% |
+| whole_match | 476764.4 | 477428.3 | -0.14% | -0.25% to 0.24% |
+| whole_wrong_shift | 483648.5 | 484183.5 | -0.11% | -0.19% to 0.28% |
+
+Positive reduction means less elapsed time per verify call. The two
+full-reference cases regress by 0.14% and 0.11%; they remain visible and
+within the predeclared 5% limit. Both large-track cases exceed the 10%
+minimum. Decision: retain the optimization as an exploratory improvement.
+The paired ranges are observed ranges of five process pairs, not confidence
+intervals. No statistical population or end-to-end speed claim is made.
+
+[Raw timing report](../evidence/E005/timing.json) preserves all repetitions,
+iterations, elapsed times, counts, commands and binary hashes. Raw stdout,
+stderr, test logs, host, compiler, source identities and shared Cargo.lock
+(as `Cargo.lock.txt`) are stored alongside it. The downloaded
+[artifact](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34754375559/artifacts/10315944230)
+had verified ZIP SHA-256
+`9cd99ecb70279d69db1e7e68f9871e6c18ef7d302e91cde556e3762e72b4e4f8`.
+All process output hashes, source SHAs, harness/lockfile hashes and raw
+rows matched; headline reductions and the acceptance rule were recalculated
+from those rows. Candidate checkout was clean; baseline was overlaid only
+with the identical added test and example files, listed in its status log.
+Both use default features and `RAYON_NUM_THREADS=1`; verification is serial.
+Compilation and fixture construction are outside the timed region.
+
+The initial commit `335119b2` passed the oracle and measured 33–36% lower
+large-case time, but its format gate failed and cache cleanup reported
+errors ([run](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34754167654)).
+Formatting was repaired without changing the algorithm. The next run at
+`38d6e5bb` failed setup because a cached baseline worktree already existed
+([run](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34754251859)); that
+failure is not correctness or timing evidence. Removing caching from this
+proof job fixed the source of contamination. Acceptance uses the final
+successful uncached run, not the earlier incomplete gates.
+
+This is an allocation-free search-scope optimization, not a change to CQT
+numerics or matching thresholds. Remaining work: profile real monitor
+stage shares and repeat on a representative host/corpus before claiming
+whole-monitor benefit. Independent recognition quality remains unmeasured.

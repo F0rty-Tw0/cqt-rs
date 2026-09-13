@@ -1,0 +1,11 @@
+[1m[92m   Compiling[0m cqt-rs v0.2.0 (/home/runner/work/cqt-rs/cqt-rs)
+[1m[92m   Compiling[0m cqt-monitor v0.1.0 (/home/runner/work/cqt-rs/cqt-rs/monitor)
+[1m[92m    Finished[0m `release` profile [optimized] target(s) in 14.35s
+[1m[92m     Running[0m tests/verify_oracle.rs (target/release/deps/verify_oracle-cbe6a26c1ccc9774)
+
+running 2 tests
+test empty_boundaries_and_extreme_frames_match_oracle ... ok
+test seeded_grid_matches_exhaustive_oracle ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+

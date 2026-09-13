@@ -1,0 +1,1612 @@
+{
+  "scope": "exploratory synthetic verifier wall time; not end-to-end or representative-host proof",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "binaries": {
+    "baseline": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe",
+      "sha256": "e702c48b8f8ddbbc8b3b7158a128f173bbef789a8341796234c5e4727634916d"
+    },
+    "candidate": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe",
+      "sha256": "56fd0b03624ce7011aa8e5138554ec99ac7760038073b08911da03bbbf5aac1b"
+    }
+  },
+  "runner": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/scripts/benchmark_verify.py",
+    "sha256": "4a1a18566488109392a7e8f845a7279e5537c69749ac8214f804cf9e7abdd530"
+  },
+  "runs": [
+    {
+      "repetition": 0,
+      "side": "baseline",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/0-baseline.jsonl",
+        "sha256": "89d9cc99a13a1de64305b6e5fd255becaec59f7b41476a5edb0e0375e099fa55"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/0-baseline.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 55328,
+          "elapsed_seconds": 0.200018051,
+          "ns_per_call": 3615.132500722961,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 51040,
+          "elapsed_seconds": 0.200010167,
+          "ns_per_call": 3918.6944945141067,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 8304,
+          "elapsed_seconds": 0.200258039,
+          "ns_per_call": 24115.852480732177,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 7920,
+          "elapsed_seconds": 0.200064206,
+          "ns_per_call": 25260.63207070707,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 7008,
+          "elapsed_seconds": 0.200090175,
+          "ns_per_call": 28551.68022260274,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 6752,
+          "elapsed_seconds": 0.200097508,
+          "ns_per_call": 29635.29443127962,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.205939702,
+          "ns_per_call": 476712.27314814815,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201197758,
+          "ns_per_call": 483648.45673076925,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 0,
+      "side": "candidate",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/0-candidate.jsonl",
+        "sha256": "d1a34f21ff6d5b8cc97b859209eb1fb3d9b3c1fe43332a2a7585bf4dbc3c36b3"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/0-candidate.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 60960,
+          "elapsed_seconds": 0.200009275,
+          "ns_per_call": 3280.9920439632547,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 58352,
+          "elapsed_seconds": 0.200023335,
+          "ns_per_call": 3427.874537290924,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 10720,
+          "elapsed_seconds": 0.200060936,
+          "ns_per_call": 18662.400746268657,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 9776,
+          "elapsed_seconds": 0.200106731,
+          "ns_per_call": 20469.18279459902,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 10672,
+          "elapsed_seconds": 0.200163418,
+          "ns_per_call": 18755.942466266868,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 9728,
+          "elapsed_seconds": 0.20030398,
+          "ns_per_call": 20590.458470394737,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.206150631,
+          "ns_per_call": 477200.53472222225,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201184201,
+          "ns_per_call": 483615.86778846156,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 1,
+      "side": "candidate",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/1-candidate.jsonl",
+        "sha256": "7658619bb925e2879f976bcd48750abaed21e2c78a72a60b262b950f46698a4a"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/1-candidate.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 60400,
+          "elapsed_seconds": 0.20001339,
+          "ns_per_call": 3311.479966887417,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 58400,
+          "elapsed_seconds": 0.200021964,
+          "ns_per_call": 3425.033630136986,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 10720,
+          "elapsed_seconds": 0.200264716,
+          "ns_per_call": 18681.410074626867,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 9776,
+          "elapsed_seconds": 0.200106301,
+          "ns_per_call": 20469.138809328968,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 10656,
+          "elapsed_seconds": 0.20013271,
+          "ns_per_call": 18781.222785285285,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 9728,
+          "elapsed_seconds": 0.200088718,
+          "ns_per_call": 20568.330386513157,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.2064397,
+          "ns_per_call": 477869.6759259259,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201491003,
+          "ns_per_call": 484353.3725961539,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 1,
+      "side": "baseline",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/1-baseline.jsonl",
+        "sha256": "e53aa6eb56b5dee829399f8e19e25111d87066641ad883f5b429bc57a1e2ebd3"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/1-baseline.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 55840,
+          "elapsed_seconds": 0.200045688,
+          "ns_per_call": 3582.4800859598854,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 51632,
+          "elapsed_seconds": 0.200013377,
+          "ns_per_call": 3873.825863805392,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 8288,
+          "elapsed_seconds": 0.200207681,
+          "ns_per_call": 24156.332166988417,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 7920,
+          "elapsed_seconds": 0.200171733,
+          "ns_per_call": 25274.208712121213,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 7008,
+          "elapsed_seconds": 0.200115678,
+          "ns_per_call": 28555.31934931507,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 6752,
+          "elapsed_seconds": 0.200132901,
+          "ns_per_call": 29640.536285545022,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.20593017,
+          "ns_per_call": 476690.2083333333,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201154926,
+          "ns_per_call": 483545.4951923077,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 2,
+      "side": "baseline",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/2-baseline.jsonl",
+        "sha256": "7df87d8e7b89da1b1db90379ad31865923cad1eb1b469752e52d38584765ca52"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/2-baseline.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 55824,
+          "elapsed_seconds": 0.20003601,
+          "ns_per_call": 3583.333512467756,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 51552,
+          "elapsed_seconds": 0.200020401,
+          "ns_per_call": 3879.9736382681563,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 8320,
+          "elapsed_seconds": 0.200304621,
+          "ns_per_call": 24075.074639423077,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 7920,
+          "elapsed_seconds": 0.200101172,
+          "ns_per_call": 25265.299494949493,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 7008,
+          "elapsed_seconds": 0.200090962,
+          "ns_per_call": 28551.79252283105,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 6752,
+          "elapsed_seconds": 0.20021896,
+          "ns_per_call": 29653.281990521325,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.205980604,
+          "ns_per_call": 476806.9537037037,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.200970182,
+          "ns_per_call": 483101.39903846156,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 2,
+      "side": "candidate",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/2-candidate.jsonl",
+        "sha256": "c369eef0b1f609954c3a313ace7c2bc7ddc5b9624dfa11c9321d03930eb4047c"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/2-candidate.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 60896,
+          "elapsed_seconds": 0.200022204,
+          "ns_per_call": 3284.6525880189174,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 58416,
+          "elapsed_seconds": 0.200003639,
+          "ns_per_call": 3423.781823473021,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 10656,
+          "elapsed_seconds": 0.200223499,
+          "ns_per_call": 18789.742774024024,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 9760,
+          "elapsed_seconds": 0.20008406,
+          "ns_per_call": 20500.41598360656,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 10672,
+          "elapsed_seconds": 0.200053863,
+          "ns_per_call": 18745.67681784108,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 9728,
+          "elapsed_seconds": 0.200041661,
+          "ns_per_call": 20563.493112664473,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.206249005,
+          "ns_per_call": 477428.25231481483,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201359026,
+          "ns_per_call": 484036.1201923077,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 3,
+      "side": "candidate",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/3-candidate.jsonl",
+        "sha256": "d53e571e6d1e966ced4a2ee24c5d5104807adf6e62c7b56cb3136c28cf086101"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/3-candidate.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 59216,
+          "elapsed_seconds": 0.200008903,
+          "ns_per_call": 3377.615897730343,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 58400,
+          "elapsed_seconds": 0.200017709,
+          "ns_per_call": 3424.9607705479452,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 10720,
+          "elapsed_seconds": 0.200112356,
+          "ns_per_call": 18667.1973880597,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 9760,
+          "elapsed_seconds": 0.200110172,
+          "ns_per_call": 20503.091393442624,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 10672,
+          "elapsed_seconds": 0.200194048,
+          "ns_per_call": 18758.812593703147,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 9728,
+          "elapsed_seconds": 0.200061441,
+          "ns_per_call": 20565.526418585527,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.206177656,
+          "ns_per_call": 477263.0925925926,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201501627,
+          "ns_per_call": 484378.9110576923,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 3,
+      "side": "baseline",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/3-baseline.jsonl",
+        "sha256": "8378342175441f52fc732b0ccc0d2c91bfe0b4e3d9930d70b3501da7bc339731"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/3-baseline.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 55808,
+          "elapsed_seconds": 0.200006569,
+          "ns_per_call": 3583.8333034690368,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 51488,
+          "elapsed_seconds": 0.200029071,
+          "ns_per_call": 3884.964865599751,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 8320,
+          "elapsed_seconds": 0.200286661,
+          "ns_per_call": 24072.915985576925,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 7920,
+          "elapsed_seconds": 0.200153173,
+          "ns_per_call": 25271.86527777778,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 7008,
+          "elapsed_seconds": 0.200209266,
+          "ns_per_call": 28568.673801369863,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 6752,
+          "elapsed_seconds": 0.2003072,
+          "ns_per_call": 29666.350710900475,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.206669853,
+          "ns_per_call": 478402.4375,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.202069583,
+          "ns_per_call": 485744.1899038461,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 4,
+      "side": "baseline",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/verify-baseline-build/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/4-baseline.jsonl",
+        "sha256": "452a696c1741fd13ff4c40680ccbe364d845f09189e048bb30b7d989097c3fab"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/4-baseline.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 55824,
+          "elapsed_seconds": 0.200008703,
+          "ns_per_call": 3582.8443501003153,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 51568,
+          "elapsed_seconds": 0.200026637,
+          "ns_per_call": 3878.890726807322,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 8304,
+          "elapsed_seconds": 0.20010888,
+          "ns_per_call": 24097.890173410404,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 7920,
+          "elapsed_seconds": 0.200228453,
+          "ns_per_call": 25281.37032828283,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 7008,
+          "elapsed_seconds": 0.200116083,
+          "ns_per_call": 28555.377140410958,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 6736,
+          "elapsed_seconds": 0.20005011,
+          "ns_per_call": 29698.650534441804,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.205962224,
+          "ns_per_call": 476764.4074074074,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201590923,
+          "ns_per_call": 484593.5649038461,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    },
+    {
+      "repetition": 4,
+      "side": "candidate",
+      "command": [
+        "/home/runner/work/cqt-rs/cqt-rs/target/release/examples/verify_probe"
+      ],
+      "returncode": 0,
+      "stdout": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/4-candidate.jsonl",
+        "sha256": "687be7b153c2e915349ac36e298475e97d44638867c59706e90dbef7ca47cc36"
+      },
+      "stderr": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/verifier-proof/4-candidate.stderr.txt",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "cases": {
+        "small_match": {
+          "case": "small_match",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 60960,
+          "elapsed_seconds": 0.200048336,
+          "ns_per_call": 3281.63280839895,
+          "counts": [
+            64,
+            64,
+            64,
+            64
+          ]
+        },
+        "small_wrong_shift": {
+          "case": "small_wrong_shift",
+          "reference_size": 128,
+          "query_size": 64,
+          "iterations": 58320,
+          "elapsed_seconds": 0.200020415,
+          "ns_per_call": 3429.7053326474625,
+          "counts": [
+            64,
+            0,
+            64,
+            0
+          ]
+        },
+        "medium_match": {
+          "case": "medium_match",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 10720,
+          "elapsed_seconds": 0.200082159,
+          "ns_per_call": 18664.380503731343,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "medium_wrong_shift": {
+          "case": "medium_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 256,
+          "iterations": 9760,
+          "elapsed_seconds": 0.20006081,
+          "ns_per_call": 20498.03381147541,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "large_match": {
+          "case": "large_match",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 10672,
+          "elapsed_seconds": 0.200210008,
+          "ns_per_call": 18760.308095952023,
+          "counts": [
+            256,
+            256,
+            256,
+            256
+          ]
+        },
+        "large_wrong_shift": {
+          "case": "large_wrong_shift",
+          "reference_size": 65536,
+          "query_size": 256,
+          "iterations": 9728,
+          "elapsed_seconds": 0.200032998,
+          "ns_per_call": 20562.602590460527,
+          "counts": [
+            256,
+            0,
+            256,
+            0
+          ]
+        },
+        "whole_match": {
+          "case": "whole_match",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 432,
+          "elapsed_seconds": 0.206269347,
+          "ns_per_call": 477475.34027777775,
+          "counts": [
+            4096,
+            4096,
+            4096,
+            4096
+          ]
+        },
+        "whole_wrong_shift": {
+          "case": "whole_wrong_shift",
+          "reference_size": 4096,
+          "query_size": 4096,
+          "iterations": 416,
+          "elapsed_seconds": 0.201420345,
+          "ns_per_call": 484183.5216346154,
+          "counts": [
+            4096,
+            0,
+            4096,
+            0
+          ]
+        }
+      }
+    }
+  ],
+  "summary": {
+    "large_match": {
+      "ns_per_call": {
+        "baseline": [
+          28551.68022260274,
+          28555.31934931507,
+          28551.79252283105,
+          28568.673801369863,
+          28555.377140410958
+        ],
+        "candidate": [
+          18755.942466266868,
+          18781.222785285285,
+          18745.67681784108,
+          18758.812593703147,
+          18760.308095952023
+        ]
+      },
+      "median_ns": {
+        "baseline": 28555.31934931507,
+        "candidate": 18758.812593703147
+      },
+      "counts": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "paired_reduction_percent": [
+        34.308796119750404,
+        34.22863685908743,
+        34.34500897675214,
+        34.33782497525781,
+        34.30201252918199
+      ],
+      "reduction_percent": 34.307116778390714
+    },
+    "large_wrong_shift": {
+      "ns_per_call": {
+        "baseline": [
+          29635.29443127962,
+          29640.536285545022,
+          29653.281990521325,
+          29666.350710900475,
+          29698.650534441804
+        ],
+        "candidate": [
+          20590.458470394737,
+          20568.330386513157,
+          20563.493112664473,
+          20565.526418585527,
+          20562.602590460527
+        ]
+      },
+      "median_ns": {
+        "baseline": 29653.281990521325,
+        "candidate": 20565.526418585527
+      },
+      "counts": [
+        256,
+        0,
+        256,
+        0
+      ],
+      "paired_reduction_percent": [
+        30.520486246082953,
+        30.607428325971828,
+        30.65356772569864,
+        30.67726253560058,
+        30.762501930470265
+      ],
+      "reduction_percent": 30.646710791880306
+    },
+    "medium_match": {
+      "ns_per_call": {
+        "baseline": [
+          24115.852480732177,
+          24156.332166988417,
+          24075.074639423077,
+          24072.915985576925,
+          24097.890173410404
+        ],
+        "candidate": [
+          18662.400746268657,
+          18681.410074626867,
+          18789.742774024024,
+          18667.1973880597,
+          18664.380503731343
+        ]
+      },
+      "median_ns": {
+        "baseline": 24097.890173410404,
+        "candidate": 18667.1973880597
+      },
+      "counts": [
+        256,
+        256,
+        256,
+        256
+      ],
+      "paired_reduction_percent": [
+        22.613555704989736,
+        22.664542176827137,
+        21.953543008935437,
+        22.455603636701156,
+        22.547657203925645
+      ],
+      "reduction_percent": 22.53596786387103
+    },
+    "medium_wrong_shift": {
+      "ns_per_call": {
+        "baseline": [
+          25260.63207070707,
+          25274.208712121213,
+          25265.299494949493,
+          25271.86527777778,
+          25281.37032828283
+        ],
+        "candidate": [
+          20469.18279459902,
+          20469.138809328968,
+          20500.41598360656,
+          20503.091393442624,
+          20498.03381147541
+        ]
+      },
+      "median_ns": {
+        "baseline": 25271.86527777778,
+        "candidate": 20498.03381147541
+      },
+      "counts": [
+        256,
+        0,
+        256,
+        0
+      ],
+      "paired_reduction_percent": [
+        18.968049820354054,
+        19.011752088949834,
+        18.85939848959807,
+        18.86989279152443,
+        18.920400495285634
+      ],
+      "reduction_percent": 18.889905489089983
+    },
+    "small_match": {
+      "ns_per_call": {
+        "baseline": [
+          3615.132500722961,
+          3582.4800859598854,
+          3583.333512467756,
+          3583.8333034690368,
+          3582.8443501003153
+        ],
+        "candidate": [
+          3280.9920439632547,
+          3311.479966887417,
+          3284.6525880189174,
+          3377.615897730343,
+          3281.63280839895
+        ]
+      },
+      "median_ns": {
+        "baseline": 3583.333512467756,
+        "candidate": 3284.6525880189174
+      },
+      "counts": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "paired_reduction_percent": [
+        9.24282738441494,
+        7.564595268360213,
+        8.335281195836671,
+        5.7541014962688655,
+        8.407050719156459
+      ],
+      "reduction_percent": 8.335281195836671
+    },
+    "small_wrong_shift": {
+      "ns_per_call": {
+        "baseline": [
+          3918.6944945141067,
+          3873.825863805392,
+          3879.9736382681563,
+          3884.964865599751,
+          3878.890726807322
+        ],
+        "candidate": [
+          3427.874537290924,
+          3425.033630136986,
+          3423.781823473021,
+          3424.9607705479452,
+          3429.7053326474625
+        ]
+      },
+      "median_ns": {
+        "baseline": 3879.9736382681563,
+        "candidate": 3425.033630136986
+      },
+      "counts": [
+        64,
+        0,
+        64,
+        0
+      ],
+      "paired_reduction_percent": [
+        12.525088595456877,
+        11.5852454252433,
+        11.75760088408122,
+        11.840624329064342,
+        11.580253886903897
+      ],
+      "reduction_percent": 11.725337606526487
+    },
+    "whole_match": {
+      "ns_per_call": {
+        "baseline": [
+          476712.27314814815,
+          476690.2083333333,
+          476806.9537037037,
+          478402.4375,
+          476764.4074074074
+        ],
+        "candidate": [
+          477200.53472222225,
+          477869.6759259259,
+          477428.25231481483,
+          477263.0925925926,
+          477475.34027777775
+        ]
+      },
+      "median_ns": {
+        "baseline": 476764.4074074074,
+        "candidate": 477428.25231481483
+      },
+      "counts": [
+        4096,
+        4096,
+        4096,
+        4096
+      ],
+      "paired_reduction_percent": [
+        -0.10242269846540426,
+        -0.24742853366264705,
+        -0.13030401639175967,
+        0.23815616687935792,
+        -0.14911617967379548
+      ],
+      "reduction_percent": -0.13923961124055628
+    },
+    "whole_wrong_shift": {
+      "ns_per_call": {
+        "baseline": [
+          483648.45673076925,
+          483545.4951923077,
+          483101.39903846156,
+          485744.1899038461,
+          484593.5649038461
+        ],
+        "candidate": [
+          483615.86778846156,
+          484353.3725961539,
+          484036.1201923077,
+          484378.9110576923,
+          484183.5216346154
+        ]
+      },
+      "median_ns": {
+        "baseline": 483648.45673076925,
+        "candidate": 484183.5216346154
+      },
+      "counts": [
+        4096,
+        0,
+        4096,
+        0
+      ],
+      "paired_reduction_percent": [
+        0.0067381466546948985,
+        -0.16707371113547229,
+        -0.19348342929797854,
+        0.2810695165338105,
+        0.08461591298929295
+      ],
+      "reduction_percent": -0.11063095444631586
+    }
+  },
+  "status": "measured",
+  "timing_rule_met": true
+}

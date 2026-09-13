@@ -1,0 +1,410 @@
+{
+  "status": "passed",
+  "cases": [
+    {
+      "name": "empty_stdin",
+      "samples": 0,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_stdin.pcm",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_stdin-baseline.stdout.jsonl",
+          "sha256": "6666b1c7d1a7071bb0cba43fb484daed757d080d842c9b327cc5f7b7f9f983d9"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_stdin-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds",
+          "undefined_realtime_fraction"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_stdin-candidate.stdout.jsonl",
+          "sha256": "41c2687da37866cfcebf735ecdf09a6b61ac7a1aa1ba95e14191a5ac53b5ee5a"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_stdin-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "empty_wav",
+      "samples": 0,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav.wav",
+        "sha256": "8b8fbafe8679076454429756fa72f11d5f442c87381cc6a4285451d826a9e629"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav-baseline.stdout.jsonl",
+          "sha256": "2b87832d67a669dde8562215ef4ef4476f3dc519ca3c1af724a2a5bd6c84d7a7"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds",
+          "undefined_realtime_fraction"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav-candidate.stdout.jsonl",
+          "sha256": "4d378cb88d4188ea77e642d8cdce9142f81fdedd125a29a81d6395a873e62bdf"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/empty_wav-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "one_sample_stdin",
+      "samples": 1,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_stdin.pcm",
+        "sha256": "96a296d224f285c67bee93c30f8a309157f0daa35dc5b87e410b78630a09cfc7"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_stdin-baseline.stdout.jsonl",
+          "sha256": "5754c8bd7aaca1db14dfee48932522a7d814bf42524f41a499164f842e54ed97"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_stdin-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_stdin-candidate.stdout.jsonl",
+          "sha256": "b87125e8d33600aba5af0d5de221f99a713777de8e28cc3f1d170dbb3c880da0"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_stdin-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "one_sample_wav",
+      "samples": 1,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav.wav",
+        "sha256": "48f304b4730189540fb9a2b9c8d05d6aba5e55b1375efbd9e2ef28ed544a9743"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav-baseline.stdout.jsonl",
+          "sha256": "baff125870bee0e8a96b5c58244f995cc36b12e947b8ef87c91352e8b8d4bf1b"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav-candidate.stdout.jsonl",
+          "sha256": "41223089b91ff5452a30dde19beabdde400359256f2aef00daf115e50193bdca"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/one_sample_wav-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "partial_block_stdin",
+      "samples": 2053,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/partial_block_stdin.pcm",
+        "sha256": "e7756c8aac741931bc2279ce5cc0d3e08b0bbc04adf0238f2f5682995538c425"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/partial_block_stdin-baseline.stdout.jsonl",
+          "sha256": "8d7e135b06034130dd976ccdd89b973373035452e0b5a4736886a866b17688b8"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/partial_block_stdin-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "-"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/partial_block_stdin-candidate.stdout.jsonl",
+          "sha256": "925bf2d9c18afc58d79b73ecebb780bf42a3bd2b34e2f7f42f3b515a8135a6af"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/partial_block_stdin-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "nonempty_wav",
+      "samples": 44100,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav.wav",
+        "sha256": "3fa20276d8a4131431490ed129d0b05fafa4e9c82d4339b5cf635512103d6615"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav-baseline.stdout.jsonl",
+          "sha256": "644420c9a26d4f80d3afc20be927eae23b94e4fc8aea06774cb955a198afd7e3"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav-candidate.stdout.jsonl",
+          "sha256": "dc3651528162ff819711eb976c660f37acd32ad9237d0e81f82febe57562eea9"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/nonempty_wav-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "two_digit_seconds_wav",
+      "samples": 544194,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav.wav",
+        "sha256": "1d121dd93463249b908608d6120481d53564332c2d5023f0e58b0e99e37dd1f9"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav-baseline.stdout.jsonl",
+          "sha256": "a70120825204ed19e7433029a9a991d5000ecc58d458bc7ce671d7745d99029b"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav-candidate.stdout.jsonl",
+          "sha256": "05c26f5abb26d0d5fed8ff730048f4233b2d0d06acfb54dbf24ebd76a254e920"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/two_digit_seconds_wav-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    },
+    {
+      "name": "three_digit_seconds_wav",
+      "samples": 5444145,
+      "input": {
+        "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav.wav",
+        "sha256": "55dbf5782ec330b2989c3fc319dad9bafb25819ffd0eb654858e4c16ce2adffa"
+      },
+      "status": "passed",
+      "baseline": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav-baseline.stdout.jsonl",
+          "sha256": "e121f8d9b0ceaad4cf4af54d9be792eae0c3aba46e2baf7e7f057ef8d35428ee"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav-baseline.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        "expected_defects": [
+          "truncated_stream_seconds"
+        ]
+      },
+      "candidate": {
+        "command": [
+          "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+          "--watch",
+          "fixture=/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+          "--stream",
+          "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav.wav"
+        ],
+        "returncode": 0,
+        "stdout": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav-candidate.stdout.jsonl",
+          "sha256": "b3e882737ac67bc64d423283f31efe6cc5ff73a65633f2133fb197bd20be28d2"
+        },
+        "stderr": {
+          "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/three_digit_seconds_wav-candidate.stderr.txt",
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      }
+    }
+  ],
+  "python": "3.12.3 (main, Jul 15 2026, 23:46:41) [GCC 13.3.0]",
+  "platform": "Linux-6.17.0-1022-azure-x86_64-with-glibc2.39",
+  "verifier": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/scripts/prove_monitor_cli.py",
+    "sha256": "9e295371a74ae2c3e78cc40e1d56ab8e1b94702621e94656e9fd7006636bd18d"
+  },
+  "scope": "CLI JSON and event compatibility on deterministic edge inputs; not recognition or performance",
+  "candidate": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/release/monitor",
+    "sha256": "cf3ec0ac1b6ba181ea8ed95a8c5a0d3c803655226579fd91c81ff6ee18e440ae"
+  },
+  "baseline": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/proof-baseline-build/release/monitor",
+    "sha256": "7be033019cd97b1658927cd4665515d88e4e37ebf350bc7374eced810090ce0e"
+  },
+  "reference": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/monitor-cli-proof/reference.wav",
+    "sha256": "3fa20276d8a4131431490ed129d0b05fafa4e9c82d4339b5cf635512103d6615"
+  }
+}
