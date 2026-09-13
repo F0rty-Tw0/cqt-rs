@@ -1,0 +1,89 @@
+E011/E012 audio sources and attribution
+
+Mix and Toucan catalogue: https://www.toucanmusic.com/mixes/tou2020
+Publisher licence: https://creativecommons.org/licenses/by-nc-sa/4.0/
+
+t01: Sleep Tight (Sergio's Last Remix) — Psychadelik Pedestrian
+https://www.toucanmusic.com/dcount/click.php?id=191
+t02: Proven Reality — JVS
+https://www.toucanmusic.com/dcount/click.php?id=282
+t03: Turbulence (2020 Remix) — Marc Burt
+https://www.toucanmusic.com/ccount/click.php?id=379
+t04: Beautiful Geometry — Phish Funk
+https://www.toucanmusic.com/ccount/click.php?id=257
+t05: Roots and Shoots — Dave Kent
+https://archive.org/download/tou285/tou285_dave_kent_roots_and_shoots.mp3
+t06: Scratching The Surface (Phish Funk Disco Mix) — Redmann
+https://www.toucanmusic.com/dcount/click.php?id=296
+t07: Chasing Rainbows (Marc Burt and Notch remix) — Frau Holle
+https://www.toucanmusic.com/dcount/click.php?id=257
+t08: Flaw 24 (extended mix) — Notch
+https://www.toucanmusic.com/dcount/click.php?id=299
+t09: Turn The Corner (Notch remix) — Redmann
+https://www.toucanmusic.com/dcount/click.php?id=240
+t10: Pioneers — Marc Burt
+https://www.toucanmusic.com/ccount/click.php?id=253
+t11: Tears In My Heart (Notch remix) — Psychadelik Pedestrian
+https://www.toucanmusic.com/dcount/click.php?id=265
+t12: Beast — Beat Doctor
+https://www.toucanmusic.com/ccount/click.php?id=289
+t13: The Piano Tune — Beat Doctor
+https://www.toucanmusic.com/ccount/click.php?id=251
+t14: Baby Crying — Fioko
+https://www.toucanmusic.com/ccount/click.php?id=298
+t15: Electronaut (edit) — Aerologic
+https://www.toucanmusic.com/dcount/click.php?id=159
+t16: Dancefloor Virus 2007 — Silverknight & Beat Doctor
+https://www.toucanmusic.com/ccount/click.php?id=215
+t17: Plastic Explosive (Aerologic Remix) — Redmann
+https://www.toucanmusic.com/dcount/click.php?id=7
+t18: Aquarius (JMD Remix) — Phish Funk
+https://www.toucanmusic.com/ccount/click.php?id=340
+t19: Body Sensations (original mix) — Base II
+https://www.toucanmusic.com/dcount/click.php?id=305
+t20: By The Water (Aerologic remix) — Space Invaderz & Psychadelik Pedestrian
+https://www.toucanmusic.com/ccount/click.php?id=372
+t21: On Target (Remix) — JMD
+https://www.toucanmusic.com/ccount/click.php?id=333
+t22: Are You Feeling It? (Rawbase Remix) — Redmann
+https://www.toucanmusic.com/ccount/click.php?id=133
+
+Corrected t05 archive: https://archive.org/details/tou285
+Archive licence metadata: http://creativecommons.org/licenses/by-nc-sa/3.0/
+Publisher release: https://www.toucanmusic.com/releases/tou285
+The old t05 ccount?id=4 download was Exodus (original mix), Marc Burt, and is excluded from the corrected catalogue.
+t22 keeps its publisher title Rawbase Remix; downloaded MP3 tags say John Dalling remix. Independent audio alignment supports the frozen catalogue audio, but these tags do not independently establish alias equivalence.
+
+Negative music:
+n01: Cruising for Goblins — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1800002
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cruising%20for%20Goblins.mp3
+n02: Go Cart — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300006
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Go%20Cart.mp3
+n03: Jerry Five — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700066
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jerry%20Five.mp3
+n04: Raving Energy (faster) — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900012
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Raving%20Energy%20%28faster%29.mp3
+n05: Reformat — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500020
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Reformat.mp3
+n06: Shiny Tech II — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100077
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shiny%20Tech2.mp3
+n07: Pamgaea — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300036
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pamgaea.mp3
+n08: Blippy Trance — Kevin MacLeod
+https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900055
+https://creativecommons.org/licenses/by/4.0/
+https://incompetech.com/music/royalty-free/mp3-royaltyfree/Blippy%20Trance.mp3

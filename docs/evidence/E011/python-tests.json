@@ -1,0 +1,23 @@
+{
+  "command": [
+    "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+    "-m",
+    "unittest",
+    "discover",
+    "-s",
+    "scripts",
+    "-p",
+    "test_*.py",
+    "-v"
+  ],
+  "returncode": 0,
+  "output_sha256": "c1a58b72bce947a4484354ff315090a163ee83551afc739c43243d9b9f912b2a",
+  "test_files": {
+    "scripts/test_recognition_lab.py": "1c828f2f79973d7427fd914c87f7de4842653f8015c733a10f19b465ed228a6d",
+    "scripts/test_chunk_query.py": "941dd0a6cf5078a4eab331d1eeef8b344425d5366bdbcbb10bcd18c55bcbabca",
+    "scripts/test_eval_provenance.py": "840cdfa52c110db91d0beba979640197f7133791348d62138aa69291f79f13f5",
+    "scripts/test_radio_eval.py": "de74c4836159c01b26a9bef7318d1249cf7a2513ebf5d85317783a3565ce5d1c",
+    "scripts/test_song_index.py": "7e1a4cbba9ae30f91fa40a25b0b6d2994b0e16267d2b442965b9b8485776ea8d",
+    "scripts/test_real_mix_checkpoint.py": "6ba5ac63800090730b17691a5855dcbcf143d0cdc8425fd74938f9365123d98b"
+  }
+}

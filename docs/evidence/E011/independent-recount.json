@@ -1,0 +1,3046 @@
+{
+  "status": "verified",
+  "native_runs": 288,
+  "query_count": 96,
+  "counts": [
+    {
+      "group": "clean",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "clean",
+      "side": "full",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "clean",
+      "side": "full-modal",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "exact",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "exact",
+      "side": "full",
+      "outcome": "correct",
+      "count": 20
+    },
+    {
+      "group": "exact",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 2
+    },
+    {
+      "group": "exact",
+      "side": "full-modal",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "frozen",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 14
+    },
+    {
+      "group": "frozen",
+      "side": "chunks",
+      "outcome": "no-match",
+      "count": 8
+    },
+    {
+      "group": "frozen",
+      "side": "full",
+      "outcome": "correct",
+      "count": 15
+    },
+    {
+      "group": "frozen",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 7
+    },
+    {
+      "group": "frozen",
+      "side": "full-modal",
+      "outcome": "correct",
+      "count": 16
+    },
+    {
+      "group": "frozen",
+      "side": "full-modal",
+      "outcome": "no-match",
+      "count": 5
+    },
+    {
+      "group": "frozen",
+      "side": "full-modal",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 15
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "no-match",
+      "count": 6
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "correct",
+      "count": 16
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 5
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "mix",
+      "side": "full-modal",
+      "outcome": "correct",
+      "count": 17
+    },
+    {
+      "group": "mix",
+      "side": "full-modal",
+      "outcome": "no-match",
+      "count": 4
+    },
+    {
+      "group": "mix",
+      "side": "full-modal",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "negative",
+      "side": "chunks",
+      "outcome": "correct-rejection",
+      "count": 8
+    },
+    {
+      "group": "negative",
+      "side": "full",
+      "outcome": "correct-rejection",
+      "count": 8
+    },
+    {
+      "group": "negative",
+      "side": "full-modal",
+      "outcome": "correct-rejection",
+      "count": 8
+    }
+  ],
+  "wrong_parent_starts": 4,
+  "cases": [
+    {
+      "id": "clean-t01-chunks",
+      "query_id": "clean-t01",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 26,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t01-full",
+      "query_id": "clean-t01",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t01-full-modal",
+      "query_id": "clean-t01",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t02-chunks",
+      "query_id": "clean-t02",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 11,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t02-full",
+      "query_id": "clean-t02",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t02-full-modal",
+      "query_id": "clean-t02",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t03-chunks",
+      "query_id": "clean-t03",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t03-full",
+      "query_id": "clean-t03",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t03-full-modal",
+      "query_id": "clean-t03",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t04-chunks",
+      "query_id": "clean-t04",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t04-full",
+      "query_id": "clean-t04",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t04-full-modal",
+      "query_id": "clean-t04",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t05-chunks",
+      "query_id": "clean-t05",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 6,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t05-full",
+      "query_id": "clean-t05",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t05-full-modal",
+      "query_id": "clean-t05",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t06-chunks",
+      "query_id": "clean-t06",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 7,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t06-full",
+      "query_id": "clean-t06",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t06-full-modal",
+      "query_id": "clean-t06",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t07-chunks",
+      "query_id": "clean-t07",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 6,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t07-full",
+      "query_id": "clean-t07",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t07-full-modal",
+      "query_id": "clean-t07",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t08-chunks",
+      "query_id": "clean-t08",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t08-full",
+      "query_id": "clean-t08",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t08-full-modal",
+      "query_id": "clean-t08",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t09-chunks",
+      "query_id": "clean-t09",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t09-full",
+      "query_id": "clean-t09",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t09-full-modal",
+      "query_id": "clean-t09",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t10-chunks",
+      "query_id": "clean-t10",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t10-full",
+      "query_id": "clean-t10",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t10-full-modal",
+      "query_id": "clean-t10",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t11-chunks",
+      "query_id": "clean-t11",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t11-full",
+      "query_id": "clean-t11",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t11-full-modal",
+      "query_id": "clean-t11",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t12-chunks",
+      "query_id": "clean-t12",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 11,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t12-full",
+      "query_id": "clean-t12",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t12-full-modal",
+      "query_id": "clean-t12",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t13-chunks",
+      "query_id": "clean-t13",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 15,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t13-full",
+      "query_id": "clean-t13",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t13-full-modal",
+      "query_id": "clean-t13",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t14-chunks",
+      "query_id": "clean-t14",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t14-full",
+      "query_id": "clean-t14",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t14-full-modal",
+      "query_id": "clean-t14",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t15-chunks",
+      "query_id": "clean-t15",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 6,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t15-full",
+      "query_id": "clean-t15",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t15-full-modal",
+      "query_id": "clean-t15",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t16-chunks",
+      "query_id": "clean-t16",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 10,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t16-full",
+      "query_id": "clean-t16",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t16-full-modal",
+      "query_id": "clean-t16",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t17-chunks",
+      "query_id": "clean-t17",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 8,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t17-full",
+      "query_id": "clean-t17",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t17-full-modal",
+      "query_id": "clean-t17",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t18-chunks",
+      "query_id": "clean-t18",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 5,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t18-full",
+      "query_id": "clean-t18",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t18-full-modal",
+      "query_id": "clean-t18",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t19-chunks",
+      "query_id": "clean-t19",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t19-full",
+      "query_id": "clean-t19",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t19-full-modal",
+      "query_id": "clean-t19",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t20-chunks",
+      "query_id": "clean-t20",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t20-full",
+      "query_id": "clean-t20",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t20-full-modal",
+      "query_id": "clean-t20",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t21-chunks",
+      "query_id": "clean-t21",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t21-full",
+      "query_id": "clean-t21",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t21-full-modal",
+      "query_id": "clean-t21",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t22-chunks",
+      "query_id": "clean-t22",
+      "side": "chunks",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t22",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t22-full",
+      "query_id": "clean-t22",
+      "side": "full",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t22",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "clean-t22-full-modal",
+      "query_id": "clean-t22",
+      "side": "full-modal",
+      "group": "clean",
+      "outcome": "correct",
+      "predicted": "t22",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t01-chunks",
+      "query_id": "exact-t01",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 13,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t01-full",
+      "query_id": "exact-t01",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t01-full-modal",
+      "query_id": "exact-t01",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t01",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t02-chunks",
+      "query_id": "exact-t02",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 6,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t02-full",
+      "query_id": "exact-t02",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t02-full-modal",
+      "query_id": "exact-t02",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t03-chunks",
+      "query_id": "exact-t03",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t03-full",
+      "query_id": "exact-t03",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t03-full-modal",
+      "query_id": "exact-t03",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t04-chunks",
+      "query_id": "exact-t04",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t04-full",
+      "query_id": "exact-t04",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t04-full-modal",
+      "query_id": "exact-t04",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t04",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t05-chunks",
+      "query_id": "exact-t05",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 12,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t05-full",
+      "query_id": "exact-t05",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t05-full-modal",
+      "query_id": "exact-t05",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t06-chunks",
+      "query_id": "exact-t06",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t06-full",
+      "query_id": "exact-t06",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t06-full-modal",
+      "query_id": "exact-t06",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t07-chunks",
+      "query_id": "exact-t07",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t07-full",
+      "query_id": "exact-t07",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t07-full-modal",
+      "query_id": "exact-t07",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t08-chunks",
+      "query_id": "exact-t08",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t08-full",
+      "query_id": "exact-t08",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t08-full-modal",
+      "query_id": "exact-t08",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t09-chunks",
+      "query_id": "exact-t09",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t09-full",
+      "query_id": "exact-t09",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t09-full-modal",
+      "query_id": "exact-t09",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t10-chunks",
+      "query_id": "exact-t10",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t10-full",
+      "query_id": "exact-t10",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t10-full-modal",
+      "query_id": "exact-t10",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t10",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t11-chunks",
+      "query_id": "exact-t11",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t11-full",
+      "query_id": "exact-t11",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t11-full-modal",
+      "query_id": "exact-t11",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t12-chunks",
+      "query_id": "exact-t12",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t12-full",
+      "query_id": "exact-t12",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t12-full-modal",
+      "query_id": "exact-t12",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t13-chunks",
+      "query_id": "exact-t13",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 11,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t13-full",
+      "query_id": "exact-t13",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t13-full-modal",
+      "query_id": "exact-t13",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t14-chunks",
+      "query_id": "exact-t14",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t14-full",
+      "query_id": "exact-t14",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t14-full-modal",
+      "query_id": "exact-t14",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t15-chunks",
+      "query_id": "exact-t15",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t15-full",
+      "query_id": "exact-t15",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t15-full-modal",
+      "query_id": "exact-t15",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t16-chunks",
+      "query_id": "exact-t16",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 8,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t16-full",
+      "query_id": "exact-t16",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t16-full-modal",
+      "query_id": "exact-t16",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t17-chunks",
+      "query_id": "exact-t17",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t17-full",
+      "query_id": "exact-t17",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t17-full-modal",
+      "query_id": "exact-t17",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t18-chunks",
+      "query_id": "exact-t18",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t18-full",
+      "query_id": "exact-t18",
+      "side": "full",
+      "group": "exact",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t18-full-modal",
+      "query_id": "exact-t18",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t19-chunks",
+      "query_id": "exact-t19",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t19-full",
+      "query_id": "exact-t19",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t19-full-modal",
+      "query_id": "exact-t19",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t20-chunks",
+      "query_id": "exact-t20",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t20-full",
+      "query_id": "exact-t20",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t20-full-modal",
+      "query_id": "exact-t20",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t21-chunks",
+      "query_id": "exact-t21",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t21-full",
+      "query_id": "exact-t21",
+      "side": "full",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t21-full-modal",
+      "query_id": "exact-t21",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t22-chunks",
+      "query_id": "exact-t22",
+      "side": "chunks",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t22",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t22-full",
+      "query_id": "exact-t22",
+      "side": "full",
+      "group": "exact",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "exact-t22-full-modal",
+      "query_id": "exact-t22",
+      "side": "full-modal",
+      "group": "exact",
+      "outcome": "correct",
+      "predicted": "t22",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t01-chunks",
+      "query_id": "frozen-t01",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t01-full",
+      "query_id": "frozen-t01",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t01-full-modal",
+      "query_id": "frozen-t01",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "wrong-match",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 1
+    },
+    {
+      "id": "frozen-t02-chunks",
+      "query_id": "frozen-t02",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t02-full",
+      "query_id": "frozen-t02",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t02-full-modal",
+      "query_id": "frozen-t02",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t03-chunks",
+      "query_id": "frozen-t03",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 5,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t03-full",
+      "query_id": "frozen-t03",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t03-full-modal",
+      "query_id": "frozen-t03",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t04-chunks",
+      "query_id": "frozen-t04",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t04-full",
+      "query_id": "frozen-t04",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t04-full-modal",
+      "query_id": "frozen-t04",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t05-chunks",
+      "query_id": "frozen-t05",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t05-full",
+      "query_id": "frozen-t05",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t05-full-modal",
+      "query_id": "frozen-t05",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t06-chunks",
+      "query_id": "frozen-t06",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t06-full",
+      "query_id": "frozen-t06",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t06-full-modal",
+      "query_id": "frozen-t06",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t07-chunks",
+      "query_id": "frozen-t07",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t07-full",
+      "query_id": "frozen-t07",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t07-full-modal",
+      "query_id": "frozen-t07",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t08-chunks",
+      "query_id": "frozen-t08",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t08-full",
+      "query_id": "frozen-t08",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t08-full-modal",
+      "query_id": "frozen-t08",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t09-chunks",
+      "query_id": "frozen-t09",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t09-full",
+      "query_id": "frozen-t09",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t09-full-modal",
+      "query_id": "frozen-t09",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t10-chunks",
+      "query_id": "frozen-t10",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t10-full",
+      "query_id": "frozen-t10",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t10-full-modal",
+      "query_id": "frozen-t10",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t11-chunks",
+      "query_id": "frozen-t11",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t11-full",
+      "query_id": "frozen-t11",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t11-full-modal",
+      "query_id": "frozen-t11",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t12-chunks",
+      "query_id": "frozen-t12",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 10,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t12-full",
+      "query_id": "frozen-t12",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t12-full-modal",
+      "query_id": "frozen-t12",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t13-chunks",
+      "query_id": "frozen-t13",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t13-full",
+      "query_id": "frozen-t13",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t13-full-modal",
+      "query_id": "frozen-t13",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t13",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t14-chunks",
+      "query_id": "frozen-t14",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t14-full",
+      "query_id": "frozen-t14",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t14-full-modal",
+      "query_id": "frozen-t14",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t15-chunks",
+      "query_id": "frozen-t15",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t15-full",
+      "query_id": "frozen-t15",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t15-full-modal",
+      "query_id": "frozen-t15",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t16-chunks",
+      "query_id": "frozen-t16",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t16-full",
+      "query_id": "frozen-t16",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t16-full-modal",
+      "query_id": "frozen-t16",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t17-chunks",
+      "query_id": "frozen-t17",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t17-full",
+      "query_id": "frozen-t17",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t17-full-modal",
+      "query_id": "frozen-t17",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t18-chunks",
+      "query_id": "frozen-t18",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t18-full",
+      "query_id": "frozen-t18",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t18-full-modal",
+      "query_id": "frozen-t18",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t19-chunks",
+      "query_id": "frozen-t19",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t19-full",
+      "query_id": "frozen-t19",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t19-full-modal",
+      "query_id": "frozen-t19",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t20-chunks",
+      "query_id": "frozen-t20",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t20-full",
+      "query_id": "frozen-t20",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t20-full-modal",
+      "query_id": "frozen-t20",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t21-chunks",
+      "query_id": "frozen-t21",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t21-full",
+      "query_id": "frozen-t21",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t21-full-modal",
+      "query_id": "frozen-t21",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t22-chunks",
+      "query_id": "frozen-t22",
+      "side": "chunks",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t22-full",
+      "query_id": "frozen-t22",
+      "side": "full",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "frozen-t22-full-modal",
+      "query_id": "frozen-t22",
+      "side": "full-modal",
+      "group": "frozen",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t01-chunks",
+      "query_id": "mix-t01",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "wrong-match",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 1
+    },
+    {
+      "id": "mix-t01-full",
+      "query_id": "mix-t01",
+      "side": "full",
+      "group": "mix",
+      "outcome": "wrong-match",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 1
+    },
+    {
+      "id": "mix-t01-full-modal",
+      "query_id": "mix-t01",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "wrong-match",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 1
+    },
+    {
+      "id": "mix-t02-chunks",
+      "query_id": "mix-t02",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t02-full",
+      "query_id": "mix-t02",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t02-full-modal",
+      "query_id": "mix-t02",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t02",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t03-chunks",
+      "query_id": "mix-t03",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t03-full",
+      "query_id": "mix-t03",
+      "side": "full",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t03-full-modal",
+      "query_id": "mix-t03",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t03",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t04-chunks",
+      "query_id": "mix-t04",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t04-full",
+      "query_id": "mix-t04",
+      "side": "full",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t04-full-modal",
+      "query_id": "mix-t04",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t05-chunks",
+      "query_id": "mix-t05",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t05-full",
+      "query_id": "mix-t05",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t05-full-modal",
+      "query_id": "mix-t05",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t05",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t06-chunks",
+      "query_id": "mix-t06",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t06-full",
+      "query_id": "mix-t06",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t06-full-modal",
+      "query_id": "mix-t06",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t06",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t07-chunks",
+      "query_id": "mix-t07",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t07-full",
+      "query_id": "mix-t07",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t07-full-modal",
+      "query_id": "mix-t07",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t07",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t08-chunks",
+      "query_id": "mix-t08",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 6,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t08-full",
+      "query_id": "mix-t08",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t08-full-modal",
+      "query_id": "mix-t08",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t08",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t09-chunks",
+      "query_id": "mix-t09",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t09-full",
+      "query_id": "mix-t09",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t09-full-modal",
+      "query_id": "mix-t09",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t09",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t10-chunks",
+      "query_id": "mix-t10",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t10-full",
+      "query_id": "mix-t10",
+      "side": "full",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t10-full-modal",
+      "query_id": "mix-t10",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t11-chunks",
+      "query_id": "mix-t11",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t11-full",
+      "query_id": "mix-t11",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t11-full-modal",
+      "query_id": "mix-t11",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t11",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t12-chunks",
+      "query_id": "mix-t12",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 10,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t12-full",
+      "query_id": "mix-t12",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t12-full-modal",
+      "query_id": "mix-t12",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t12",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t13-chunks",
+      "query_id": "mix-t13",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t13-full",
+      "query_id": "mix-t13",
+      "side": "full",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t13-full-modal",
+      "query_id": "mix-t13",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t14-chunks",
+      "query_id": "mix-t14",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t14-full",
+      "query_id": "mix-t14",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t14-full-modal",
+      "query_id": "mix-t14",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t14",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t15-chunks",
+      "query_id": "mix-t15",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t15-full",
+      "query_id": "mix-t15",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t15-full-modal",
+      "query_id": "mix-t15",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t15",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t16-chunks",
+      "query_id": "mix-t16",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 3,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t16-full",
+      "query_id": "mix-t16",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t16-full-modal",
+      "query_id": "mix-t16",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t16",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t17-chunks",
+      "query_id": "mix-t17",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t17-full",
+      "query_id": "mix-t17",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t17-full-modal",
+      "query_id": "mix-t17",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t17",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t18-chunks",
+      "query_id": "mix-t18",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t18-full",
+      "query_id": "mix-t18",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t18-full-modal",
+      "query_id": "mix-t18",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t18",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t19-chunks",
+      "query_id": "mix-t19",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 2,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t19-full",
+      "query_id": "mix-t19",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t19-full-modal",
+      "query_id": "mix-t19",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t19",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t20-chunks",
+      "query_id": "mix-t20",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t20-full",
+      "query_id": "mix-t20",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t20-full-modal",
+      "query_id": "mix-t20",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t20",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t21-chunks",
+      "query_id": "mix-t21",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 4,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t21-full",
+      "query_id": "mix-t21",
+      "side": "full",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t21-full-modal",
+      "query_id": "mix-t21",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "correct",
+      "predicted": "t21",
+      "accepted_starts": 1,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t22-chunks",
+      "query_id": "mix-t22",
+      "side": "chunks",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t22-full",
+      "query_id": "mix-t22",
+      "side": "full",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "mix-t22-full-modal",
+      "query_id": "mix-t22",
+      "side": "full-modal",
+      "group": "mix",
+      "outcome": "no-match",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n01-chunks",
+      "query_id": "n01",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n01-full",
+      "query_id": "n01",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n01-full-modal",
+      "query_id": "n01",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n02-chunks",
+      "query_id": "n02",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n02-full",
+      "query_id": "n02",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n02-full-modal",
+      "query_id": "n02",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n03-chunks",
+      "query_id": "n03",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n03-full",
+      "query_id": "n03",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n03-full-modal",
+      "query_id": "n03",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n04-chunks",
+      "query_id": "n04",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n04-full",
+      "query_id": "n04",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n04-full-modal",
+      "query_id": "n04",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n05-chunks",
+      "query_id": "n05",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n05-full",
+      "query_id": "n05",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n05-full-modal",
+      "query_id": "n05",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n06-chunks",
+      "query_id": "n06",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n06-full",
+      "query_id": "n06",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n06-full-modal",
+      "query_id": "n06",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n07-chunks",
+      "query_id": "n07",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n07-full",
+      "query_id": "n07",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n07-full-modal",
+      "query_id": "n07",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n08-chunks",
+      "query_id": "n08",
+      "side": "chunks",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n08-full",
+      "query_id": "n08",
+      "side": "full",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    },
+    {
+      "id": "n08-full-modal",
+      "query_id": "n08",
+      "side": "full-modal",
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "predicted": null,
+      "accepted_starts": 0,
+      "wrong_parent_starts": 0
+    }
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "status": "verified-execution",
+  "native_runs": 96,
+  "groups": {
+    "exact": {
+      "count": 22,
+      "gains": [
+        "exact-t18",
+        "exact-t22"
+      ],
+      "losses": [],
+      "sides": {
+        "default": {
+          "outcomes": {
+            "correct": 20,
+            "no-match": 2
+          },
+          "accepted_starts": 21,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 1
+        },
+        "modal": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 25,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 3
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 9.090909090909092,
+        "interval_95_percentage_points": [
+          0.0,
+          22.727272727272727
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "clean": {
+      "count": 22,
+      "gains": [],
+      "losses": [],
+      "sides": {
+        "default": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 22,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        },
+        "modal": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 22,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 0.0,
+        "interval_95_percentage_points": [
+          0.0,
+          0.0
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "frozen": {
+      "count": 22,
+      "gains": [
+        "frozen-t18"
+      ],
+      "losses": [],
+      "sides": {
+        "default": {
+          "outcomes": {
+            "no-match": 7,
+            "correct": 15
+          },
+          "accepted_starts": 16,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 1
+        },
+        "modal": {
+          "outcomes": {
+            "wrong-match": 1,
+            "correct": 16,
+            "no-match": 5
+          },
+          "accepted_starts": 18,
+          "wrong_parent_starts": 1,
+          "repeated_parent_starts": 1
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 4.545454545454546,
+        "interval_95_percentage_points": [
+          0.0,
+          13.636363636363635
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "mix": {
+      "count": 22,
+      "gains": [
+        "mix-t03"
+      ],
+      "losses": [],
+      "sides": {
+        "default": {
+          "outcomes": {
+            "wrong-match": 1,
+            "correct": 16,
+            "no-match": 5
+          },
+          "accepted_starts": 17,
+          "wrong_parent_starts": 1,
+          "repeated_parent_starts": 0
+        },
+        "modal": {
+          "outcomes": {
+            "wrong-match": 1,
+            "correct": 17,
+            "no-match": 4
+          },
+          "accepted_starts": 19,
+          "wrong_parent_starts": 1,
+          "repeated_parent_starts": 1
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 4.545454545454546,
+        "interval_95_percentage_points": [
+          0.0,
+          13.636363636363635
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "negative": {
+      "count": 8,
+      "gains": [],
+      "losses": [],
+      "sides": {
+        "default": {
+          "outcomes": {
+            "correct-rejection": 8
+          },
+          "accepted_starts": 0,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        },
+        "modal": {
+          "outcomes": {
+            "correct-rejection": 8
+          },
+          "accepted_starts": 0,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        }
+      }
+    }
+  },
+  "acceptance_checks": {
+    "triggering_misses_recovered": true,
+    "clean_targets_met": true,
+    "more_mix_correct": true,
+    "no_lost_correct": true,
+    "no_added_wrong_starts": false
+  },
+  "exploratory_acceptance": false,
+  "binary": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/chunk-query/binaries/candidate",
+    "bytes": 3114856,
+    "sha256": "d3494a5c0ff0a5e5d78548d73877810f3653e666fde59761d83ee5fade1e82cc"
+  },
+  "manifest": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/manifest.json",
+    "bytes": 524734,
+    "sha256": "41be41c6fccd39e772a4b83ab763a2eda8556ee031267da4496e74982c25cc15"
+  },
+  "unchanged_report_evidence_pairs": 96,
+  "independent_recount": [
+    {
+      "group": "clean",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "exact",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "frozen",
+      "outcome": "correct",
+      "count": 16
+    },
+    {
+      "group": "frozen",
+      "outcome": "no-match",
+      "count": 5
+    },
+    {
+      "group": "frozen",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "mix",
+      "outcome": "correct",
+      "count": 17
+    },
+    {
+      "group": "mix",
+      "outcome": "no-match",
+      "count": 4
+    },
+    {
+      "group": "mix",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "negative",
+      "outcome": "correct-rejection",
+      "count": 8
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "status": "completed",
+  "binary": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/chunk-query/binaries/candidate",
+    "bytes": 3114856,
+    "sha256": "d3494a5c0ff0a5e5d78548d73877810f3653e666fde59761d83ee5fade1e82cc"
+  },
+  "source_commit": "bace1a92feb7d9e862c21d295fd84df6a6df6626",
+  "evaluator": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/scripts/song_index_modal.py",
+    "bytes": 5380,
+    "sha256": "57ca76de4067048701a4e81d81b1480802fc3ced60ee555ca3ff9bf03443909f"
+  },
+  "scorer": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/scripts/song_index_eval.py",
+    "bytes": 7042,
+    "sha256": "bc90e0495ae9ef35d64e7ae2ff60961fb32f991ca157c384e5cfa46efef65c8c"
+  },
+  "baseline": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/runs/default-a/results.json",
+    "bytes": 11197736,
+    "sha256": "600e1907a4943e32a12c8aff55868d12583569ec21388890e077a4b738386b88"
+  },
+  "baseline_metadata": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/runs/default-a/metadata.json",
+    "bytes": 1681,
+    "sha256": "acb3569c419f53bd654b8d31c933ec688403663dfe865c404d88749dc7f3ca5d"
+  },
+  "manifest": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/manifest.json",
+    "bytes": 524734,
+    "sha256": "41be41c6fccd39e772a4b83ab763a2eda8556ee031267da4496e74982c25cc15"
+  },
+  "workers": 4,
+  "rayon_threads_per_process": 1,
+  "native_options": [
+    "--modal-fit"
+  ],
+  "expected_runs": 96,
+  "completed_runs": 96
+}

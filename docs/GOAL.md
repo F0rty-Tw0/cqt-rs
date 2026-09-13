@@ -148,7 +148,7 @@ Run the CI gates from `.github/workflows/ci.yml`: format, clippy and docs;
 release tests on stable and Rust 1.98, both library feature sets; monitor
 tests; bench compilation; and the library package dry run. Run Python
 regressions with `python -m unittest discover -s scripts -p 'test_*.py' -v`
-after installing numpy and matplotlib.
+after installing numpy, scipy and matplotlib.
 
 For benchmarks, use isolated worktrees and target directories. Record the
 resolved Cargo.lock even though the library ignores it in Git; use a shared

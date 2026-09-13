@@ -1,0 +1,23 @@
+test_competing_chunks_do_not_get_summed (test_chunk_query.ScoringTest.test_competing_chunks_do_not_get_summed) ... ok
+test_deterministic_ties_and_unknown_chunk_rejected (test_chunk_query.ScoringTest.test_deterministic_ties_and_unknown_chunk_rejected) ... ok
+test_query_label_cannot_change_prediction (test_chunk_query.ScoringTest.test_query_label_cannot_change_prediction) ... ok
+test_reports_are_not_accepted_matches (test_chunk_query.ScoringTest.test_reports_are_not_accepted_matches) ... ok
+test_external_binary_is_identified_by_content_not_checkout_commit (test_eval_provenance.ProvenanceTests.test_external_binary_is_identified_by_content_not_checkout_commit) ... ok
+test_legacy_opt_in_does_not_bypass_known_input_mismatch (test_eval_provenance.ProvenanceTests.test_legacy_opt_in_does_not_bypass_known_input_mismatch) ... ok
+test_missing_or_added_inputs_are_rejected (test_eval_provenance.ProvenanceTests.test_missing_or_added_inputs_are_rejected) ... ok
+test_moved_inputs_and_changed_detector_are_comparable (test_eval_provenance.ProvenanceTests.test_moved_inputs_and_changed_detector_are_comparable) ... ok
+test_replaced_input_at_same_path_is_rejected (test_eval_provenance.ProvenanceTests.test_replaced_input_at_same_path_is_rejected) ... ok
+test_cargo_reported_executable_handles_a_custom_target_directory (test_radio_eval.EvaluationTests.test_cargo_reported_executable_handles_a_custom_target_directory) ... ok
+test_replayed_evaluation_saves_external_binary_and_corpus_identity (test_radio_eval.EvaluationTests.test_replayed_evaluation_saves_external_binary_and_corpus_identity) ... ok
+test_hard_kill_preserves_running_identities (test_real_mix_checkpoint.CancellationCheckpoint.test_hard_kill_preserves_running_identities) ... ok
+test_every_start_on_unwatched_music_is_false (test_recognition_lab.KnownTruthTests.test_every_start_on_unwatched_music_is_false) ... ok
+test_spurious_first_start_does_not_hide_a_later_correct_detection (test_recognition_lab.KnownTruthTests.test_spurious_first_start_does_not_hide_a_later_correct_detection) ... ok
+test_interval_union_does_not_overweight_overlapping_anchors (test_song_index.SongIndexTest.test_interval_union_does_not_overweight_overlapping_anchors) ... ok
+test_mislabeled_download_rejected (test_song_index.SongIndexTest.test_mislabeled_download_rejected) ... ok
+test_negative_acceptance_cannot_be_scored_as_correct (test_song_index.SongIndexTest.test_negative_acceptance_cannot_be_scored_as_correct) ... ok
+test_partial_query_and_incomplete_index_are_rejected (test_song_index.SongIndexTest.test_partial_query_and_incomplete_index_are_rejected) ... ok
+
+----------------------------------------------------------------------
+Ran 18 tests in 0.245s
+
+OK

@@ -2,6 +2,12 @@
 
 **2/21 → 13/21 supported song identities.** All 44 native runs completed on 22 actual ten-second mix clips. t05 has an unverified label and is excluded from this accuracy denominator.
 
+Later source audit: [E011](E011-song-index.md) found that the pinned t05
+download is Marc Burt's Exodus, mislabeled by the publisher's link as Dave
+Kent's Roots and Shoots. E011 uses the corrected recording and establishes
+its mix cue. The frozen E010 inputs, 21-song denominator and results below
+remain unchanged; its t05 outcome is not a test of the actual Roots and Shoots.
+
 | Reference configuration | Correct | Wrong top identity | No match |
 | --- | ---: | ---: | ---: |
 | midpoint | 2 | 0 | 19 |

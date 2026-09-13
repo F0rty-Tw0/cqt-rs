@@ -1,0 +1,16 @@
+{
+  "status": "verified-execution",
+  "runs": 4,
+  "correct": 4,
+  "wrong_parent_starts": 0,
+  "plan": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/matched-source-controls/plan.json",
+    "bytes": 15736,
+    "sha256": "64f9f8c4a4485099a90adb9970afcbfb7d748058c1b9e1365f96643f309b9f18"
+  },
+  "results": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/matched-source-controls/results.json",
+    "bytes": 36382,
+    "sha256": "e4c7d1c0f8a2d55b52709eb8908cbd1b2d496b302836dc736de6f16a0c44407e"
+  }
+}

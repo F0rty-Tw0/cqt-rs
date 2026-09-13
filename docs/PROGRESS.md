@@ -1,5 +1,65 @@
 # Goal progress and evidence
 
+## E011/E012 completed: coverage, alignment and source identity — 2026-09-13
+
+All **288 main native runs plus four matched-source diagnostics** completed.
+[E011](experiments/E011-results.md) compares reference layouts;
+[E012](experiments/E012-results.md) changes only the existing modal option.
+
+| Correct identities | Chunks | Full songs, default | Full songs, modal |
+| --- | ---: | ---: | ---: |
+| Exact database clips | 22/22 | 20/22 | 22/22 |
+| Random clean originals | 22/22 | 22/22 | 22/22 |
+| Frozen mix excerpts | 14/22 | 15/22 | 16/22 |
+| Random mix excerpts | 15/22 | 16/22 | 17/22 |
+| Known music negatives rejected | 8/8 | 8/8 | 8/8 |
+
+The source audit found the publisher’s t05 link supplied Exodus by Marc
+Burt, mislabeled as Roots and Shoots by Dave Kent. The correct recording
+from the publisher-linked Internet Archive release has matching tags and
+five consistent independent STFT anchors around 791–852 seconds. Both new
+layouts use the same corrected 22 songs: 864 independent chunks or 22 full
+references. Preserve historical E010 inputs/results; its t05 did not test
+Roots and Shoots. All mix labels have algorithmic, not human, support.
+
+**Decisions:** reject a blanket switch to default full-song indexing because
+it loses exact controls t18/t22. Modal fitting recovers those controls and
+one additional query in each mix group, without losing a previously correct
+identity, but adds a wrong identity on frozen t01; its strict acceptance rule
+also fails. Keep modal fitting opt-in and defaults unchanged. All 96 paired
+report traces preserve song, evidence, confidence, vote count and timestamps;
+only point estimates, verification and detection events change.
+
+Random t01 at 59.594195 seconds is scored as wrong in all three configurations
+(t02 predicted under a frozen t01 label). Independent post-outcome STFT
+alignment supports both tracks near this time, compatible with overlap or
+cue ambiguity; no relabeling/exclusion is applied. Frozen t01 at 37 seconds
+adds a t02 acceptance only under modal fitting. That additional error remains
+in the gate; the later overlap diagnostic is not proof of its correct label.
+
+The four remaining random modal no-matches (t04/t10/t13/t22) have maximum
+reported confidence only 36.5/38.5/47.4/48.7. All four approximately
+corresponding clean passages are recognized at identical settings; see
+[matched-source diagnostic](experiments/E012-matched-source.md). Investigate
+fingerprint survival in mixed audio; no individual DJ effect is isolated.
+
+Evidence: [raw archives and reproduction](evidence/E011/README.md), with
+source/binary/query/evaluator hashes, complete commands, raw native output,
+independent archive recount, descriptive paired bootstrap intervals and all
+losses. All 18 Python regressions pass. Final-head CI will be recorded in the
+PR after publication; prior green checks do not validate this new head.
+
+Exact audit commands: `python3 scripts/recount_song_index_archives.py`;
+with local audio, `python3 scripts/song_index_report.py --label default-a`
+and `python3 scripts/song_index_modal_report.py --label modal-a`.
+Next research action: establish exclusive first-track cue labels, then
+inspect peak/hash survival on the four mix misses versus their matched
+source controls before changing retrieval. Start with
+`target/chunk-query/binaries/candidate fingerprint target/song-index/queries/mix-t04.wav`.
+This is a known development mix with only 80 seconds of known negatives per
+configuration; no production reliability, speedup, new-recording generality,
+merge or release claim. The broader research goal remains incomplete.
+
 ## E010 execution verified; one annotation gate remains — 2026-09-13
 
 The user requested the same DJ mix with all originals split into ten-second

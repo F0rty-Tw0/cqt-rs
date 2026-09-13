@@ -1,0 +1,68 @@
+[
+  {
+    "file": "inputs-and-provenance.zip",
+    "bytes": 233549,
+    "sha256": "cb09ce9f5e9b7063a23c64b9a8cf791e0d7c839cfe4209a21cebaa50cee361cd",
+    "members": 28
+  },
+  {
+    "file": "default-exact.zip",
+    "bytes": 473375,
+    "sha256": "a7f5baf8246f9315e7d12349309a83adb6ac9ab92b991bbfa9601100e18054f4",
+    "members": 132
+  },
+  {
+    "file": "default-clean.zip",
+    "bytes": 488886,
+    "sha256": "5169a83efdd30f1c5ba79d3e20982e191b0582f848695243b49823e2e5084dc8",
+    "members": 132
+  },
+  {
+    "file": "default-frozen.zip",
+    "bytes": 492516,
+    "sha256": "5f6aaf6e085a616fee89d00ae450eae0c315a5d0c38b1d948a20c7c83d2f97f7",
+    "members": 132
+  },
+  {
+    "file": "default-mix.zip",
+    "bytes": 496998,
+    "sha256": "29c3389f25e10ce3412bf92c884f93004764dff15988b5b5e4f9f3989c2ee8f8",
+    "members": 132
+  },
+  {
+    "file": "default-negative.zip",
+    "bytes": 169443,
+    "sha256": "bb62ed959247c86fbe32acb055ac66ac2d87017b4d0feee4f9d68d1a751b2575",
+    "members": 48
+  },
+  {
+    "file": "modal-exact.zip",
+    "bytes": 96878,
+    "sha256": "b648b7515b617d7ac1f98ddecb74ff7c7fea1541a09201b96d37366edfaa242e",
+    "members": 66
+  },
+  {
+    "file": "modal-clean.zip",
+    "bytes": 98459,
+    "sha256": "9abfb741c17010f58b2a3458f35269ff5a3c6c2381626aefd2ed6999eeb1a15b",
+    "members": 66
+  },
+  {
+    "file": "modal-frozen.zip",
+    "bytes": 105166,
+    "sha256": "c7ec19613a45fa662e0c5cc2c70bc8f4c2ccedc72b646d11aa467fcd4387bc81",
+    "members": 66
+  },
+  {
+    "file": "modal-mix.zip",
+    "bytes": 106718,
+    "sha256": "1c6e13026560eb1bbf040bd1c7b786a350b3230ff599e9c358f30ee9af48e3aa",
+    "members": 66
+  },
+  {
+    "file": "modal-negative.zip",
+    "bytes": 34260,
+    "sha256": "01a0e5f840296bb3de7ed357556f09248a378df705a0a6cc8213cccbf27fcdaf",
+    "members": 24
+  }
+]

@@ -1,0 +1,303 @@
+{
+  "status": "verified-execution",
+  "native_runs": 192,
+  "query_count": 96,
+  "groups": {
+    "exact": {
+      "count": 22,
+      "gains": [],
+      "losses": [
+        "exact-t18",
+        "exact-t22"
+      ],
+      "sides": {
+        "chunks": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 81,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 59
+        },
+        "full": {
+          "outcomes": {
+            "correct": 20,
+            "no-match": 2
+          },
+          "accepted_starts": 21,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 1
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": -9.090909090909092,
+        "interval_95_percentage_points": [
+          -22.727272727272727,
+          0.0
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "clean": {
+      "count": 22,
+      "gains": [],
+      "losses": [],
+      "sides": {
+        "chunks": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 135,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 113
+        },
+        "full": {
+          "outcomes": {
+            "correct": 22
+          },
+          "accepted_starts": 22,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 0.0,
+        "interval_95_percentage_points": [
+          0.0,
+          0.0
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "frozen": {
+      "count": 22,
+      "gains": [
+        "frozen-t13"
+      ],
+      "losses": [],
+      "sides": {
+        "chunks": {
+          "outcomes": {
+            "no-match": 8,
+            "correct": 14
+          },
+          "accepted_starts": 36,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 22
+        },
+        "full": {
+          "outcomes": {
+            "no-match": 7,
+            "correct": 15
+          },
+          "accepted_starts": 16,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 1
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 4.545454545454546,
+        "interval_95_percentage_points": [
+          0.0,
+          13.636363636363635
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "mix": {
+      "count": 22,
+      "gains": [
+        "mix-t14"
+      ],
+      "losses": [],
+      "sides": {
+        "chunks": {
+          "outcomes": {
+            "wrong-match": 1,
+            "correct": 15,
+            "no-match": 6
+          },
+          "accepted_starts": 47,
+          "wrong_parent_starts": 1,
+          "repeated_parent_starts": 31
+        },
+        "full": {
+          "outcomes": {
+            "wrong-match": 1,
+            "correct": 16,
+            "no-match": 5
+          },
+          "accepted_starts": 17,
+          "wrong_parent_starts": 1,
+          "repeated_parent_starts": 0
+        }
+      },
+      "uncertainty": {
+        "delta_percentage_points": 4.545454545454546,
+        "interval_95_percentage_points": [
+          0.0,
+          13.636363636363635
+        ],
+        "method": "paired track bootstrap; 10000 resamples; seed 20260913; conditional descriptive interval"
+      }
+    },
+    "negative": {
+      "count": 8,
+      "gains": [],
+      "losses": [],
+      "sides": {
+        "chunks": {
+          "outcomes": {
+            "correct-rejection": 8
+          },
+          "accepted_starts": 0,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        },
+        "full": {
+          "outcomes": {
+            "correct-rejection": 8
+          },
+          "accepted_starts": 0,
+          "wrong_parent_starts": 0,
+          "repeated_parent_starts": 0
+        }
+      }
+    }
+  },
+  "index": {
+    "chunks": {
+      "songs": 864,
+      "hashes": 4906390,
+      "dropped": 3815,
+      "bytes": 117596936
+    },
+    "full": {
+      "songs": 22,
+      "hashes": 4721918,
+      "dropped": 381286,
+      "bytes": 115383272
+    }
+  },
+  "source_commit": "bace1a92feb7d9e862c21d295fd84df6a6df6626",
+  "binary_sha256": "d3494a5c0ff0a5e5d78548d73877810f3653e666fde59761d83ee5fade1e82cc",
+  "manifest": {
+    "path": "/workspace/scratch/132831d2e64b/cqt-work/target/song-index/manifest.json",
+    "bytes": 524734,
+    "sha256": "41be41c6fccd39e772a4b83ab763a2eda8556ee031267da4496e74982c25cc15"
+  },
+  "exploratory_preference_for_full": false,
+  "acceptance_checks": {
+    "more_mix_correct": true,
+    "no_losses": false,
+    "no_added_wrong_starts": true
+  },
+  "clean_target_met": {
+    "chunks": true,
+    "full": false
+  },
+  "independent_recount": [
+    {
+      "group": "clean",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "clean",
+      "side": "full",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "exact",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 22
+    },
+    {
+      "group": "exact",
+      "side": "full",
+      "outcome": "correct",
+      "count": 20
+    },
+    {
+      "group": "exact",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 2
+    },
+    {
+      "group": "frozen",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 14
+    },
+    {
+      "group": "frozen",
+      "side": "chunks",
+      "outcome": "no-match",
+      "count": 8
+    },
+    {
+      "group": "frozen",
+      "side": "full",
+      "outcome": "correct",
+      "count": 15
+    },
+    {
+      "group": "frozen",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 7
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "correct",
+      "count": 15
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "no-match",
+      "count": 6
+    },
+    {
+      "group": "mix",
+      "side": "chunks",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "correct",
+      "count": 16
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "no-match",
+      "count": 5
+    },
+    {
+      "group": "mix",
+      "side": "full",
+      "outcome": "wrong-match",
+      "count": 1
+    },
+    {
+      "group": "negative",
+      "side": "chunks",
+      "outcome": "correct-rejection",
+      "count": 8
+    },
+    {
+      "group": "negative",
+      "side": "full",
+      "outcome": "correct-rejection",
+      "count": 8
+    }
+  ]
+}
