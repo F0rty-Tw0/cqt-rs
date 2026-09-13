@@ -7,6 +7,12 @@ to validate through repeatable research, regression tests, debugging and
 benchmarks. Treat numerical transform accuracy and song-recognition
 accuracy as separate outcomes.
 
+Run this goal directly in the current chat using the standing instructions
+in [AGENTS.md](../AGENTS.md). Maintain the evidence register and exact next
+action in [PROGRESS.md](PROGRESS.md). This instruction-driven workflow
+does not require native Goal mode. A saved checkpoint preserves continuity;
+it does not create an unattended scheduler.
+
 Baseline: [PR #3](https://github.com/F0rty-Tw0/cqt-rs/pull/3), commit
 `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`, branch
 `claude/cqt-library-analysis-update-87jyuu`. At inspection on 2026-09-13 it
@@ -198,8 +204,8 @@ accept/reject decision; and the next question.
   speed/accuracy improvements are still outstanding. No new speedup or
   recognition improvement is claimed by this checkpoint.
 
-## Ready-to-use goal prompt
+## Standing instruction for this chat
 
 ```text
-/goal Improve F0rty-Tw0/cqt-rs from PR #3 at 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a using docs/GOAL.md as the research and acceptance protocol. Reproduce the baseline, freeze a recording-disjoint evaluation corpus, research and test numerical accuracy, debug failures, profile and benchmark realistic workloads, and run the ordered experiments. Keep changes only when before/after evidence supports their accuracy, latency, memory and runtime tradeoffs. Preserve stream/batch parity, public API semantics and unsafe-code prohibition. Deliver focused draft PRs, regression cases, reproducible measurements and an experiment log including rejected ideas. Report blocked gates honestly; do not merge or release automatically.
+Use AGENTS.md to pursue the cqt-rs goal in this chat. Resume from docs/PROGRESS.md, apply docs/GOAL.md, choose the next unblocked experiment, establish its baseline and acceptance criteria, implement and verify it, and record proof before claiming success. Continue useful authorized work without repeated permission requests. Preserve failed cases and rejected ideas; never weaken evidence or count a blocker as completion. Checkpoint the exact next action before yielding. Deliver measured improvements as focused draft PRs; do not merge or release automatically.
 ```
