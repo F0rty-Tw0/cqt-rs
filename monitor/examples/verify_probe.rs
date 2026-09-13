@@ -58,9 +58,14 @@ fn main() {
                 iterations += 16;
             }
             let elapsed = started.elapsed().as_secs_f64();
-            println!("{{\"case\":\"{name}_{kind}\",\"reference_size\":{size},\"query_size\":{count},\"iterations\":{iterations},\"elapsed_seconds\":{elapsed},\"ns_per_call\":{},\"counts\":[{},{},{},{}]}}",
+            println!(
+                "{{\"case\":\"{name}_{kind}\",\"reference_size\":{size},\"query_size\":{count},\"iterations\":{iterations},\"elapsed_seconds\":{elapsed},\"ns_per_call\":{},\"counts\":[{},{},{},{}]}}",
                 elapsed * 1e9 / iterations as f64,
-                expected.query_peaks, expected.query_matched, expected.reference_peaks, expected.reference_matched);
+                expected.query_peaks,
+                expected.query_matched,
+                expected.reference_peaks,
+                expected.reference_matched
+            );
         }
     }
 }
