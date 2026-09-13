@@ -26,7 +26,6 @@ jobs:
           cargo fmt --all
           git diff --binary > target/recognition-lab/formatting.patch
           git restore .
-          cp "$(rustup which rustfmt)" target/recognition-lab/rustfmt
       - name: Build pinned baselines and candidate
         run: |
           set -eu

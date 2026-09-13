@@ -381,11 +381,11 @@ fn main() {
         },
         cqt.latency_samples() as f64 / f64::from(sample_rate),
         delay as f64 / frames_per_second,
-        opts.window,
+        opts.sequence_seconds.unwrap_or(opts.window),
         opts.half,
         opts.threshold,
         opts.fan_out,
-        opts.verify_seconds,
+        opts.sequence_seconds.unwrap_or(opts.verify_seconds),
         opts.verify_start,
         opts.verify_hold
     )

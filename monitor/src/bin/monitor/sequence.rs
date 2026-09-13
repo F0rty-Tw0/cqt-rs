@@ -202,8 +202,8 @@ impl Sequence {
         loop {
             // Round cumulative boundaries: five two-second observations must
             // fit a ten-second excerpt despite a nonintegral frame rate.
-            let next = ((self.observation_number + 1) as f64 * self.frames_per_observation)
-                .round() as u64;
+            let next =
+                ((self.observation_number + 1) as f64 * self.frames_per_observation).round() as u64;
             if next > horizon && !(eof && self.begin < horizon) {
                 break;
             }
