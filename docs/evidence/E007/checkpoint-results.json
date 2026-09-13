@@ -1,0 +1,32 @@
+[
+  {
+    "side": "baseline",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_real_mix_checkpoint.py",
+      "-v"
+    ],
+    "returncode": 1
+  },
+  {
+    "side": "candidate",
+    "command": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "scripts",
+      "-p",
+      "test_real_mix_checkpoint.py",
+      "-v"
+    ],
+    "returncode": 0
+  }
+]

@@ -1,0 +1,161 @@
+{
+  "seed": 20260913,
+  "catalog": [
+    "2021",
+    "2020",
+    "2019",
+    "2018",
+    "2017",
+    "2016",
+    "2015",
+    "10years",
+    "2014",
+    "2011-13"
+  ],
+  "selected": "2020",
+  "source_page": "https://www.toucanmusic.com/mixes/tou2020",
+  "mix_url": "https://www.toucanmusic.com/ccount/click.php?id=393",
+  "license": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+  "tracks": [
+    {
+      "id": "t01",
+      "title": "Sleep Tight (Sergio's Last Remix)",
+      "artist": "Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=191"
+    },
+    {
+      "id": "t02",
+      "title": "Proven Reality",
+      "artist": "JVS",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=282"
+    },
+    {
+      "id": "t03",
+      "title": "Turbulence (2020 Remix)",
+      "artist": "Marc Burt",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=379"
+    },
+    {
+      "id": "t04",
+      "title": "Beautiful Geometry",
+      "artist": "Phish Funk",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=257"
+    },
+    {
+      "id": "t05",
+      "title": "Roots and Shoots",
+      "artist": "Dave Kent",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=4"
+    },
+    {
+      "id": "t06",
+      "title": "Scratching The Surface (Phish Funk Disco Mix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=296"
+    },
+    {
+      "id": "t07",
+      "title": "Chasing Rainbows (Marc Burt and Notch remix)",
+      "artist": "Frau Holle",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=257"
+    },
+    {
+      "id": "t08",
+      "title": "Flaw 24 (extended mix)",
+      "artist": "Notch",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=299"
+    },
+    {
+      "id": "t09",
+      "title": "Turn The Corner (Notch remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=240"
+    },
+    {
+      "id": "t10",
+      "title": "Pioneers",
+      "artist": "Marc Burt",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=253"
+    },
+    {
+      "id": "t11",
+      "title": "Tears In My Heart (Notch remix)",
+      "artist": "Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=265"
+    },
+    {
+      "id": "t12",
+      "title": "Beast",
+      "artist": "Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=289"
+    },
+    {
+      "id": "t13",
+      "title": "The Piano Tune",
+      "artist": "Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=251"
+    },
+    {
+      "id": "t14",
+      "title": "Baby Crying",
+      "artist": "Fioko",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=298"
+    },
+    {
+      "id": "t15",
+      "title": "Electronaut (edit)",
+      "artist": "Aerologic",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=159"
+    },
+    {
+      "id": "t16",
+      "title": "Dancefloor Virus 2007",
+      "artist": "Silverknight & Beat Doctor",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=215"
+    },
+    {
+      "id": "t17",
+      "title": "Plastic Explosive (Aerologic Remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=7"
+    },
+    {
+      "id": "t18",
+      "title": "Aquarius (JMD Remix)",
+      "artist": "Phish Funk",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=340"
+    },
+    {
+      "id": "t19",
+      "title": "Body Sensations (original mix)",
+      "artist": "Base II",
+      "url": "https://www.toucanmusic.com/dcount/click.php?id=305"
+    },
+    {
+      "id": "t20",
+      "title": "By The Water (Aerologic remix)",
+      "artist": "Space Invaderz & Psychadelik Pedestrian",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=372"
+    },
+    {
+      "id": "t21",
+      "title": "On Target (Remix)",
+      "artist": "JMD",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=333"
+    },
+    {
+      "id": "t22",
+      "title": "Are You Feeling It? (Rawbase Remix)",
+      "artist": "Redmann",
+      "url": "https://www.toucanmusic.com/ccount/click.php?id=133"
+    }
+  ],
+  "reference_rule": "10 seconds centered at source duration / 2, selected before detector output",
+  "semitones": 2,
+  "tempo": 0.9,
+  "voice_period_seconds": 30,
+  "voice_duration_seconds": 12,
+  "voice_music_rms_db": 0,
+  "baseline_commit": "7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a",
+  "candidate_commit": "176bce2fef1d1463ff7b815f4f0ee62a21deb435"
+}

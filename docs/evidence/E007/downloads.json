@@ -1,0 +1,738 @@
+{
+  "t02": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=282",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=282",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t02.mp3",
+      "bytes": 13752840,
+      "sha256": "8dcc6441e902f74be6d5d306f1e6516a70adeaa5effc4eb3efc22dbfa9e8ee83"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t02.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t02.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=282"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.733378921999986,
+      "stderr": ""
+    }
+  },
+  "t01": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=191",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=191",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t01.mp3",
+      "bytes": 12334746,
+      "sha256": "bcc9f75c93392f6c16961304f9054377bc9ea3be39fda5e7705b546367950f7b"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t01.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t01.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=191"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 6.052017049999989,
+      "stderr": ""
+    }
+  },
+  "t03": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=379",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=379",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t03.mp3",
+      "bytes": 14135104,
+      "sha256": "68bc338344ca351739912ef17190f5779fa713e8824fa266febe332f2e81a18f"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t03.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t03.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=379"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.627046968000002,
+      "stderr": ""
+    }
+  },
+  "t04": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=257",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=257",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t04.mp3",
+      "bytes": 11509760,
+      "sha256": "97d984243dbe0c3866916ddb7a15b5fe0789e9fb7cb70260fd3783e6ba65f151"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t04.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t04.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=257"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.622004867000015,
+      "stderr": ""
+    }
+  },
+  "mix": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=393",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=393",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/mix.mp3",
+      "bytes": 173972711,
+      "sha256": "39d7923a20de5053d56d126eb499a2f6fe7de2cd393a1310566a3e826d72e103"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/mix.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/mix.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=393"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 16.752872381999993,
+      "stderr": ""
+    }
+  },
+  "t06": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=296",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=296",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t06.mp3",
+      "bytes": 8248945,
+      "sha256": "62e08836dde023f5b5af9c07ddc9ebd34705a2eb4d5e197357d5f7974eae7a78"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t06.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t06.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=296"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.2309134139999856,
+      "stderr": ""
+    }
+  },
+  "t05": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=4",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=4",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t05.mp3",
+      "bytes": 12324864,
+      "sha256": "14f56f2f8312eeb2a90f808792e932f324610cffc8cbed2ade50a9ed6cba0855"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t05.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t05.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=4"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.841281530999993,
+      "stderr": ""
+    }
+  },
+  "t08": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=299",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=299",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t08.mp3",
+      "bytes": 10900404,
+      "sha256": "b79fd5e01c14339cff8325e9f388496f674f705b97959549cec1c0777722b2c2"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t08.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t08.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=299"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.32160700999998,
+      "stderr": ""
+    }
+  },
+  "t09": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=240",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=240",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t09.mp3",
+      "bytes": 11227178,
+      "sha256": "2554e549627fd8d598270c4a5ec60d8b7494893d09ffce46953ad20ba122dbab"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t09.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t09.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=240"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.481860121000011,
+      "stderr": ""
+    }
+  },
+  "t07": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=257",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=257",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t07.mp3",
+      "bytes": 13918890,
+      "sha256": "9688319fe8c8534e509bebe73d2cf5cd430deeab9c6a7953779d32c6ead3fb19"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t07.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t07.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=257"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.893546934,
+      "stderr": ""
+    }
+  },
+  "t10": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=253",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=253",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t10.mp3",
+      "bytes": 7940096,
+      "sha256": "1b71495a7dfe8e2722bb6bbdf2a608b36516ff3a00b35b5ec7aad4abdc5076b8"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t10.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t10.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=253"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.434045760999993,
+      "stderr": ""
+    }
+  },
+  "t12": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=289",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=289",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t12.mp3",
+      "bytes": 9325383,
+      "sha256": "0dca2b13e0dc89341b33f21015d2739e1e811a42cd44f32ba5a2024b394b7851"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t12.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t12.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=289"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.606963960000002,
+      "stderr": ""
+    }
+  },
+  "t11": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=265",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=265",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t11.mp3",
+      "bytes": 13691882,
+      "sha256": "e4e5b43fb2761113a04fc74bf64da4f090d3f6ad698a454de428c21a68a9fbac"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t11.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t11.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=265"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.747037405000015,
+      "stderr": ""
+    }
+  },
+  "t13": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=251",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=251",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t13.mp3",
+      "bytes": 10184704,
+      "sha256": "5d588272889ed6ec36185f1fac8b272174c05ea0bbe887fadd20fdc37614cc52"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t13.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t13.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=251"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.583992685999988,
+      "stderr": ""
+    }
+  },
+  "t15": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=159",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=159",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t15.mp3",
+      "bytes": 11547751,
+      "sha256": "f6bbedd357bda90fd0d483de47f66bd24c081a4ffa784fd0dac9e992acac1010"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t15.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t15.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=159"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.4210389330000055,
+      "stderr": ""
+    }
+  },
+  "t14": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=298",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=298",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t14.mp3",
+      "bytes": 13324416,
+      "sha256": "39d61078b5511e34f4271751255881603b01a0ffb5d4f4c857b3d78246b46e36"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t14.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t14.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=298"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.880903400999983,
+      "stderr": ""
+    }
+  },
+  "t16": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=215",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=215",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t16.mp3",
+      "bytes": 10555392,
+      "sha256": "79620382cf3221654296b812de88f1fe5ca81208a86c99fab9a847bd10077949"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t16.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t16.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=215"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.674377789000005,
+      "stderr": ""
+    }
+  },
+  "t17": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=7",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=7",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t17.mp3",
+      "bytes": 9548494,
+      "sha256": "7915e5b1d390997aa0b8e4c5ef3df2de2f87e0eea8eb450ab2394adf14323c66"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t17.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t17.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=7"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.143255075000013,
+      "stderr": ""
+    }
+  },
+  "t18": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=340",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=340",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t18.mp3",
+      "bytes": 10398666,
+      "sha256": "62d19612420fc3e15ffcf54bd445e72bb535df04d1efd41e9f06e3be6078ca05"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t18.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t18.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=340"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.762571192999985,
+      "stderr": ""
+    }
+  },
+  "t19": {
+    "url": "https://www.toucanmusic.com/dcount/click.php?id=305",
+    "resolved_url": "https://www.toucanmusic.com/dcount/click.php?id=305",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t19.mp3",
+      "bytes": 11456376,
+      "sha256": "5e14abcf805d6ce5f5278948ef73182ef7d5ca372a55f28dc0fc855cf82f97d6"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t19.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t19.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/dcount/click.php?id=305"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.615182463999986,
+      "stderr": ""
+    }
+  },
+  "t20": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=372",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=372",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t20.mp3",
+      "bytes": 13273384,
+      "sha256": "dd2ec4edd4d550c9efb370f9ef57c20c697f5b04fa49d73d759ba886c5d8402a"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t20.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t20.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=372"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.820896446000006,
+      "stderr": ""
+    }
+  },
+  "t21": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=333",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=333",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t21.mp3",
+      "bytes": 12740849,
+      "sha256": "8d09c6d17b54f0f80d0d440f8e3c60cded6fe1f9a82ebdf2ff67a6bb0ecf696e"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t21.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t21.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=333"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 6.49233065300001,
+      "stderr": ""
+    }
+  },
+  "t22": {
+    "url": "https://www.toucanmusic.com/ccount/click.php?id=133",
+    "resolved_url": "https://www.toucanmusic.com/ccount/click.php?id=133",
+    "file": {
+      "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t22.mp3",
+      "bytes": 8515584,
+      "sha256": "4e53781afbc2e0e92f2d9b9ef746d933b708b0f62f8fd36c27125ba88229a657"
+    },
+    "command": {
+      "command": [
+        "curl",
+        "--fail",
+        "--location",
+        "--silent",
+        "--show-error",
+        "--retry",
+        "2",
+        "--max-time",
+        "300",
+        "--dump-header",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t22.headers.txt",
+        "--output",
+        "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/t22.mp3",
+        "--write-out",
+        "%{url_effective}",
+        "https://www.toucanmusic.com/ccount/click.php?id=133"
+      ],
+      "returncode": 0,
+      "elapsed_seconds": 5.3645343000000025,
+      "stderr": ""
+    }
+  }
+}

@@ -30,34 +30,68 @@ stage performance; independent accuracy and end-to-end gains are unproved.
 | E004 | planned | Independent recognition evaluation | Corpus/splits and executable run not yet prepared; existing radio results remain development validation. |
 | E005 | verified | Verifier searches a bounded reference interval with exact count parity; large synthetic cases use 31–34% less time | Five alternating process pairs, 3,030 oracle combinations, ten checks at `7e529dc8`; all raw results/hash review in [experiment](experiments/E005-verifier-window.md). Whole-reference cases regress about 0.1%; real-monitor benefit remains unproved. |
 
+E007 primary counts are reviewed with explicit incomplete diagnostics and
+missing binary identities; E008 is planned only. See the records below.
+
 The CI snapshot records observed GitHub metadata, not copies of compiler
 or test logs. Follow the run/job URLs for logs; preserve logs/artifacts
 needed for later acceptance decisions before they expire.
 
-## Active user-requested task: E007, real-mix recognition
+## User-requested task: E007, real-mix recognition
 
-The user requested an actual royalty-free stream comparison with ten-second
-references, raised pitch, reduced BPM and voiceover. This supersedes the
-next profiling step. The frozen protocol is in
-[experiments/E007-real-mix.md](experiments/E007-real-mix.md).
+[Draft PR #8](https://github.com/F0rty-Tw0/cqt-rs/pull/8) implements the
+real-audio harness, frozen sources, transforms and report. The requested
+short-reference matrix completed. [Full findings](experiments/E007-results.md)
+and [proof/failure record](evidence/E007/README.md) retain every miss.
 
-Random seed 20260913 selected Toucan Music 2005 to 2020: 22 listed tracks,
-about 90 minutes. References are clean ten-second midpoint clips; the full
-mix is tested clean, pitch-only +2 semitones, tempo-only 0.9, and combined
-with 12-second voiceovers every 30 seconds at equal local RMS. Full-track
-references, original-clip self-recognition and speech/silence are controls.
-No detector settings are tuned. Source licenses and all hashes are recorded.
+| Stream / ten-second references | PR #3 | PR #7 |
+| --- | ---: | ---: |
+| Clean | 14/22 | 14/22 |
+| Pitch +2 semitones | 12/22 | 12/22 |
+| Tempo 0.9 | 12/22 | 12/22 |
+| Both plus recurring voiceover | 5/22 | 5/22 |
 
-Local audio-transform validation passed: independent tempo/pitch on a known
-tone, equal-RMS speech and partial-block sample counts. Real-binary results
-are pending. CI builds pinned PR #3 and current PR #7 with one toolchain
-and lockfile, then runs the same audio through both. Inspect every miss,
-raw events and artifacts before claiming recognition coverage. Cue times
-are unavailable, so exact onset latency and in-mix false-start precision
-are not independently established.
+All six completed pairs have identical non-timing events. Self-control is
+21/22; five minutes of speech/silence produces zero starts. This is track-list
+coverage on one 90.61-minute mix, not independently timed per-play recall.
+No recognition gain or real-monitor speedup is established.
 
-Next: inspect the real-mix workflow and retrieve its evidence. Do not change
-reference excerpts or thresholds after opening the results.
+E007 status: **blocked for full acceptance**. Thirteen of sixteen runs
+finished at harness `64bc53d448697f860586139bb256c9b1764e982b`. Full-reference
+PR #3 clean finds 20/22; PR #7 clean was interrupted by the 35-minute job
+limit, and both combined full-reference cases never started. The artifact
+ZIP hash and 26 completed raw-output hashes were checked; all counts and
+six event-parity pairs were recomputed. Binary identities were lost when
+cancellation skipped the old final metadata write. Pinned source/toolchain
+logs survive but are not substitutes for missing executable hashes.
+
+The metadata-loss defect is reproduced with SIGKILL: the original harness
+fails and the repaired harness passes. Identities now persist before work
+and JSON checkpoints are atomic. The workflow is manual, with a 60-minute
+evaluation step inside a 65-minute job; the heavier experiment has not
+been rerun. Normal correctness CI passed all nine checks at `64bc53d`.
+Do not transfer that green status automatically to this later repair.
+
+The user also asked about EQ. [E008](experiments/E008-eq-plan.md) records
+architectural expectations and an explicit planned EQ sweep. EQ robustness
+is unmeasured; confidence scores are not calibrated probabilities.
+
+Exact proof recheck (download/extract the original linked artifact first):
+
+```sh
+python3 scripts/report_real_mix.py target/real-mix-first --allow-incomplete --report docs/experiments/E007-results.md --validation docs/evidence/E007/validation.json
+python3 -m unittest discover -s scripts -p 'test_real_mix_checkpoint.py' -v
+```
+
+Next bounded execution: reproduce E007 with the repaired harness and the
+same pinned binaries/sources/settings on a Rust-capable host, allowing the
+full 65-minute job budget; use the build/run commands in the evidence
+README. Do not reclassify unfinished full-reference cases as completed.
+The observed t01 original-snippet miss is the next detector-debugging case:
+confidence reaches 94.8 while high-confidence reports never reach the
+0.4 alignment start gate. Preserve this failure and investigate its position
+hypotheses without tuning on the frozen mix. EQ needs its own frozen
+parameters and unwatched-music controls before any reliability claim.
 
 ## Remaining gates and unblock actions
 

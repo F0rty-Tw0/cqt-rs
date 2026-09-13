@@ -1,0 +1,50 @@
+{
+  "clean": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-clean.wav",
+    "bytes": 479500450,
+    "sha256": "72086645155a9a4f20649cb7afb24e4501bafd2b073dc31a4ccc92faa878a7bb",
+    "samples": 239750125,
+    "seconds": 5436.510770975056,
+    "rate": 44100
+  },
+  "pitch": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-pitch.wav",
+    "bytes": 479500450,
+    "sha256": "b34eb772a2bc8ecf7a246b4e534d5e09670e64cda87d60fbcff399cd7d85645d",
+    "samples": 239750125,
+    "seconds": 5436.510770975056,
+    "rate": 44100
+  },
+  "tempo": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-tempo.wav",
+    "bytes": 532778256,
+    "sha256": "346bf3891f12b412b94cffab310028229a5257282b7f26e761e5b760cd4531b6",
+    "samples": 266389028,
+    "seconds": 6040.567528344671,
+    "rate": 44100
+  },
+  "combined": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-combined.wav",
+    "bytes": 532778100,
+    "sha256": "a17e2945919347f6e5ae43aa6a890c461d9c3bc952d5ef8fcb43cb6e349e5f43",
+    "samples": 266389028,
+    "seconds": 6040.567528344671,
+    "rate": 44100
+  },
+  "self": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-self.wav",
+    "bytes": 48510044,
+    "sha256": "51128ed44bc8b77e541c5d55daba3ac6b3ccdf9e91d3869d870ff0e118e0b19e",
+    "samples": 24255000,
+    "seconds": 550.0,
+    "rate": 44100
+  },
+  "negative": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/stream-negative.wav",
+    "bytes": 26460044,
+    "sha256": "7bfd4ee6ba11b99d03c72d16fd0e416ee4b67bc1a05bf084ce41bdfe10f77d04",
+    "samples": 13230000,
+    "seconds": 300.0,
+    "rate": 44100
+  }
+}

@@ -1,0 +1,14 @@
+test_hard_kill_preserves_running_identities (test_real_mix_checkpoint.CancellationCheckpoint.test_hard_kill_preserves_running_identities) ... FAIL
+
+======================================================================
+FAIL: test_hard_kill_preserves_running_identities (test_real_mix_checkpoint.CancellationCheckpoint.test_hard_kill_preserves_running_identities)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/workspace/scratch/bb1c840e177b/cqt-stream/target/checkpoint-regression/baseline/scripts/test_real_mix_checkpoint.py", line 35, in test_hard_kill_preserves_running_identities
+    self.assertTrue(checkpoint.exists(), "cancellation erased the only identity checkpoint")
+AssertionError: False is not true : cancellation erased the only identity checkpoint
+
+----------------------------------------------------------------------
+Ran 1 test in 0.193s
+
+FAILED (failures=1)

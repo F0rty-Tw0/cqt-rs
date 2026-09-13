@@ -1,11 +1,7 @@
 name: Real mix recognition experiment
 
 on:
-  pull_request:
-    paths:
-      - scripts/real_mix_eval.py
-      - experiments/toucan2020.json
-      - .github/workflows/real-mix-evaluation.yml
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -13,17 +9,17 @@ permissions:
 jobs:
   real-mix:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
+    timeout-minutes: 65
     env:
       RAYON_NUM_THREADS: 1
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.pull_request.head.sha }}
+          ref: ${{ github.sha }}
           fetch-depth: 0
       - uses: dtolnay/rust-toolchain@master
         with:
-          toolchain: "1.98"
+          toolchain: "1.98.1"
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
@@ -35,7 +31,7 @@ jobs:
           ffmpeg -hide_banner -filters 2>/dev/null | grep -E 'rubberband|flite'
       - name: Build pinned implementations with the same lockfile
         run: |
-          cargo generate-lockfile
+          cp docs/evidence/E007/Cargo.lock.txt Cargo.lock
           git worktree add --detach "$RUNNER_TEMP/mix-baseline" 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a
           git worktree add --detach "$RUNNER_TEMP/mix-candidate" 176bce2fef1d1463ff7b815f4f0ee62a21deb435
           cp Cargo.lock "$RUNNER_TEMP/mix-baseline/Cargo.lock"
@@ -43,6 +39,7 @@ jobs:
           cargo build --release --locked -p cqt-monitor --manifest-path "$RUNNER_TEMP/mix-baseline/Cargo.toml" --target-dir "$RUNNER_TEMP/mix-baseline-build"
           cargo build --release --locked -p cqt-monitor --manifest-path "$RUNNER_TEMP/mix-candidate/Cargo.toml" --target-dir "$RUNNER_TEMP/mix-candidate-build"
       - name: Evaluate the real mix and controls
+        timeout-minutes: 60
         run: |
           python scripts/real_mix_eval.py --baseline "$RUNNER_TEMP/mix-baseline-build/release/monitor" --candidate "$RUNNER_TEMP/mix-candidate-build/release/monitor"
       - name: Preserve source and host identities
@@ -62,6 +59,6 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: real-mix-${{ github.event.pull_request.head.sha }}
+          name: real-mix-${{ github.sha }}
           path: target/real-mix/evidence
           retention-days: 90

@@ -1,6 +1,6 @@
 # E007: ten-second references against an independently produced DJ mix
 
-Status: running. Requested by the user on 2026-09-13; this takes priority
+Status: blocked for full acceptance; primary counts reviewed. Requested by the user on 2026-09-13; this takes priority
 over the next profiling task. No detector thresholds or algorithms change.
 
 ## Frozen design, before recognition results
@@ -68,4 +68,22 @@ source identities and tool versions as the proof artifact.
 
 ## Results
 
-Pending execution. Do not interpret this protocol as a completed test.
+The primary short-reference matrix and both controls completed: 14/22 clean,
+12/22 pitch, 12/22 tempo and 5/22 combined in both versions. All six
+completed pairs have identical non-timing events. The self-control finds
+21/22; the speech/silence control emits zero starts in five minutes.
+
+Thirteen of sixteen planned runs finished before the 35-minute job limit.
+The completed full-reference PR #3 clean diagnostic finds 20/22; PR #7
+clean was interrupted and both combined full-reference runs never began.
+Actual executable hashes were lost because cancellation skipped the
+original final metadata write. This proof gap is explicit, not repaired
+retroactively. See [all findings](E007-results.md) and
+[validated evidence](../evidence/E007/README.md).
+
+The harness now atomically persists identities before expensive work.
+A hard-kill reproducer fails on the executed harness and passes on the
+repair. The heavy workflow is manual with a 65-minute job budget and
+60-minute evaluation-step budget, allowing evidence upload after a step
+timeout. These changes have not been used to rerun this audio experiment.
+No threshold, clip, detector source or frozen treatment changed.

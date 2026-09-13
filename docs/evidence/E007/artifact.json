@@ -1,0 +1,15 @@
+{
+  "run_url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34755314457",
+  "job_url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34755314457/job/103718583013",
+  "artifact_url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34755314457/artifacts/10316868225",
+  "artifact_id": 10316868225,
+  "zip_bytes": 7557215,
+  "zip_sha256": "1c9528f87339f10f478f94d6daa34f3b47326f9c5ddf66fb0a3ad6e2e926f64e",
+  "expires_at": "2026-12-12T11:46:39Z",
+  "harness_commit": "64bc53d448697f860586139bb256c9b1764e982b",
+  "harness_sha256": "9b732afbdeef985482405cd5bc257ea84883d94d40514adadcd0721b16a0a36a",
+  "job_conclusion": "cancelled",
+  "completed_runs": 13,
+  "planned_runs": 16,
+  "binary_hashes_available": false
+}

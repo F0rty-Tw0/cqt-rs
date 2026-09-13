@@ -1,0 +1,6 @@
+test_hard_kill_preserves_running_identities (test_real_mix_checkpoint.CancellationCheckpoint.test_hard_kill_preserves_running_identities) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.199s
+
+OK

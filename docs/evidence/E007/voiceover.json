@@ -1,0 +1,1426 @@
+{
+  "voice": {
+    "path": "/home/runner/work/cqt-rs/cqt-rs/target/real-mix/media/voice.wav",
+    "bytes": 1312936,
+    "sha256": "3e14d9f4429d908adc74126b275c37509d035d276bbd0b8beab502fbfcf4fffb"
+  },
+  "spans": [
+    {
+      "start": 0,
+      "end": 12.0,
+      "music_rms_before": 0.05246489572794678,
+      "speech_rms_before_scale": 0.05246489572794678,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 30,
+      "end": 42.0,
+      "music_rms_before": 0.060043156987470016,
+      "speech_rms_before_scale": 0.060043156987470016,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 60,
+      "end": 72.0,
+      "music_rms_before": 0.06419143760066982,
+      "speech_rms_before_scale": 0.06419143760066982,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 90,
+      "end": 102.0,
+      "music_rms_before": 0.06589381036084829,
+      "speech_rms_before_scale": 0.06589381036084829,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 120,
+      "end": 132.0,
+      "music_rms_before": 0.05041385716238837,
+      "speech_rms_before_scale": 0.05041385716238837,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 150,
+      "end": 162.0,
+      "music_rms_before": 0.06620783280079914,
+      "speech_rms_before_scale": 0.06620783280079913,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 180,
+      "end": 192.0,
+      "music_rms_before": 0.0668211918956706,
+      "speech_rms_before_scale": 0.0668211918956706,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 210,
+      "end": 222.0,
+      "music_rms_before": 0.06830094126136281,
+      "speech_rms_before_scale": 0.06830094126136281,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 240,
+      "end": 252.0,
+      "music_rms_before": 0.06978171004688041,
+      "speech_rms_before_scale": 0.06978171004688041,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 270,
+      "end": 282.0,
+      "music_rms_before": 0.07087206517381359,
+      "speech_rms_before_scale": 0.07087206517381359,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 300,
+      "end": 312.0,
+      "music_rms_before": 0.050536841975991384,
+      "speech_rms_before_scale": 0.050536841975991384,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 330,
+      "end": 342.0,
+      "music_rms_before": 0.04239785564179249,
+      "speech_rms_before_scale": 0.04239785564179249,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 360,
+      "end": 372.0,
+      "music_rms_before": 0.05330193087547148,
+      "speech_rms_before_scale": 0.05330193087547148,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 390,
+      "end": 402.0,
+      "music_rms_before": 0.05517485344057026,
+      "speech_rms_before_scale": 0.05517485344057026,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 420,
+      "end": 432.0,
+      "music_rms_before": 0.05574839215057714,
+      "speech_rms_before_scale": 0.05574839215057714,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 450,
+      "end": 462.0,
+      "music_rms_before": 0.05516579654552286,
+      "speech_rms_before_scale": 0.05516579654552286,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 480,
+      "end": 492.0,
+      "music_rms_before": 0.05262723171781492,
+      "speech_rms_before_scale": 0.05262723171781492,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 510,
+      "end": 522.0,
+      "music_rms_before": 0.05096097117355282,
+      "speech_rms_before_scale": 0.05096097117355282,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 540,
+      "end": 552.0,
+      "music_rms_before": 0.0512092606106514,
+      "speech_rms_before_scale": 0.0512092606106514,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 570,
+      "end": 582.0,
+      "music_rms_before": 0.046228251827400556,
+      "speech_rms_before_scale": 0.046228251827400556,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 600,
+      "end": 612.0,
+      "music_rms_before": 0.055557012685990566,
+      "speech_rms_before_scale": 0.055557012685990566,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 630,
+      "end": 642.0,
+      "music_rms_before": 0.047703739029717224,
+      "speech_rms_before_scale": 0.047703739029717224,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 660,
+      "end": 672.0,
+      "music_rms_before": 0.01443888657974945,
+      "speech_rms_before_scale": 0.01443888657974945,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 690,
+      "end": 702.0,
+      "music_rms_before": 0.01815964820413189,
+      "speech_rms_before_scale": 0.01815964820413189,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 720,
+      "end": 732.0,
+      "music_rms_before": 0.02682981611852293,
+      "speech_rms_before_scale": 0.02682981611852293,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 750,
+      "end": 762.0,
+      "music_rms_before": 0.05767125377394094,
+      "speech_rms_before_scale": 0.057671253773940945,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 780,
+      "end": 792.0,
+      "music_rms_before": 0.05827276419956289,
+      "speech_rms_before_scale": 0.058272764199562885,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 810,
+      "end": 822.0,
+      "music_rms_before": 0.05742834579721374,
+      "speech_rms_before_scale": 0.05742834579721374,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 840,
+      "end": 852.0,
+      "music_rms_before": 0.06740079452858638,
+      "speech_rms_before_scale": 0.06740079452858638,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 870,
+      "end": 882.0,
+      "music_rms_before": 0.0634603303187321,
+      "speech_rms_before_scale": 0.0634603303187321,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 900,
+      "end": 912.0,
+      "music_rms_before": 0.07020590619055504,
+      "speech_rms_before_scale": 0.07020590619055504,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 930,
+      "end": 942.0,
+      "music_rms_before": 0.0740709639493168,
+      "speech_rms_before_scale": 0.0740709639493168,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 960,
+      "end": 972.0,
+      "music_rms_before": 0.07776520221090462,
+      "speech_rms_before_scale": 0.07776520221090462,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 990,
+      "end": 1002.0,
+      "music_rms_before": 0.06954948550358057,
+      "speech_rms_before_scale": 0.06954948550358057,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1020,
+      "end": 1032.0,
+      "music_rms_before": 0.04422538116609987,
+      "speech_rms_before_scale": 0.04422538116609987,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1050,
+      "end": 1062.0,
+      "music_rms_before": 0.045984938818959334,
+      "speech_rms_before_scale": 0.045984938818959334,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1080,
+      "end": 1092.0,
+      "music_rms_before": 0.04754766188053735,
+      "speech_rms_before_scale": 0.04754766188053735,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1110,
+      "end": 1122.0,
+      "music_rms_before": 0.05146048923664164,
+      "speech_rms_before_scale": 0.05146048923664164,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1140,
+      "end": 1152.0,
+      "music_rms_before": 0.055888065679448866,
+      "speech_rms_before_scale": 0.055888065679448866,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1170,
+      "end": 1182.0,
+      "music_rms_before": 0.05805107545751444,
+      "speech_rms_before_scale": 0.05805107545751444,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1200,
+      "end": 1212.0,
+      "music_rms_before": 0.05872141553418795,
+      "speech_rms_before_scale": 0.05872141553418795,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1230,
+      "end": 1242.0,
+      "music_rms_before": 0.0596484505365702,
+      "speech_rms_before_scale": 0.0596484505365702,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1260,
+      "end": 1272.0,
+      "music_rms_before": 0.05689829653050343,
+      "speech_rms_before_scale": 0.05689829653050343,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1290,
+      "end": 1302.0,
+      "music_rms_before": 0.05699778842943538,
+      "speech_rms_before_scale": 0.05699778842943538,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1320,
+      "end": 1332.0,
+      "music_rms_before": 0.05937545369169022,
+      "speech_rms_before_scale": 0.05937545369169022,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1350,
+      "end": 1362.0,
+      "music_rms_before": 0.05712371796092647,
+      "speech_rms_before_scale": 0.05712371796092647,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1380,
+      "end": 1392.0,
+      "music_rms_before": 0.060458208553194205,
+      "speech_rms_before_scale": 0.060458208553194205,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1410,
+      "end": 1422.0,
+      "music_rms_before": 0.03655814384561098,
+      "speech_rms_before_scale": 0.03655814384561098,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1440,
+      "end": 1452.0,
+      "music_rms_before": 0.05810449310486744,
+      "speech_rms_before_scale": 0.05810449310486744,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1470,
+      "end": 1482.0,
+      "music_rms_before": 0.05868508238328421,
+      "speech_rms_before_scale": 0.05868508238328421,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1500,
+      "end": 1512.0,
+      "music_rms_before": 0.05957192625647988,
+      "speech_rms_before_scale": 0.05957192625647988,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1530,
+      "end": 1542.0,
+      "music_rms_before": 0.03830796122591805,
+      "speech_rms_before_scale": 0.03830796122591805,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1560,
+      "end": 1572.0,
+      "music_rms_before": 0.05894604253504117,
+      "speech_rms_before_scale": 0.05894604253504116,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1590,
+      "end": 1602.0,
+      "music_rms_before": 0.051685818324078266,
+      "speech_rms_before_scale": 0.051685818324078266,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1620,
+      "end": 1632.0,
+      "music_rms_before": 0.06041850316663002,
+      "speech_rms_before_scale": 0.06041850316663002,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1650,
+      "end": 1662.0,
+      "music_rms_before": 0.009753769680566042,
+      "speech_rms_before_scale": 0.009753769680566042,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1680,
+      "end": 1692.0,
+      "music_rms_before": 0.026301483787357485,
+      "speech_rms_before_scale": 0.026301483787357485,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1710,
+      "end": 1722.0,
+      "music_rms_before": 0.05466109275695815,
+      "speech_rms_before_scale": 0.05466109275695815,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1740,
+      "end": 1752.0,
+      "music_rms_before": 0.05993914699280771,
+      "speech_rms_before_scale": 0.0599391469928077,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1770,
+      "end": 1782.0,
+      "music_rms_before": 0.05320672865505537,
+      "speech_rms_before_scale": 0.05320672865505537,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1800,
+      "end": 1812.0,
+      "music_rms_before": 0.04068907557134594,
+      "speech_rms_before_scale": 0.04068907557134594,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1830,
+      "end": 1842.0,
+      "music_rms_before": 0.05414435839515939,
+      "speech_rms_before_scale": 0.05414435839515939,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1860,
+      "end": 1872.0,
+      "music_rms_before": 0.053251043616982664,
+      "speech_rms_before_scale": 0.053251043616982664,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1890,
+      "end": 1902.0,
+      "music_rms_before": 0.04886536070738924,
+      "speech_rms_before_scale": 0.04886536070738924,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1920,
+      "end": 1932.0,
+      "music_rms_before": 0.051879021440346285,
+      "speech_rms_before_scale": 0.051879021440346285,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1950,
+      "end": 1962.0,
+      "music_rms_before": 0.026956277838494646,
+      "speech_rms_before_scale": 0.026956277838494646,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 1980,
+      "end": 1992.0,
+      "music_rms_before": 0.05120426105888453,
+      "speech_rms_before_scale": 0.05120426105888453,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2010,
+      "end": 2022.0,
+      "music_rms_before": 0.06084545941108819,
+      "speech_rms_before_scale": 0.06084545941108819,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2040,
+      "end": 2052.0,
+      "music_rms_before": 0.059142324483451095,
+      "speech_rms_before_scale": 0.059142324483451095,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2070,
+      "end": 2082.0,
+      "music_rms_before": 0.06120678216680832,
+      "speech_rms_before_scale": 0.06120678216680832,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2100,
+      "end": 2112.0,
+      "music_rms_before": 0.05204765821016674,
+      "speech_rms_before_scale": 0.05204765821016674,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2130,
+      "end": 2142.0,
+      "music_rms_before": 0.06435056577515855,
+      "speech_rms_before_scale": 0.06435056577515855,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2160,
+      "end": 2172.0,
+      "music_rms_before": 0.075997995042694,
+      "speech_rms_before_scale": 0.075997995042694,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2190,
+      "end": 2202.0,
+      "music_rms_before": 0.08139772664668007,
+      "speech_rms_before_scale": 0.08139772664668007,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2220,
+      "end": 2232.0,
+      "music_rms_before": 0.08182078532678094,
+      "speech_rms_before_scale": 0.08182078532678094,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2250,
+      "end": 2262.0,
+      "music_rms_before": 0.08102641285612805,
+      "speech_rms_before_scale": 0.08102641285612805,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2280,
+      "end": 2292.0,
+      "music_rms_before": 0.0829640832683197,
+      "speech_rms_before_scale": 0.0829640832683197,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2310,
+      "end": 2322.0,
+      "music_rms_before": 0.04931779248133115,
+      "speech_rms_before_scale": 0.04931779248133115,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2340,
+      "end": 2352.0,
+      "music_rms_before": 0.05278835745168358,
+      "speech_rms_before_scale": 0.05278835745168358,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2370,
+      "end": 2382.0,
+      "music_rms_before": 0.06141600902988207,
+      "speech_rms_before_scale": 0.06141600902988207,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2400,
+      "end": 2412.0,
+      "music_rms_before": 0.06587351871079809,
+      "speech_rms_before_scale": 0.06587351871079809,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2430,
+      "end": 2442.0,
+      "music_rms_before": 0.06587857818356387,
+      "speech_rms_before_scale": 0.06587857818356387,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2460,
+      "end": 2472.0,
+      "music_rms_before": 0.06568064957428188,
+      "speech_rms_before_scale": 0.06568064957428188,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2490,
+      "end": 2502.0,
+      "music_rms_before": 0.05152365210801467,
+      "speech_rms_before_scale": 0.05152365210801467,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2520,
+      "end": 2532.0,
+      "music_rms_before": 0.05941404896031002,
+      "speech_rms_before_scale": 0.05941404896031002,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2550,
+      "end": 2562.0,
+      "music_rms_before": 0.06379154232997987,
+      "speech_rms_before_scale": 0.06379154232997987,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2580,
+      "end": 2592.0,
+      "music_rms_before": 0.06755202388573685,
+      "speech_rms_before_scale": 0.06755202388573685,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2610,
+      "end": 2622.0,
+      "music_rms_before": 0.06540833126753974,
+      "speech_rms_before_scale": 0.06540833126753974,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2640,
+      "end": 2652.0,
+      "music_rms_before": 0.06572723762705912,
+      "speech_rms_before_scale": 0.06572723762705912,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2670,
+      "end": 2682.0,
+      "music_rms_before": 0.0662062861047338,
+      "speech_rms_before_scale": 0.0662062861047338,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2700,
+      "end": 2712.0,
+      "music_rms_before": 0.057321369189241335,
+      "speech_rms_before_scale": 0.057321369189241335,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2730,
+      "end": 2742.0,
+      "music_rms_before": 0.04160446184693406,
+      "speech_rms_before_scale": 0.04160446184693406,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2760,
+      "end": 2772.0,
+      "music_rms_before": 0.05091833900587043,
+      "speech_rms_before_scale": 0.05091833900587043,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2790,
+      "end": 2802.0,
+      "music_rms_before": 0.05146022272362428,
+      "speech_rms_before_scale": 0.05146022272362428,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2820,
+      "end": 2832.0,
+      "music_rms_before": 0.012317332870203247,
+      "speech_rms_before_scale": 0.012317332870203247,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2850,
+      "end": 2862.0,
+      "music_rms_before": 0.04750975112067721,
+      "speech_rms_before_scale": 0.04750975112067721,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2880,
+      "end": 2892.0,
+      "music_rms_before": 0.056189332805883264,
+      "speech_rms_before_scale": 0.056189332805883264,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2910,
+      "end": 2922.0,
+      "music_rms_before": 0.056092265553469925,
+      "speech_rms_before_scale": 0.05609226555346992,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2940,
+      "end": 2952.0,
+      "music_rms_before": 0.03882625596757263,
+      "speech_rms_before_scale": 0.03882625596757263,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 2970,
+      "end": 2982.0,
+      "music_rms_before": 0.05691344342034291,
+      "speech_rms_before_scale": 0.05691344342034291,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3000,
+      "end": 3012.0,
+      "music_rms_before": 0.052462640309517375,
+      "speech_rms_before_scale": 0.052462640309517375,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3030,
+      "end": 3042.0,
+      "music_rms_before": 0.04538804386177903,
+      "speech_rms_before_scale": 0.04538804386177903,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3060,
+      "end": 3072.0,
+      "music_rms_before": 0.03993070086141639,
+      "speech_rms_before_scale": 0.03993070086141639,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3090,
+      "end": 3102.0,
+      "music_rms_before": 0.06403394716892193,
+      "speech_rms_before_scale": 0.06403394716892193,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3120,
+      "end": 3132.0,
+      "music_rms_before": 0.06575035791147844,
+      "speech_rms_before_scale": 0.06575035791147844,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3150,
+      "end": 3162.0,
+      "music_rms_before": 0.06390217375877555,
+      "speech_rms_before_scale": 0.06390217375877555,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3180,
+      "end": 3192.0,
+      "music_rms_before": 0.06599374507200231,
+      "speech_rms_before_scale": 0.06599374507200231,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3210,
+      "end": 3222.0,
+      "music_rms_before": 0.049851234751294556,
+      "speech_rms_before_scale": 0.049851234751294556,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3240,
+      "end": 3252.0,
+      "music_rms_before": 0.029060895366116044,
+      "speech_rms_before_scale": 0.029060895366116044,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3270,
+      "end": 3282.0,
+      "music_rms_before": 0.06543029297783078,
+      "speech_rms_before_scale": 0.06543029297783078,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3300,
+      "end": 3312.0,
+      "music_rms_before": 0.06798351710427353,
+      "speech_rms_before_scale": 0.06798351710427351,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3330,
+      "end": 3342.0,
+      "music_rms_before": 0.06501512233182427,
+      "speech_rms_before_scale": 0.06501512233182427,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3360,
+      "end": 3372.0,
+      "music_rms_before": 0.06679101605132774,
+      "speech_rms_before_scale": 0.06679101605132774,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3390,
+      "end": 3402.0,
+      "music_rms_before": 0.060509519840620384,
+      "speech_rms_before_scale": 0.060509519840620384,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3420,
+      "end": 3432.0,
+      "music_rms_before": 0.05029764275150932,
+      "speech_rms_before_scale": 0.05029764275150932,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3450,
+      "end": 3462.0,
+      "music_rms_before": 0.0384224943729464,
+      "speech_rms_before_scale": 0.0384224943729464,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3480,
+      "end": 3492.0,
+      "music_rms_before": 0.02338836467946753,
+      "speech_rms_before_scale": 0.02338836467946753,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3510,
+      "end": 3522.0,
+      "music_rms_before": 0.06128378123199163,
+      "speech_rms_before_scale": 0.06128378123199163,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3540,
+      "end": 3552.0,
+      "music_rms_before": 0.056429524506397426,
+      "speech_rms_before_scale": 0.056429524506397426,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3570,
+      "end": 3582.0,
+      "music_rms_before": 0.050069458723828876,
+      "speech_rms_before_scale": 0.05006945872382887,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3600,
+      "end": 3612.0,
+      "music_rms_before": 0.07385175267523479,
+      "speech_rms_before_scale": 0.07385175267523479,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3630,
+      "end": 3642.0,
+      "music_rms_before": 0.0771923729887252,
+      "speech_rms_before_scale": 0.0771923729887252,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3660,
+      "end": 3672.0,
+      "music_rms_before": 0.07429555200575802,
+      "speech_rms_before_scale": 0.07429555200575802,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3690,
+      "end": 3702.0,
+      "music_rms_before": 0.0689964570141489,
+      "speech_rms_before_scale": 0.0689964570141489,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3720,
+      "end": 3732.0,
+      "music_rms_before": 0.022487955985785093,
+      "speech_rms_before_scale": 0.022487955985785093,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3750,
+      "end": 3762.0,
+      "music_rms_before": 0.05586318141681235,
+      "speech_rms_before_scale": 0.05586318141681235,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3780,
+      "end": 3792.0,
+      "music_rms_before": 0.06873953739482978,
+      "speech_rms_before_scale": 0.06873953739482978,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3810,
+      "end": 3822.0,
+      "music_rms_before": 0.05987439030797922,
+      "speech_rms_before_scale": 0.05987439030797922,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3840,
+      "end": 3852.0,
+      "music_rms_before": 0.062317616067587456,
+      "speech_rms_before_scale": 0.062317616067587456,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3870,
+      "end": 3882.0,
+      "music_rms_before": 0.06849199331686315,
+      "speech_rms_before_scale": 0.06849199331686315,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3900,
+      "end": 3912.0,
+      "music_rms_before": 0.06586252486356299,
+      "speech_rms_before_scale": 0.06586252486356299,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3930,
+      "end": 3942.0,
+      "music_rms_before": 0.06849628975800442,
+      "speech_rms_before_scale": 0.06849628975800442,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3960,
+      "end": 3972.0,
+      "music_rms_before": 0.026909892818057578,
+      "speech_rms_before_scale": 0.026909892818057578,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 3990,
+      "end": 4002.0,
+      "music_rms_before": 0.04002477608850782,
+      "speech_rms_before_scale": 0.04002477608850782,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4020,
+      "end": 4032.0,
+      "music_rms_before": 0.050695455198362056,
+      "speech_rms_before_scale": 0.050695455198362056,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4050,
+      "end": 4062.0,
+      "music_rms_before": 0.0499290111713201,
+      "speech_rms_before_scale": 0.0499290111713201,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4080,
+      "end": 4092.0,
+      "music_rms_before": 0.05193411784271981,
+      "speech_rms_before_scale": 0.05193411784271981,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4110,
+      "end": 4122.0,
+      "music_rms_before": 0.052494380709110985,
+      "speech_rms_before_scale": 0.052494380709110985,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4140,
+      "end": 4152.0,
+      "music_rms_before": 0.04552607059175524,
+      "speech_rms_before_scale": 0.04552607059175524,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4170,
+      "end": 4182.0,
+      "music_rms_before": 0.05641743809089995,
+      "speech_rms_before_scale": 0.05641743809089995,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4200,
+      "end": 4212.0,
+      "music_rms_before": 0.02851088514507831,
+      "speech_rms_before_scale": 0.02851088514507831,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4230,
+      "end": 4242.0,
+      "music_rms_before": 0.049801239317472185,
+      "speech_rms_before_scale": 0.049801239317472185,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4260,
+      "end": 4272.0,
+      "music_rms_before": 0.05814510358051616,
+      "speech_rms_before_scale": 0.05814510358051616,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4290,
+      "end": 4302.0,
+      "music_rms_before": 0.0578189473456337,
+      "speech_rms_before_scale": 0.0578189473456337,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4320,
+      "end": 4332.0,
+      "music_rms_before": 0.050819030709842755,
+      "speech_rms_before_scale": 0.050819030709842755,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4350,
+      "end": 4362.0,
+      "music_rms_before": 0.057220425731800174,
+      "speech_rms_before_scale": 0.057220425731800174,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4380,
+      "end": 4392.0,
+      "music_rms_before": 0.05001619231461812,
+      "speech_rms_before_scale": 0.05001619231461812,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4410,
+      "end": 4422.0,
+      "music_rms_before": 0.051799964381885534,
+      "speech_rms_before_scale": 0.051799964381885534,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4440,
+      "end": 4452.0,
+      "music_rms_before": 0.05417779961314139,
+      "speech_rms_before_scale": 0.05417779961314139,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4470,
+      "end": 4482.0,
+      "music_rms_before": 0.05034834754867166,
+      "speech_rms_before_scale": 0.05034834754867166,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4500,
+      "end": 4512.0,
+      "music_rms_before": 0.018944307550535472,
+      "speech_rms_before_scale": 0.018944307550535472,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4530,
+      "end": 4542.0,
+      "music_rms_before": 0.04002036265790942,
+      "speech_rms_before_scale": 0.04002036265790942,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4560,
+      "end": 4572.0,
+      "music_rms_before": 0.031753858149726,
+      "speech_rms_before_scale": 0.031753858149726,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4590,
+      "end": 4602.0,
+      "music_rms_before": 0.048988348009754906,
+      "speech_rms_before_scale": 0.048988348009754906,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4620,
+      "end": 4632.0,
+      "music_rms_before": 0.04785005859920364,
+      "speech_rms_before_scale": 0.04785005859920364,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4650,
+      "end": 4662.0,
+      "music_rms_before": 0.04848044079835467,
+      "speech_rms_before_scale": 0.04848044079835467,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4680,
+      "end": 4692.0,
+      "music_rms_before": 0.05189644662150795,
+      "speech_rms_before_scale": 0.05189644662150795,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4710,
+      "end": 4722.0,
+      "music_rms_before": 0.0640915516754089,
+      "speech_rms_before_scale": 0.0640915516754089,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4740,
+      "end": 4752.0,
+      "music_rms_before": 0.00746516759803187,
+      "speech_rms_before_scale": 0.00746516759803187,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4770,
+      "end": 4782.0,
+      "music_rms_before": 0.037919693889683206,
+      "speech_rms_before_scale": 0.037919693889683206,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4800,
+      "end": 4812.0,
+      "music_rms_before": 0.05604953464894864,
+      "speech_rms_before_scale": 0.05604953464894864,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4830,
+      "end": 4842.0,
+      "music_rms_before": 0.05733330174075061,
+      "speech_rms_before_scale": 0.05733330174075061,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4860,
+      "end": 4872.0,
+      "music_rms_before": 0.05774087495086017,
+      "speech_rms_before_scale": 0.05774087495086017,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4890,
+      "end": 4902.0,
+      "music_rms_before": 0.042129758162470166,
+      "speech_rms_before_scale": 0.042129758162470166,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4920,
+      "end": 4932.0,
+      "music_rms_before": 0.06369088674073599,
+      "speech_rms_before_scale": 0.06369088674073599,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4950,
+      "end": 4962.0,
+      "music_rms_before": 0.0706856438424227,
+      "speech_rms_before_scale": 0.0706856438424227,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 4980,
+      "end": 4992.0,
+      "music_rms_before": 0.06554353989985262,
+      "speech_rms_before_scale": 0.06554353989985262,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5010,
+      "end": 5022.0,
+      "music_rms_before": 0.0664525187066886,
+      "speech_rms_before_scale": 0.0664525187066886,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5040,
+      "end": 5052.0,
+      "music_rms_before": 0.06466745028284761,
+      "speech_rms_before_scale": 0.06466745028284761,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5070,
+      "end": 5082.0,
+      "music_rms_before": 0.051265284836607916,
+      "speech_rms_before_scale": 0.051265284836607916,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5100,
+      "end": 5112.0,
+      "music_rms_before": 0.027010292093929994,
+      "speech_rms_before_scale": 0.027010292093929997,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5130,
+      "end": 5142.0,
+      "music_rms_before": 0.058857510868493945,
+      "speech_rms_before_scale": 0.058857510868493945,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5160,
+      "end": 5172.0,
+      "music_rms_before": 0.06039467239499283,
+      "speech_rms_before_scale": 0.06039467239499283,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5190,
+      "end": 5202.0,
+      "music_rms_before": 0.06058102248445035,
+      "speech_rms_before_scale": 0.06058102248445035,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5220,
+      "end": 5232.0,
+      "music_rms_before": 0.059654486380937864,
+      "speech_rms_before_scale": 0.059654486380937864,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5250,
+      "end": 5262.0,
+      "music_rms_before": 0.06320937357949102,
+      "speech_rms_before_scale": 0.06320937357949101,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5280,
+      "end": 5292.0,
+      "music_rms_before": 0.067477951616625,
+      "speech_rms_before_scale": 0.067477951616625,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5310,
+      "end": 5322.0,
+      "music_rms_before": 0.0713016400573049,
+      "speech_rms_before_scale": 0.0713016400573049,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5340,
+      "end": 5352.0,
+      "music_rms_before": 0.062353868469022626,
+      "speech_rms_before_scale": 0.062353868469022626,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5370,
+      "end": 5382.0,
+      "music_rms_before": 0.06171846156997664,
+      "speech_rms_before_scale": 0.06171846156997664,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5400,
+      "end": 5412.0,
+      "music_rms_before": 0.06225299835531349,
+      "speech_rms_before_scale": 0.06225299835531349,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5430,
+      "end": 5442.0,
+      "music_rms_before": 0.04627802341142153,
+      "speech_rms_before_scale": 0.04627802341142153,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5460,
+      "end": 5472.0,
+      "music_rms_before": 0.05236532037306865,
+      "speech_rms_before_scale": 0.05236532037306865,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5490,
+      "end": 5502.0,
+      "music_rms_before": 0.06307685457528533,
+      "speech_rms_before_scale": 0.06307685457528533,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5520,
+      "end": 5532.0,
+      "music_rms_before": 0.062466604827171174,
+      "speech_rms_before_scale": 0.062466604827171174,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5550,
+      "end": 5562.0,
+      "music_rms_before": 0.06140057212652467,
+      "speech_rms_before_scale": 0.06140057212652467,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5580,
+      "end": 5592.0,
+      "music_rms_before": 0.0591350469152024,
+      "speech_rms_before_scale": 0.0591350469152024,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5610,
+      "end": 5622.0,
+      "music_rms_before": 0.060023407789701305,
+      "speech_rms_before_scale": 0.060023407789701305,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5640,
+      "end": 5652.0,
+      "music_rms_before": 0.0597503661849888,
+      "speech_rms_before_scale": 0.0597503661849888,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5670,
+      "end": 5682.0,
+      "music_rms_before": 0.06240266438786731,
+      "speech_rms_before_scale": 0.06240266438786731,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5700,
+      "end": 5712.0,
+      "music_rms_before": 0.063010902844079,
+      "speech_rms_before_scale": 0.063010902844079,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5730,
+      "end": 5742.0,
+      "music_rms_before": 0.06797982612120101,
+      "speech_rms_before_scale": 0.06797982612120101,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5760,
+      "end": 5772.0,
+      "music_rms_before": 0.06052314082473415,
+      "speech_rms_before_scale": 0.060523140824734145,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5790,
+      "end": 5802.0,
+      "music_rms_before": 0.06473335077051134,
+      "speech_rms_before_scale": 0.06473335077051134,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5820,
+      "end": 5832.0,
+      "music_rms_before": 0.0668959776543395,
+      "speech_rms_before_scale": 0.0668959776543395,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5850,
+      "end": 5862.0,
+      "music_rms_before": 0.05795249867834155,
+      "speech_rms_before_scale": 0.057952498678341555,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5880,
+      "end": 5892.0,
+      "music_rms_before": 0.051185487632911295,
+      "speech_rms_before_scale": 0.051185487632911295,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5910,
+      "end": 5922.0,
+      "music_rms_before": 0.06403343287199462,
+      "speech_rms_before_scale": 0.06403343287199462,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5940,
+      "end": 5952.0,
+      "music_rms_before": 0.06437464588174886,
+      "speech_rms_before_scale": 0.06437464588174886,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 5970,
+      "end": 5982.0,
+      "music_rms_before": 0.06222990904017262,
+      "speech_rms_before_scale": 0.06222990904017262,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 6000,
+      "end": 6012.0,
+      "music_rms_before": 0.05183622479292013,
+      "speech_rms_before_scale": 0.05183622479292013,
+      "common_headroom_scale": 1.0
+    },
+    {
+      "start": 6030,
+      "end": 6040.567528344671,
+      "music_rms_before": 0.046642962013700884,
+      "speech_rms_before_scale": 0.046642962013700884,
+      "common_headroom_scale": 1.0
+    }
+  ],
+  "period_seconds": 30,
+  "duration_seconds": 12,
+  "target_ratio_db": 0
+}

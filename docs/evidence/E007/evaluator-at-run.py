@@ -33,10 +33,7 @@ def identity(path):
 
 
 def save(path, data):
-    path = Path(path)
-    temporary = path.with_name(path.name + ".tmp")
-    temporary.write_text(json.dumps(data, indent=2, allow_nan=False) + "\n")
-    temporary.replace(path)
+    Path(path).write_text(json.dumps(data, indent=2, allow_nan=False) + "\n")
 
 
 def command(cmd, log, timeout=1200):
@@ -288,9 +285,6 @@ def main():
     metadata = dict(status="running", plan=identity(args.plan), evaluator=identity(__file__),
                     binaries={s: identity(p) for s, p in binaries.items()}, platform=platform.platform(),
                     python=sys.version, numpy=np.__version__, source_page=plan["source_page"])
-    # CI cancellation can kill Python without executing its finally block.
-    # Persist identities before the expensive work, without claiming completion.
-    save(evidence / "metadata.json", metadata)
     (evidence / "ATTRIBUTION.txt").write_text(
         "Toucan Music 2005 to 2020, Various Artists, Toucan Music.\n" + plan["source_page"] + "\n" +
         "CC BY-NC-SA 4.0: " + plan["license"] + "\n" +
