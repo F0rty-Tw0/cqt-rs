@@ -1,5 +1,13 @@
 # Engineering notes for cqt-rs 0.2
 
+Measurement correction (post-PR #3): the monitor uses `Instant::elapsed`,
+so the historical monitor "CPU" percentages below are elapsed wall time
+divided by audio duration, not process CPU measurements. The legacy CLI
+`cpu_seconds` field has the same misnomer and includes input waits in live
+mode. New evaluator summaries fingerprint their binary and inputs; an
+external binary must not be attributed to the evaluator checkout's commit.
+See [GOAL.md](GOAL.md) for the subsequent research and measurement protocol.
+
 Compact record of what was found, what was decided, what was measured and
 what to do next. Written for whoever continues the fingerprinting work.
 

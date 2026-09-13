@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -25,6 +26,7 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
+from eval_provenance import manifest  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "target" / "radio"
@@ -33,11 +35,28 @@ BINS_PER_OCTAVE = 24
 WATCH = {"vibe_ace": WORK / "watch_vibe_ace.wav", "sweet_waltz": WORK / "watch_sweet_waltz.wav"}
 
 
-def run_monitor(stream: Path, extra: list[str], monitor: str | None = None) -> list[dict]:
+def resolve_monitor(monitor: str | None) -> Path:
+    """Build once, or resolve an external binary without claiming its source revision."""
     if monitor is None:
-        subprocess.run(["cargo", "build", "--release", "--quiet", "-p", "cqt-monitor"], cwd=ROOT, check=True)
-        monitor = str(ROOT / "target" / "release" / "monitor")
-    cmd = [monitor]
+        # Cargo reports the real path, including CARGO_TARGET_DIR/target overrides.
+        built = subprocess.run(["cargo", "build", "--release", "--quiet", "-p", "cqt-monitor",
+                                "--message-format=json"], cwd=ROOT, check=True,
+                               stdout=subprocess.PIPE, text=True)
+        for line in built.stdout.splitlines():
+            artifact = json.loads(line)
+            if (artifact.get("reason") == "compiler-artifact"
+                    and artifact["target"]["name"] == "monitor" and artifact.get("executable")):
+                return Path(artifact["executable"]).resolve(strict=True)
+        raise RuntimeError("cargo did not report the monitor executable")
+    path = Path(monitor)
+    if not path.is_absolute():
+        found = shutil.which(monitor) if path.parent == Path(".") else None
+        path = Path(found) if found else ROOT / path
+    return path.resolve(strict=True)
+
+
+def run_monitor(stream: Path, extra: list[str], monitor: str | None = None) -> list[dict]:
+    cmd = [str(resolve_monitor(monitor))]
     for name, path in WATCH.items():
         cmd += ["--watch", f"{name}={path}"]
     cmd += ["--stream", str(stream), *extra]
@@ -46,7 +65,7 @@ def run_monitor(stream: Path, extra: list[str], monitor: str | None = None) -> l
 
 
 def load_truth(name: str) -> dict:
-    return json.load(open(WORK / f"{name}.json"))
+    return json.loads((WORK / f"{name}.json").read_text(encoding="utf-8"))
 
 
 def git_commit() -> str:
@@ -220,8 +239,16 @@ def evaluate(args) -> dict:
     extra += [a for spec in args.arg for a in spec.split()]
     programme = args.programme
     suffix = "" if programme == "stream_eval" else "_" + programme.removeprefix("stream_")
-    null_events = run_monitor(WORK / "stream_null.wav", extra, args.monitor)
-    eval_events = run_monitor(WORK / f"{programme}.wav", extra, args.monitor)
+    monitor = resolve_monitor(args.monitor)
+    negative_streams = [name for name in ("stream_null2", "stream_hard")
+                        if args.negatives and (WORK / f"{name}.wav").exists()]
+    inputs = {f"watch:{name}": path for name, path in WATCH.items()}
+    for name in ("stream_null", programme, *negative_streams):
+        inputs[f"{name}.audio"] = WORK / f"{name}.wav"
+        inputs[f"{name}.truth"] = WORK / f"{name}.json"
+    provenance = manifest(ROOT, monitor, inputs, built_here=args.monitor is None)
+    null_events = run_monitor(WORK / "stream_null.wav", extra, str(monitor))
+    eval_events = run_monitor(WORK / f"{programme}.wav", extra, str(monitor))
     null_truth = load_truth("stream_null")
     eval_truth = load_truth(programme)
 
@@ -274,9 +301,11 @@ def evaluate(args) -> dict:
     summary = dict(
         programme=programme,
         half=args.half, threshold=args.threshold, window=args.window, args=extra,
-        commit=git_commit(),
-        label=args.label or git_commit()[:7],
-        monitor=args.monitor or "target/release/monitor",
+        commit=git_commit(),  # Legacy field: the evaluator checkout, not the external binary.
+        label=args.label or (git_commit()[:7] + ("-dirty" if provenance["evaluator"]["dirty"] else "")
+                             if args.monitor is None else "binary-" + provenance["monitor"]["sha256"][:12]),
+        monitor=str(monitor),
+        provenance=provenance,
         stream=next(e for e in eval_events if e["event"] == "stream"),
         null=dict(seconds=null_done["audio_seconds"], reports=len(null_reports), max_evidence=int(null_evidence.max()),
                   p999_evidence=float(np.percentile(null_evidence, 99.9)), median_evidence=float(np.median(null_evidence)),
@@ -292,20 +321,18 @@ def evaluate(args) -> dict:
         plays=rows,
         worst=worst_cases(rows, false_starts, reports, eval_truth),
     )
-    if args.negatives:
-        for name in ("stream_null2", "stream_hard"):
-            if (WORK / f"{name}.wav").exists():
-                summary[name] = negatives(name, extra, args.monitor, args.threshold)
-    json.dump(summary, open(WORK / f"{args.out}.json", "w"), indent=2)
+    for name in negative_streams:
+        summary[name] = negatives(name, extra, str(monitor), args.threshold)
+    (WORK / f"{args.out}.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
 
     # --- table --------------------------------------------------------------
     print(f"\nnull stream: {null_done['audio_seconds'] / 60:.1f} min, evidence max {null_evidence.max()}, "
           f"99.9 % {np.percentile(null_evidence, 99.9):.0f}, median {np.median(null_evidence):.0f}; "
           f"max confidence {null_conf.max():.1f}; verify_q max {null_verify.max():.2f}, 99.9 % {np.percentile(null_verify, 99.9):.2f}; "
           f"false alarms at {args.threshold}: {len(null_starts)}; "
-          f"CPU {100 * null_done['realtime_fraction']:.2f} % of one core")
+          f"wall time/audio {100 * null_done['realtime_fraction']:.2f} % (not CPU utilization)")
     print(f"{programme}: {done['audio_seconds'] / 60:.1f} min, {sum(r['detected'] for r in rows)}/{len(plays)} plays detected, "
-          f"{len(false_starts)} false starts, CPU {100 * done['realtime_fraction']:.2f} %"
+          f"{len(false_starts)} false starts, wall time/audio {100 * done['realtime_fraction']:.2f} %"
           + (f"; hash delay median {done['hash_delay_median_seconds']:.2f} s, max {done['hash_delay_max_seconds']:.2f} s"
              if "hash_delay_median_seconds" in done else ""))
     print("\n| Song | Treatment | Detected after | Confidence at detection / max | Shift expected / detected | Tempo expected / detected | Position error | verify_q at detection / min / median while above |")
@@ -416,7 +443,7 @@ def main() -> None:
     parser.add_argument("--programme", default="stream_eval",
                         help="programme stream to evaluate under target/radio (default stream_eval; stream_dj for the DJ set)")
     parser.add_argument("--negatives", action="store_true",
-                        help="also run the held-out null stream and the hard negatives (scripts/radio_negatives.py)")
+                        help="also run the second development null stream and hard negatives (scripts/radio_negatives.py)")
     parser.add_argument("--arg", action="append", default=[],
                         help="extra monitor arguments, e.g. --arg '--fan-out 4' (repeatable)")
     evaluate(parser.parse_args())

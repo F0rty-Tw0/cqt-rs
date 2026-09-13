@@ -11,8 +11,8 @@ and the null-stream and resource figures side by side.
 
 from __future__ import annotations
 
+import argparse
 import json
-import sys
 import textwrap
 from pathlib import Path
 
@@ -21,6 +21,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 import numpy as np  # noqa: E402
+from eval_provenance import validate_comparison  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 WORK = ROOT / "target" / "radio"
@@ -28,12 +29,24 @@ PLOTS = ROOT / "plots"
 
 
 def load(name: str) -> dict:
-    return json.load(open(WORK / f"{name}.json"))
+    return json.loads((WORK / f"{name}.json").read_text(encoding="utf-8"))
 
 
 def main() -> None:
-    before_name, after_name = (sys.argv[1:3] + ["eval_summary_before", "eval_summary"])[:2]
-    before, after = load(before_name), load(after_name)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("before", nargs="?", default="eval_summary_before")
+    parser.add_argument("after", nargs="?", default="eval_summary")
+    parser.add_argument("--allow-unverified", action="store_true",
+                        help="compare legacy summaries without input hashes (cannot establish identical inputs)")
+    args = parser.parse_args()
+    before, after = load(args.before), load(args.after)
+    try:
+        validate_comparison(before, after, allow_unverified=args.allow_unverified)
+    except ValueError as error:
+        parser.error(str(error))
+    unverified = not before.get("provenance") or not after.get("provenance")
+    if unverified:
+        print("WARNING: legacy comparison; identical audio, truth and watch lists are unverified")
     plays_b = {(p["source"], p["start"]): p for p in before["plays"]}
     plays_a = {(p["source"], p["start"]): p for p in after["plays"]}
     keys = sorted(plays_a, key=lambda k: k[1])
@@ -67,8 +80,8 @@ def main() -> None:
         ("null max evidence", before["null"]["max_evidence"], after["null"]["max_evidence"], ""),
         ("null max confidence", before["null"]["max_confidence"], after["null"]["max_confidence"], ""),
         ("null false alarms", before["null"]["false_alarms"], after["null"]["false_alarms"], ""),
-        ("CPU, null stream", 100 * before["null"]["realtime_fraction"], 100 * after["null"]["realtime_fraction"], "%"),
-        ("CPU, programme", 100 * before["eval"]["realtime_fraction"], 100 * after["eval"]["realtime_fraction"], "%"),
+        ("wall/audio, null", 100 * before["null"]["realtime_fraction"], 100 * after["null"]["realtime_fraction"], "%"),
+        ("wall/audio, programme", 100 * before["eval"]["realtime_fraction"], 100 * after["eval"]["realtime_fraction"], "%"),
         ("hash delay, median", before["stream"]["fingerprint_delay_seconds"] if before["eval"].get("hash_delay_median_seconds") is None
          else before["eval"]["hash_delay_median_seconds"], after["eval"]["hash_delay_median_seconds"], "s"),
         ("index bytes / song-second", before["eval"]["index"][-1]["bytes"] / sum(e["seconds"] for e in before["eval"]["index"][:-1]),
@@ -88,7 +101,7 @@ def main() -> None:
     table.auto_set_font_size(False)
     table.set_fontsize(8.5)
     table.scale(1.0, 1.7)
-    ax.set_title("Null stream (31 min) and resources", fontsize=10)
+    ax.set_title("Null stream and resources" + (" (unverified inputs)" if unverified else ""), fontsize=10)
     fig.savefig(PLOTS / "radio_compare.png", dpi=90)
     print(f"wrote {PLOTS / 'radio_compare.png'}")
     for name, b, a, u in rows:

@@ -156,7 +156,7 @@ one 2048-sample window for every bin (so it was not constant-Q) and the
 rayon pool for both. The 0.2 multi-rate engine processes the same audio
 1.8× faster (4.3× with a reused workspace) with true constant-Q
 resolution, and the streaming path handles a frame in 9.3 µs, which at hop
-1760 is about 0.01 % of one core.
+1760 is about 0.01 % of the hop's audio duration in elapsed wall time.
 
 Regenerate the figures with:
 
@@ -264,7 +264,7 @@ bass cut, an FM chain and a 128k MP3 are each recognised within about
 the position in the song reported. A DJ who changes the BPM *and* the
 key *and* talks over the intro is recognised 1 to 8 s after the talking
 stops, once during it (the worst case, everything at once through FM
-and MP3, takes 18 s). The whole chain costs 0.4 % of one core, and
+and MP3, takes 18 s). The measured processing wall time is 0.4 % of audio duration, and
 `--stream -` reads live PCM from a decoder.
 
 The `cqt-monitor` crate in [`monitor/`](./monitor) turns the transform into
@@ -437,26 +437,36 @@ every play.
   <img src="./plots/radio_plays_dj.png" width="98%" />
 </p>
 
-The evaluation records the commit, the monitor configuration and the
-report traces around the worst cases, and `scripts/radio_compare.py`
-plots two runs against each other. Below, the monitor after the first
+The evaluation records the evaluator commit and dirty status, the actual
+monitor executable's SHA-256, hashes of the watch audio, query audio and
+annotations, the monitor configuration, and report traces around the worst
+cases. An external `--monitor` binary is identified by its hash; its source
+commit is unknown. `scripts/radio_compare.py` checks matching input hashes
+before plotting two runs. Older summaries require `--allow-unverified`,
+which labels the comparison as unverified. The research goal and comparison
+protocol are in [docs/GOAL.md](docs/GOAL.md).
+
+Timing uses elapsed wall time divided by audio duration, not measured CPU
+utilization. In live mode it includes input waits. The CLI's legacy
+`cpu_seconds` field also contains wall time; historical figures that say
+"CPU" should be read with this correction. Below, the monitor after the first
 review round (fan-out 6, votes only) against the current default
 (fan-out 4, alignment-gated tracker): detections move up to 0.7 s
 earlier (median 2.3 s → 1.8 s), the null-stream ceiling drops from 50
-to 20 votes, the index halves and the CPU cost drops from 0.9 % to
-0.4 % of a core.
+to 20 votes, the index halves and processing wall time drops from 0.9 % to
+0.4 % of audio duration.
 
 <p align="center">
   <img src="./plots/radio_compare.png" width="98%" />
 </p>
 
-Resources: with two watched songs the whole chain runs at 0.4 % of
-one core on both streams (44.1 kHz mono, one thread), and the index
+Resources: with two watched songs the whole chain takes wall time equal to
+0.4 % of audio duration on both streams (44.1 kHz mono, one thread), and the index
 costs about 4 MB per 3 minutes of watched audio. Watching all eight
 music tracks of the simulation (8.5 minutes of audio, 7.5 MB) against
 the 31 minute stream, which is built from six of them, detects all 45
 plays with no extra start and no start outside a play (median 2.4 s,
-worst 9.1 s) at 0.7 % of a core (details in `docs/NOTES.md`). Larger
+worst 9.1 s) at 0.7 % wall time/audio duration (details in `docs/NOTES.md`). Larger
 watch lists have not been measured.
 
 ## References
