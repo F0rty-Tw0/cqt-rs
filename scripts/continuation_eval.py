@@ -161,6 +161,8 @@ def prepare_robustness():
 
 
 def validate_resume(row, signature):
+    # JSON has arrays, so normalize in-memory tuple fields before comparison.
+    signature = json.loads(json.dumps(signature, allow_nan=False))
     if row.get('signature') != signature or row.get('status') != 'completed':
         raise ValueError('Refusing mismatched or incomplete cached run')
     for name in ('stdout', 'stderr'):
@@ -312,7 +314,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('action',choices=['prepare','prepare-robustness','run','report'])
     parser.add_argument('--stage',choices=['queries','programme','full-mix','robustness','parity'],default='queries')
-    parser.add_argument('--binary',type=Path,default=ROOT/'candidate/candidate')
+    parser.add_argument('--binary',type=Path,default=ROOT/'candidate-v3/candidate')
     args=parser.parse_args()
     if args.action=='prepare':prepare()
     elif args.action=='prepare-robustness':prepare_robustness()

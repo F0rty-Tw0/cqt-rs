@@ -1,29 +1,69 @@
 # Goal progress and evidence
 
-## E014 running — longer retrieval with fresh continuation
+## E015 verified — evidence survival diagnostic
 
-Frozen protocol: [E014](experiments/E014-long-context.md). Candidate native
-source `748dcd0e4ed4d1431a39a6878e99f1ee7075ccae`, executable SHA-256
+[Findings](experiments/E015-results.md), [frozen protocol](experiments/E015-survival-protocol.md),
+and [complete evidence](evidence/E015/README.md). The unchanged E014 executable
+exported 27 files covering 110 controlled plays and 452 interior two-second
+windows. All 5,693,564 triplets independently regenerate from native peaks.
+All extraction counts agree with E014. Of 1,917 verifier observations, 1,885
+recount exactly and 32 nominal differences are inside serialization uncertainty;
+every difference remains visible. All 30 Python evaluation tests pass.
+
+Heavy noise: 8/22 recognized, but all 22 have two consecutive passing checks
+when supplied the correct trajectory. Reference peak recovery is 31.8% and
+triplet recovery 3.3% (gain control: 84.2% and 52.9%). All 14 misses have
+below-threshold correct-song retrieval during interior observations. Voiceover:
+16/22 recognized; all six misses lack consecutive oracle start checks. Matched
+query fraction is 45.1%, with both music-peak loss and interference dilution.
+Combined effects additionally expose trajectory/start-continuation failures.
+
+Next bounded action: freeze E016 and test a bounded pair-assisted retrieval
+fallback using distinct anchors across the ten-second context, preserving
+pitch/tempo estimation, current verifier, and two-second cadence. Measure the
+14 heavy-noise failures, collisions/false starts and all existing regressions.
+A later separate verifier experiment should address voiceover. This diagnostic
+does not establish that either proposed change improves recognition. Real human
+speech and recording-disjoint evaluation remain open.
+
+The source is unchanged; exact-source CI is linked in the report. Final-head
+checks are tracked on PR #4. Full raw E015 evidence is saved in
+`target/survival/E015-evidence.zip`; GitHub contains all findings, every play and
+window, compressed full audit and extraction provenance. No processes remain
+running after publication. No default switch, merge or release.
+
+## E014 completed — default switch rejected
+
+[Results](experiments/E014-results.md), [provenance and reproduction](experiments/E014-reproduction.md),
+[frozen protocol](experiments/E014-long-context.md), and [evidence](evidence/E014/README.md).
+
+Ten-second retrieval with fresh two-second continuation checks is implemented
+as opt-in. It retains 22/22 exact and clean identities. Controlled programme
+recall is 25/25 with duplicates 3→0 and no false starts, including phase/block
+checks. Each finite pitch, tempo, EQ, gain and 10 dB noise cell is 22/22.
+The quality gate fails: random mix recall is 16/22 versus legacy 17/22;
+0 dB noise 8/22, synthetic voiceover 16/22 versus long 17/22, and combined
+17/22 versus long 19/22. Full mix remains 21/22 (t10 absent), with long /
+continuation / single-hypothesis segments 58 / 109 / 90. Frozen location coverage
+is 12 / 9 / 9; random location coverage 14 / 12 / 12, out of 22 each.
+
+All 231 scored cases are independently recounted. Two truncated query outputs
+required exact-command replays, for 233 native invocations; original evidence
+and deviations are retained. No thresholds or labels were retuned. All 25
+Python evaluation regressions pass (five continuation-specific). Legacy semantic, block-size, and file/live
+PCM parity pass. Evaluated native source `748dcd0e4ed4d1431a39a6878e99f1ee7075ccae`
+has all 12 CI checks green; executable SHA-256
 `1b1c5968ce134bda1b559da9b8bdade829c30070c4960700da6015988c0ed9d7`.
-All 12 CI checks pass on that source. Eight new Rust behavior regressions
-pass; the final independent Python recount tests are being added separately.
+Final-head checks are recorded separately on PR #4. Default behavior is unchanged.
 
-`--window 10 --continuation-seconds 2 --continuation-hypotheses 3 --modal-fit`
-retains continuous retrieval evidence, checks old trajectories on fresh peak
-intervals before refitting, and never sums overlapping rolling scores.
-Default and E013 semantics are preserved. Full-source decoding for t19/t22
-was repaired and matched to the frozen hashes before native evaluation.
-
-The 192 primary query comparisons and all controlled/robustness/parity runs
-are tracked in `target/continuation/runs`. Full-mix runs have completed.
-The [resource-only scheduling note](experiments/E014-scheduling.md) records
-reuse of the two full-mix slots, at a maximum of six native processes total.
-Do not retune gates on these results. `scripts/continuation_remaining.py`
-finishes the programmes and parity after the query stage. Next commands:
-`python3 scripts/continuation_report.py` and
-`python3 scripts/continuation_package.py`. Publish the independently audited
-results and preserve the raw evidence before marking E014 completed.
-The broad 100% transformation/voiceover goal remains unproved. No merge/release.
+Evidence locations: `docs/evidence/E014/` contains accepted events, compressed
+full numeric proofs, identities, integrity replays and the raw archive hash.
+`target/continuation/E014-evidence.zip` was saved with the deliverable. Initial
+publication stalled and automatic approval review blocked a smaller payload;
+the user subsequently explicitly authorized updating PR #4 and committing all
+findings. E014's complete report and compact proofs are included in the E015
+publication. No native matcher changes were made after its evaluated source.
+The overall recognition goal remains incomplete. No merge or release.
 
 ## E013 completed — two-second sequence experiment
 

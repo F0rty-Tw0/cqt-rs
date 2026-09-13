@@ -1,0 +1,14 @@
+{
+  "adapter": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/scripts/continuation_resume.py",
+    "bytes": 1389,
+    "sha256": "6bef591b16bbf0d9187504b6dd40dc05dbd3407c1046ba41ac3f7c8347a829b3"
+  },
+  "executed_evaluator": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/frozen-evaluator/continuation_eval.py",
+    "bytes": 16812,
+    "sha256": "944697e0a1e686fb04fc5e95fadae199249848bcb9812a8b4e24208884a0867d"
+  },
+  "cause": "JSON serialization turns reference tuples into lists; all identity values match",
+  "normalization": "JSON round trip only; original strict guard then checks every field and output hash"
+}

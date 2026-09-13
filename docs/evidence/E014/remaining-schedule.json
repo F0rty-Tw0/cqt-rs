@@ -1,0 +1,138 @@
+{
+  "workers": 2,
+  "maximum_total_processes": 6,
+  "condition": "full-mix stage completed before these workers start",
+  "scripts": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/scripts/continuation_remaining.py",
+    "bytes": 1652,
+    "sha256": "1dfce01406e657454c640425d38d696e322cfdc1053b9a539414959ae62b4973"
+  },
+  "binary": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/candidate-v3/candidate",
+    "bytes": 3206728,
+    "sha256": "1b1c5968ce134bda1b559da9b8bdade829c30070c4960700da6015988c0ed9d7"
+  },
+  "jobs": [
+    [
+      "programme",
+      "legacy"
+    ],
+    [
+      "programme",
+      "long"
+    ],
+    [
+      "programme",
+      "continuation"
+    ],
+    [
+      "programme",
+      "single"
+    ],
+    [
+      "phase",
+      "long"
+    ],
+    [
+      "phase",
+      "continuation"
+    ],
+    [
+      "gain",
+      "long"
+    ],
+    [
+      "gain",
+      "continuation"
+    ],
+    [
+      "pitch_minus2",
+      "long"
+    ],
+    [
+      "pitch_minus2",
+      "continuation"
+    ],
+    [
+      "pitch_plus2",
+      "long"
+    ],
+    [
+      "pitch_plus2",
+      "continuation"
+    ],
+    [
+      "pitch_plus_half",
+      "long"
+    ],
+    [
+      "pitch_plus_half",
+      "continuation"
+    ],
+    [
+      "tempo_088",
+      "long"
+    ],
+    [
+      "tempo_088",
+      "continuation"
+    ],
+    [
+      "tempo_112",
+      "long"
+    ],
+    [
+      "tempo_112",
+      "continuation"
+    ],
+    [
+      "bass_cut12",
+      "long"
+    ],
+    [
+      "bass_cut12",
+      "continuation"
+    ],
+    [
+      "treble_cut12",
+      "long"
+    ],
+    [
+      "treble_cut12",
+      "continuation"
+    ],
+    [
+      "noise_10db",
+      "long"
+    ],
+    [
+      "noise_10db",
+      "continuation"
+    ],
+    [
+      "noise_0db",
+      "long"
+    ],
+    [
+      "noise_0db",
+      "continuation"
+    ],
+    [
+      "voice_0db",
+      "long"
+    ],
+    [
+      "voice_0db",
+      "continuation"
+    ],
+    [
+      "combined",
+      "long"
+    ],
+    [
+      "combined",
+      "continuation"
+    ]
+  ],
+  "note": "resource-only scheduling amendment; unchanged audio, native flags, gates and sample-time metrics"
+}

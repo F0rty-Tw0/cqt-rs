@@ -1,0 +1,1237 @@
+{
+  "summary": [
+    {
+      "case": "gain",
+      "detected": 22,
+      "oracle_two_checks": 22,
+      "misses_with_oracle_support": 0,
+      "failure_classes": {},
+      "windows": 88,
+      "query_peaks": 3246,
+      "query_matched": 2722,
+      "reference_peaks": 3231,
+      "reference_matched": 2722,
+      "query_precision": 0.8385705483672212,
+      "reference_recall": 0.8424636335499845,
+      "hashes": {
+        "query_hashes": 124690,
+        "supported_raw": 65449,
+        "supported_after_cap": 61079,
+        "reference_hashes": 123620,
+        "reference_hashes_recovered": 65449,
+        "query_anchors": 3884,
+        "supported_anchors": 3263,
+        "supported_anchors_after_cap": 3258
+      },
+      "hash_recovery": 0.5294369843067465,
+      "median_hash_recovery": 0.514034044827298
+    },
+    {
+      "case": "noise_10db",
+      "detected": 22,
+      "oracle_two_checks": 22,
+      "misses_with_oracle_support": 0,
+      "failure_classes": {},
+      "windows": 88,
+      "query_peaks": 2620,
+      "query_matched": 2147,
+      "reference_peaks": 3215,
+      "reference_matched": 2147,
+      "query_precision": 0.8194656488549619,
+      "reference_recall": 0.6678071539657854,
+      "hashes": {
+        "query_hashes": 101141,
+        "supported_raw": 34751,
+        "supported_after_cap": 31558,
+        "reference_hashes": 123620,
+        "reference_hashes_recovered": 34751,
+        "query_anchors": 3131,
+        "supported_anchors": 2546,
+        "supported_anchors_after_cap": 2527
+      },
+      "hash_recovery": 0.2811114706358194,
+      "median_hash_recovery": 0.2823394076939285
+    },
+    {
+      "case": "noise_0db",
+      "detected": 8,
+      "oracle_two_checks": 22,
+      "misses_with_oracle_support": 14,
+      "failure_classes": {
+        "retrieval_confidence_below_gate": 14
+      },
+      "windows": 88,
+      "query_peaks": 1078,
+      "query_matched": 914,
+      "reference_peaks": 2870,
+      "reference_matched": 914,
+      "query_precision": 0.8478664192949907,
+      "reference_recall": 0.3184668989547038,
+      "hashes": {
+        "query_hashes": 36846,
+        "supported_raw": 4034,
+        "supported_after_cap": 3416,
+        "reference_hashes": 123620,
+        "reference_hashes_recovered": 4034,
+        "query_anchors": 1263,
+        "supported_anchors": 836,
+        "supported_anchors_after_cap": 785
+      },
+      "hash_recovery": 0.03263226015207895,
+      "median_hash_recovery": 0.01827453960111551
+    },
+    {
+      "case": "voice_0db",
+      "detected": 16,
+      "oracle_two_checks": 16,
+      "misses_with_oracle_support": 0,
+      "failure_classes": {
+        "oracle_start_support_insufficient": 6
+      },
+      "windows": 88,
+      "query_peaks": 3663,
+      "query_matched": 1652,
+      "reference_peaks": 3212,
+      "reference_matched": 1652,
+      "query_precision": 0.45099645099645097,
+      "reference_recall": 0.5143212951432129,
+      "hashes": {
+        "query_hashes": 145347,
+        "supported_raw": 10086,
+        "supported_after_cap": 9159,
+        "reference_hashes": 123620,
+        "reference_hashes_recovered": 10086,
+        "query_anchors": 4349,
+        "supported_anchors": 1735,
+        "supported_anchors_after_cap": 1677
+      },
+      "hash_recovery": 0.08158873968613493,
+      "median_hash_recovery": 0.06812855720898164
+    },
+    {
+      "case": "combined",
+      "detected": 17,
+      "oracle_two_checks": 18,
+      "misses_with_oracle_support": 2,
+      "failure_classes": {
+        "oracle_start_support_insufficient": 3,
+        "continuation_or_start_timing": 1,
+        "retrieved_wrong_trajectory": 1
+      },
+      "windows": 100,
+      "query_peaks": 3867,
+      "query_matched": 1688,
+      "reference_peaks": 3205,
+      "reference_matched": 1668,
+      "query_precision": 0.4365140936126196,
+      "reference_recall": 0.5204368174726989,
+      "hashes": {
+        "query_hashes": 153519,
+        "supported_raw": 8535,
+        "supported_after_cap": 7618,
+        "reference_hashes": 124036,
+        "reference_hashes_recovered": 8535,
+        "query_anchors": 4669,
+        "supported_anchors": 1784,
+        "supported_anchors_after_cap": 1739
+      },
+      "hash_recovery": 0.06881066787061821,
+      "median_hash_recovery": 0.05494677291065908
+    }
+  ],
+  "parity": {
+    "checked_observations": 1917,
+    "mismatches": [
+      {
+        "case": "gain",
+        "play": "clean-t10",
+        "origin": "pending",
+        "t": 244.001088,
+        "mismatch": {
+          "query_matched": [
+            6,
+            7
+          ],
+          "reference_matched": [
+            6,
+            7
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            43,
+            43
+          ],
+          "query_matched": [
+            6,
+            7
+          ],
+          "reference_peaks": [
+            39,
+            39
+          ],
+          "reference_matched": [
+            6,
+            7
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "gain",
+        "play": "clean-t14",
+        "origin": "pending",
+        "t": 347.99746,
+        "mismatch": {
+          "query_matched": [
+            22,
+            24
+          ],
+          "reference_matched": [
+            22,
+            24
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            34,
+            34
+          ],
+          "query_matched": [
+            22,
+            24
+          ],
+          "reference_peaks": [
+            34,
+            34
+          ],
+          "reference_matched": [
+            22,
+            24
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "gain",
+        "play": "clean-t14",
+        "origin": "pending",
+        "t": 347.99746,
+        "mismatch": {
+          "query_matched": [
+            19,
+            20
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            19,
+            20
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            34,
+            34
+          ],
+          "query_matched": [
+            19,
+            20
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            19,
+            20
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "gain",
+        "play": "clean-t20",
+        "origin": "retrieval",
+        "t": 504.000726,
+        "mismatch": {
+          "query_matched": [
+            14,
+            15
+          ],
+          "reference_matched": [
+            14,
+            15
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            31,
+            31
+          ],
+          "query_matched": [
+            13,
+            15
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            13,
+            15
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_10db",
+        "play": "clean-t07",
+        "origin": "retrieval",
+        "t": 165.999456,
+        "mismatch": {
+          "query_matched": [
+            20,
+            21
+          ],
+          "reference_matched": [
+            20,
+            21
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            37,
+            37
+          ],
+          "query_matched": [
+            20,
+            21
+          ],
+          "reference_peaks": [
+            48,
+            48
+          ],
+          "reference_matched": [
+            20,
+            21
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t05",
+        "origin": "retrieval",
+        "t": 120.000726,
+        "mismatch": {
+          "reference_peaks": [
+            25,
+            26
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            9,
+            9
+          ],
+          "query_matched": [
+            6,
+            6
+          ],
+          "reference_peaks": [
+            25,
+            26
+          ],
+          "reference_matched": [
+            6,
+            6
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t06",
+        "origin": "pending",
+        "t": 139.998912,
+        "mismatch": {
+          "reference_peaks": [
+            24,
+            25
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            11,
+            11
+          ],
+          "query_matched": [
+            7,
+            7
+          ],
+          "reference_peaks": [
+            24,
+            25
+          ],
+          "reference_matched": [
+            7,
+            7
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t16",
+        "origin": "pending",
+        "t": 399.998549,
+        "mismatch": {
+          "query_matched": [
+            6,
+            7
+          ],
+          "reference_peaks": [
+            39,
+            40
+          ],
+          "reference_matched": [
+            6,
+            7
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            14,
+            14
+          ],
+          "query_matched": [
+            6,
+            7
+          ],
+          "reference_peaks": [
+            39,
+            40
+          ],
+          "reference_matched": [
+            6,
+            7
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t16",
+        "origin": "retrieval",
+        "t": 402.00127,
+        "mismatch": {
+          "reference_peaks": [
+            36,
+            37
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            16,
+            16
+          ],
+          "query_matched": [
+            12,
+            12
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            12,
+            12
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t16",
+        "origin": "pending",
+        "t": 402.00127,
+        "mismatch": {
+          "reference_peaks": [
+            36,
+            37
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            16,
+            16
+          ],
+          "query_matched": [
+            12,
+            12
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            12,
+            12
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t18",
+        "origin": "retrieval",
+        "t": 458.001995,
+        "mismatch": {
+          "reference_peaks": [
+            38,
+            40
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            5,
+            5
+          ],
+          "query_matched": [
+            3,
+            3
+          ],
+          "reference_peaks": [
+            38,
+            40
+          ],
+          "reference_matched": [
+            3,
+            3
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t18",
+        "origin": "pending",
+        "t": 458.001995,
+        "mismatch": {
+          "reference_peaks": [
+            38,
+            40
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            5,
+            5
+          ],
+          "query_matched": [
+            3,
+            3
+          ],
+          "reference_peaks": [
+            38,
+            40
+          ],
+          "reference_matched": [
+            3,
+            3
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t20",
+        "origin": "retrieval",
+        "t": 509.997279,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            9,
+            9
+          ],
+          "query_matched": [
+            8,
+            8
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            8,
+            8
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "noise_0db",
+        "play": "clean-t20",
+        "origin": "pending",
+        "t": 509.997279,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            9,
+            9
+          ],
+          "query_matched": [
+            8,
+            8
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            8,
+            8
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t03",
+        "origin": "retrieval",
+        "t": 61.997279,
+        "mismatch": {
+          "query_matched": [
+            9,
+            10
+          ],
+          "reference_matched": [
+            9,
+            10
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            46,
+            46
+          ],
+          "query_matched": [
+            9,
+            10
+          ],
+          "reference_peaks": [
+            38,
+            38
+          ],
+          "reference_matched": [
+            9,
+            10
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t03",
+        "origin": "pending",
+        "t": 61.997279,
+        "mismatch": {
+          "query_matched": [
+            9,
+            10
+          ],
+          "reference_matched": [
+            9,
+            10
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            46,
+            46
+          ],
+          "query_matched": [
+            9,
+            10
+          ],
+          "reference_peaks": [
+            38,
+            38
+          ],
+          "reference_matched": [
+            9,
+            10
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t08",
+        "origin": "retrieval",
+        "t": 195.999637,
+        "mismatch": {
+          "query_matched": [
+            2,
+            3
+          ],
+          "reference_matched": [
+            2,
+            3
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            44,
+            44
+          ],
+          "query_matched": [
+            2,
+            3
+          ],
+          "reference_peaks": [
+            31,
+            31
+          ],
+          "reference_matched": [
+            2,
+            3
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t09",
+        "origin": "retrieval",
+        "t": 218.000544,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            46,
+            46
+          ],
+          "query_matched": [
+            15,
+            15
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            15,
+            15
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t09",
+        "origin": "retrieval",
+        "t": 218.000544,
+        "mismatch": {
+          "query_matched": [
+            15,
+            16
+          ],
+          "reference_matched": [
+            15,
+            16
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            46,
+            46
+          ],
+          "query_matched": [
+            15,
+            16
+          ],
+          "reference_peaks": [
+            45,
+            45
+          ],
+          "reference_matched": [
+            15,
+            16
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t09",
+        "origin": "retrieval",
+        "t": 218.000544,
+        "mismatch": {
+          "query_matched": [
+            17,
+            18
+          ],
+          "reference_matched": [
+            17,
+            18
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            46,
+            46
+          ],
+          "query_matched": [
+            17,
+            18
+          ],
+          "reference_peaks": [
+            44,
+            44
+          ],
+          "reference_matched": [
+            17,
+            18
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t09",
+        "origin": "retrieval",
+        "t": 222.000181,
+        "mismatch": {
+          "query_matched": [
+            11,
+            12
+          ],
+          "reference_matched": [
+            11,
+            12
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            43,
+            43
+          ],
+          "query_matched": [
+            11,
+            12
+          ],
+          "reference_peaks": [
+            46,
+            46
+          ],
+          "reference_matched": [
+            11,
+            12
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t11",
+        "origin": "retrieval",
+        "t": 271.998549,
+        "mismatch": {
+          "query_matched": [
+            8,
+            10
+          ],
+          "reference_matched": [
+            8,
+            10
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            35,
+            35
+          ],
+          "query_matched": [
+            8,
+            10
+          ],
+          "reference_peaks": [
+            26,
+            26
+          ],
+          "reference_matched": [
+            8,
+            10
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t16",
+        "origin": "retrieval",
+        "t": 399.998549,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            43,
+            43
+          ],
+          "query_matched": [
+            18,
+            18
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            18,
+            18
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t17",
+        "origin": "retrieval",
+        "t": 425.999093,
+        "mismatch": {
+          "reference_peaks": [
+            36,
+            37
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            47,
+            47
+          ],
+          "query_matched": [
+            25,
+            25
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            25,
+            25
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t17",
+        "origin": "retrieval",
+        "t": 425.999093,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            47,
+            47
+          ],
+          "query_matched": [
+            19,
+            19
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            19,
+            19
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t17",
+        "origin": "pending",
+        "t": 425.999093,
+        "mismatch": {
+          "reference_peaks": [
+            36,
+            37
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            47,
+            47
+          ],
+          "query_matched": [
+            25,
+            25
+          ],
+          "reference_peaks": [
+            36,
+            37
+          ],
+          "reference_matched": [
+            25,
+            25
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t17",
+        "origin": "retrieval",
+        "t": 428.001814,
+        "mismatch": {
+          "query_matched": [
+            19,
+            20
+          ],
+          "reference_matched": [
+            19,
+            20
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            47,
+            47
+          ],
+          "query_matched": [
+            19,
+            20
+          ],
+          "reference_peaks": [
+            39,
+            39
+          ],
+          "reference_matched": [
+            19,
+            20
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t18",
+        "origin": "retrieval",
+        "t": 455.999274,
+        "mismatch": {
+          "query_matched": [
+            10,
+            11
+          ],
+          "reference_matched": [
+            10,
+            11
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            45,
+            45
+          ],
+          "query_matched": [
+            9,
+            11
+          ],
+          "reference_peaks": [
+            41,
+            41
+          ],
+          "reference_matched": [
+            9,
+            11
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t18",
+        "origin": "retrieval",
+        "t": 458.001995,
+        "mismatch": {
+          "query_matched": [
+            20,
+            21
+          ],
+          "reference_matched": [
+            20,
+            21
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            49,
+            49
+          ],
+          "query_matched": [
+            20,
+            21
+          ],
+          "reference_peaks": [
+            42,
+            42
+          ],
+          "reference_matched": [
+            20,
+            21
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t18",
+        "origin": "retrieval",
+        "t": 458.001995,
+        "mismatch": {
+          "query_matched": [
+            12,
+            13
+          ],
+          "reference_matched": [
+            12,
+            13
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            49,
+            49
+          ],
+          "query_matched": [
+            12,
+            13
+          ],
+          "reference_peaks": [
+            46,
+            46
+          ],
+          "reference_matched": [
+            12,
+            13
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "voice_0db",
+        "play": "clean-t22",
+        "origin": "retrieval",
+        "t": 556.001814,
+        "mismatch": {
+          "query_matched": [
+            8,
+            9
+          ],
+          "reference_matched": [
+            8,
+            9
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            39,
+            39
+          ],
+          "query_matched": [
+            8,
+            9
+          ],
+          "reference_peaks": [
+            35,
+            35
+          ],
+          "reference_matched": [
+            8,
+            9
+          ]
+        },
+        "covered_by_serialization": true
+      },
+      {
+        "case": "combined",
+        "play": "clean-t19",
+        "origin": "retrieval",
+        "t": 505.997642,
+        "mismatch": {
+          "reference_peaks": [
+            41,
+            42
+          ]
+        },
+        "serialization_envelope": {
+          "query_peaks": [
+            38,
+            38
+          ],
+          "query_matched": [
+            2,
+            3
+          ],
+          "reference_peaks": [
+            41,
+            42
+          ],
+          "reference_matched": [
+            2,
+            3
+          ]
+        },
+        "covered_by_serialization": true
+      }
+    ],
+    "extraction_count_parity": "all five programme done events and 22 reference index counts agree",
+    "triplets_reproduced": 5693564
+  },
+  "evaluator": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/scripts/survival_diagnostic.py",
+    "bytes": 14353,
+    "sha256": "88d0ea182a6cb1c7e629d92dbfc936a84b3d9d72ebfb3a5427bd6699f91c8561"
+  },
+  "protocol": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/docs/experiments/E015-survival-protocol.md",
+    "bytes": 4780,
+    "sha256": "cdaf1c41e584f8c7e38c517681d7a8d021f080ca9cef96a13991e5df8b7322e2"
+  },
+  "limits": [
+    "supplied source trajectory, not recognition",
+    "known recordings and synthetic speech",
+    "serialized native trajectories may cause count boundary differences",
+    "interior windows only; diagnostic classes are overlapping mechanisms with a fixed attribution order"
+  ]
+}

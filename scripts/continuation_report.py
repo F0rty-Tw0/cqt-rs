@@ -183,12 +183,22 @@ def main():
         for a,b in [('legacy','long'),('legacy','continuation'),('long','continuation')]:
             comparisons.append(dict(group=group,before_arm=a,after_arm=b,
                                     **paired(old if a=='legacy' else arms[a],arms[b])))
-    summary=dict(runs=len(results),comparisons=comparisons,results=results,
+    weak=[]
+    for q in queries.values():
+        if q['group'] not in ('frozen','mix') or q['song'] not in ('t04','t10','t13','t22'):continue
+        rows=[r for r in raw[q['id']+'-continuation'] if r.get('song')==q['song'] and r.get('origin')=='retrieval']
+        high=[r for r in rows if r['confidence']>=70]
+        weak.append(dict(query=q['id'],outcome=results[q['id']+'-continuation']['outcome'],
+             maximum_retrieval_confidence=max((r['confidence'] for r in rows),default=0),
+             maximum_alignment_above_confidence=max((r['verify_q'] for r in high),default=None)))
+    replays=c.read(ROOT/'integrity-replay.json') if (ROOT/'integrity-replay.json').exists() else None
+    summary=dict(integrity_replay=replays,total_native_invocations=len(results)+(replays['additional_exact_command_replays'] if replays else 0),weak_queries=weak,runs=len(results),comparisons=comparisons,results=results,
                  legacy=legacy,parity=c.read(ROOT/'parity.json') if (ROOT/'parity.json').exists() else None,
                  hashes={p.name:c.e.sha(p) for p in (ROOT/'runs').glob('*.jsonl')})
     c.save(ROOT/'audit.json',summary)
     lines=['# E014 results: longer retrieval and two-second continuation', '',
-           'Status: native experiment completed; acceptance decision below.', '',
+           'Status: completed; default switch rejected. Controlled tracking improves, but mixed-audio and voiceover regressions remain.', '',
+           'See [provenance, integrity replays and reproduction](E014-reproduction.md).', '',
            'All results use the frozen corrected catalogue and query labels. '
            'These are known recordings; synthetic speech is not a test of general human voiceover.', '',
            '## Frozen ten-second queries', '',
@@ -196,7 +206,7 @@ def main():
            '| --- | ---: | ---: | ---: |']
     for group in GROUPS:
         old=sum(good(r) for k,r in legacy.items() if queries[k]['group']==group)
-        cells=[str(old)]
+        cells=[f"{old}/{sum(q['group']==group for q in queries.values())}"]
         for a in ('long','continuation'):
             selected=[r for k,r in results.items() if r['group']==group and k==r['query_id']+'-'+a]
             cells.append(f'{sum(good(r) for r in selected)}/{len(selected)}')
@@ -234,6 +244,15 @@ def main():
     for case in ['programme','phase',*c.TREATMENTS]:
         old=results.get(case+'-long',{}).get('score');new=results.get(case+'-continuation',{}).get('score')
         if old and new: rejected |= new['detected']<old['detected'] or new['duplicate_starts']>old['duplicate_starts'] or len(new['false_starts'])>len(old['false_starts'])
+    lines += ['', '## Previously weak mix passages', '',
+              '| Query | Continuation outcome | Maximum retrieval confidence | Best fresh alignment when confidence ≥70 |',
+              '| --- | --- | ---: | ---: |']
+    for w in weak:
+        alignment='—' if w['maximum_alignment_above_confidence'] is None else f"{w['maximum_alignment_above_confidence']:.3f}"
+        lines.append(f"| {w['query']} | {w['outcome']} | {w['maximum_retrieval_confidence']:.3f} | {alignment} |")
+    lines += ['', 'The start gates remain confidence ≥70 and alignment ≥0.4 on successive fresh observations. '
+              'Longer windows cannot establish missing fingerprint correspondence by themselves. '
+              'These diagnostics do not isolate which DJ effect caused a miss.', '']
     lines += ['', '## Decision', '', 'Reject a default switch; retain the prototype as opt-in.' if rejected else
               'The measured no-regression comparison passes; this development corpus does not justify a default switch or general accuracy claim.', '',
               '100% matching under the requested range of mix transformations and voiceover remains unproved. '

@@ -1,0 +1,9 @@
+{
+  "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/survival/E015-evidence.zip",
+  "bytes": 37380221,
+  "sha256": "450e488fd414c7d12da95902041680a2fd9b605a2a184c8b7e300be5c5daf0c8",
+  "members": 93,
+  "native_extractions": 27,
+  "plays": 110,
+  "validation": "ZIP CRC and every member SHA-256 passed"
+}

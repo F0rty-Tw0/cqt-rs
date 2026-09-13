@@ -1,0 +1,70 @@
+{
+  "reason": "Two stdout files were truncated after completed records were written; cause not established. Original files and records retained; strict hashes were not waived.",
+  "original_native_runs": 231,
+  "additional_exact_command_replays": 2,
+  "total_native_invocations": 233,
+  "evaluator": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/frozen-evaluator/continuation_eval.py",
+    "bytes": 16812,
+    "sha256": "944697e0a1e686fb04fc5e95fadae199249848bcb9812a8b4e24208884a0867d"
+  },
+  "replay_script": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/scripts/continuation_repair_logs.py",
+    "bytes": 2149,
+    "sha256": "cedcdc8b0f96c630c805742c39d1378697df086d0da5835e87e022a9065d7bdc"
+  },
+  "runs": [
+    {
+      "id": "clean-t21-continuation",
+      "original_record": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/integrity-replay/clean-t21-continuation.result.json",
+        "bytes": 11219,
+        "sha256": "c180fd0a7150fe665ec74db464dd93aefc42157152cf73d76b4073cd200f6b6a"
+      },
+      "preserved_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/integrity-replay/clean-t21-continuation.jsonl",
+        "bytes": 89903,
+        "sha256": "5dc402a1a81de421295575ddc05c24a5c762f4a60c91bfb91a8204b8dff59223"
+      },
+      "expected_original_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/runs/clean-t21-continuation.jsonl",
+        "bytes": 120350,
+        "sha256": "61d5b92da148f72d3e1dbe6e14dd3475dc9a097384d2103f4ec212c8fc1607dd"
+      },
+      "replay_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/runs/clean-t21-continuation.jsonl",
+        "bytes": 120350,
+        "sha256": "78de15d0f637d7dc09e75fdbab3db32a5cf67b804a7f932868fa06204ddb08c4"
+      },
+      "byte_identical_to_original_recorded_hash": false,
+      "original_outcome": "correct",
+      "replay_outcome": "correct"
+    },
+    {
+      "id": "mix-t21-continuation",
+      "original_record": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/integrity-replay/mix-t21-continuation.result.json",
+        "bytes": 12942,
+        "sha256": "e5c3916d6169a790cc4ce81c57459e379166f31477d77013199156dbed96981c"
+      },
+      "preserved_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/integrity-replay/mix-t21-continuation.jsonl",
+        "bytes": 65326,
+        "sha256": "dc34a525dce52752995510c0cfae620c758ab3748b3374f44fd7724fdb5f25d0"
+      },
+      "expected_original_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/runs/mix-t21-continuation.jsonl",
+        "bytes": 118623,
+        "sha256": "ba23ab117a524334137e7286f835a885b6d20288139317a4e5546527477f9a1c"
+      },
+      "replay_stdout": {
+        "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/runs/mix-t21-continuation.jsonl",
+        "bytes": 118623,
+        "sha256": "94c6bea742866388972cc3d8759fa12b41490b5c6c3bc4cbd9b61e2a23e02366"
+      },
+      "byte_identical_to_original_recorded_hash": false,
+      "original_outcome": "no-match",
+      "replay_outcome": "no-match"
+    }
+  ]
+}

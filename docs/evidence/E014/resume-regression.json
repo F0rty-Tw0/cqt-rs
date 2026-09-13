@@ -1,0 +1,15 @@
+{
+  "original": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/frozen-evaluator/continuation_eval.py",
+    "bytes": 16812,
+    "sha256": "944697e0a1e686fb04fc5e95fadae199249848bcb9812a8b4e24208884a0867d"
+  },
+  "fixed": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/scripts/continuation_eval.py",
+    "bytes": 16957,
+    "sha256": "52802f732be813253c25df9927c5d9d1ce7c98c14808c6cb7814c7d57455adac"
+  },
+  "original_expected_failure": "Refusing mismatched or incomplete cached run",
+  "candidate": "passes canonical-equivalent tuple/list signature",
+  "changed_identity_regressions": "references and evaluator SHA still rejected by unit tests"
+}

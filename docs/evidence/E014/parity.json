@@ -1,0 +1,10 @@
+{
+  "status": "passed",
+  "baseline_source": "36098740e78556e41e3e4bbd477508f191331d21",
+  "source": "748dcd0e4ed4d1431a39a6878e99f1ee7075ccae",
+  "binary": {
+    "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/candidate-v3/candidate",
+    "bytes": 3206728,
+    "sha256": "1b1c5968ce134bda1b559da9b8bdade829c30070c4960700da6015988c0ed9d7"
+  }
+}

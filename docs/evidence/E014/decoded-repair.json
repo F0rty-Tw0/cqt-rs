@@ -1,0 +1,50 @@
+[
+  {
+    "song": "t19",
+    "command": [
+      "ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-nostdin",
+      "-y",
+      "-i",
+      "target/continuation/media/t19.mp3",
+      "-ac",
+      "1",
+      "-ar",
+      "44100",
+      "-c:a",
+      "pcm_s16le",
+      "target/continuation/media/t19-verified.wav"
+    ],
+    "returncode": 0,
+    "old_sha256": "32baf329b935d639473aaa550975e3df288cd3b84eefb47fa3b52f94cf10fb04",
+    "new_sha256": "4d77042f602c15de59ae73ff66884fce78feff9a28ed79c6e159b750664f1262",
+    "expected": "4d77042f602c15de59ae73ff66884fce78feff9a28ed79c6e159b750664f1262"
+  },
+  {
+    "song": "t22",
+    "command": [
+      "ffmpeg",
+      "-hide_banner",
+      "-loglevel",
+      "error",
+      "-nostdin",
+      "-y",
+      "-i",
+      "target/continuation/media/t22.mp3",
+      "-ac",
+      "1",
+      "-ar",
+      "44100",
+      "-c:a",
+      "pcm_s16le",
+      "target/continuation/media/t22-verified.wav"
+    ],
+    "returncode": 0,
+    "old_sha256": "b36b90ed9dc32d1cb87249ad057bf34f14273b7708458764e37455f9a2ddb33c",
+    "new_sha256": "bc6b0f2f83c34c01f21bc24dc5e6a10ff636118e180cb69a5be62904e94e928d",
+    "expected": "bc6b0f2f83c34c01f21bc24dc5e6a10ff636118e180cb69a5be62904e94e928d"
+  }
+]

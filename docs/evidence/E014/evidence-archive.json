@@ -1,0 +1,13 @@
+{
+  "path": "/workspace/scratch/718c6fb7c50a/cqt-rs/target/continuation/E014-evidence.zip",
+  "bytes": 15888763,
+  "sha256": "31b842358e59850fa7b562871e517c594ae51d87af48651c2b34a59f675a5efb",
+  "members": 880,
+  "runs": 231,
+  "total_native_invocations": 233,
+  "excludes": [
+    "audio",
+    "executables"
+  ],
+  "validation": "ZIP CRC and every member SHA-256 passed"
+}
