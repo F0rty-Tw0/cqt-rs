@@ -1,0 +1,69 @@
+name: Verifier parity and timing proof
+
+on:
+  pull_request:
+    paths:
+      - monitor/src/verify.rs
+      - monitor/tests/verify_oracle.rs
+      - monitor/examples/verify_probe.rs
+      - scripts/benchmark_verify.py
+      - .github/workflows/verifier-proof.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verifier-proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RAYON_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98"
+      - uses: Swatinem/rust-cache@v2
+      - name: Prepare baseline with identical test and timing harnesses
+        run: |
+          mkdir -p target/verifier-proof
+          cargo generate-lockfile
+          git worktree add --detach target/verify-baseline 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a
+          mkdir -p target/verify-baseline/monitor/examples target/verify-baseline/monitor/tests
+          cp Cargo.lock target/verify-baseline/Cargo.lock
+          cp monitor/examples/verify_probe.rs target/verify-baseline/monitor/examples/
+          cp monitor/tests/verify_oracle.rs target/verify-baseline/monitor/tests/
+      - name: Baseline and candidate oracle parity, release builds
+        run: |
+          set -o pipefail
+          cargo test --release --locked -p cqt-monitor --test verify_oracle 2>&1 | tee target/verifier-proof/candidate-oracle.txt
+          cargo test --release --locked -p cqt-monitor --no-default-features --test verify_oracle 2>&1 | tee target/verifier-proof/candidate-serial-oracle.txt
+          cargo test --release --locked -p cqt-monitor --test verify_oracle --manifest-path target/verify-baseline/Cargo.toml --target-dir target/verify-baseline-build 2>&1 | tee target/verifier-proof/baseline-oracle.txt
+          cargo build --release --locked -p cqt-monitor --example verify_probe
+          cargo build --release --locked -p cqt-monitor --example verify_probe --manifest-path target/verify-baseline/Cargo.toml --target-dir target/verify-baseline-build
+      - name: Five alternating process pairs
+        run: python3 scripts/benchmark_verify.py --baseline target/verify-baseline-build/release/examples/verify_probe --candidate target/release/examples/verify_probe
+      - name: Preserve and print evidence
+        if: always()
+        run: |
+          mkdir -p target/verifier-proof
+          git rev-parse HEAD > target/verifier-proof/candidate-commit.txt
+          git -C target/verify-baseline rev-parse HEAD > target/verifier-proof/baseline-commit.txt
+          git status --porcelain > target/verifier-proof/candidate-status.txt
+          git -C target/verify-baseline status --porcelain > target/verifier-proof/baseline-status.txt
+          rustc -Vv > target/verifier-proof/rustc.txt
+          lscpu > target/verifier-proof/cpu.txt
+          uname -a > target/verifier-proof/os.txt
+          cp Cargo.lock target/verifier-proof/
+          sha256sum Cargo.lock monitor/examples/verify_probe.rs monitor/tests/verify_oracle.rs scripts/benchmark_verify.py > target/verifier-proof/hashes.txt
+          cat target/verifier-proof/timing.json
+          cat target/verifier-proof/hashes.txt
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: verifier-proof-${{ github.event.pull_request.head.sha }}
+          path: target/verifier-proof
+          retention-days: 90
