@@ -65,17 +65,16 @@ impl Decisions {
                 .find(|s| usize::from(s.candidate.song) == song)
                 .map(|&scored| Observation { begin, end, scored });
             let mut state = std::mem::take(&mut self.states[song]);
-            if let (Some(mut play), Some(o)) = (state.active, observation) {
-                if o.scored.candidate.evidence > 0
-                    && o.scored.alignment >= self.hold_alignment
-                    && self.agrees(play.last, o)
-                {
-                    play.last = o;
-                    state.active = Some(play);
-                    state.pending.clear();
-                    self.states[song] = state;
-                    continue;
-                }
+            if let (Some(mut play), Some(o)) = (state.active, observation)
+                && o.scored.candidate.evidence > 0
+                && o.scored.alignment >= self.hold_alignment
+                && self.agrees(play.last, o)
+            {
+                play.last = o;
+                state.active = Some(play);
+                state.pending.clear();
+                self.states[song] = state;
+                continue;
             }
             if let Some(o) = observation.filter(|o| {
                 o.scored.candidate.evidence > 0 && o.scored.alignment >= self.start_alignment
@@ -112,15 +111,15 @@ impl Decisions {
             } else {
                 state.pending.clear();
             }
-            if let Some(play) = state.active {
-                if end.saturating_sub(play.last.end) >= self.release {
-                    changes.push(Change::End {
-                        song: song as u16,
-                        play,
-                        reason: "release",
-                    });
-                    state.active = None;
-                }
+            if let Some(play) = state.active
+                && end.saturating_sub(play.last.end) >= self.release
+            {
+                changes.push(Change::End {
+                    song: song as u16,
+                    play,
+                    reason: "release",
+                });
+                state.active = None;
             }
             self.states[song] = state;
         }
