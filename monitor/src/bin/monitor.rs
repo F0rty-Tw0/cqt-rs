@@ -19,6 +19,8 @@ use cqt_rs::{Cqt, CqtParams, CqtStream};
 
 #[path = "monitor/sequence.rs"]
 mod sequence;
+#[path = "monitor/continuation.rs"]
+mod continuation;
 
 const USAGE: &str = "usage:
   monitor --watch NAME=FILE.wav [--watch ...] --stream FILE.wav [options]
@@ -58,6 +60,9 @@ options (defaults in brackets):
   --modal-fit          experimental modal-cell position estimate [off]
   --sequence-seconds S experimental disjoint observations, two to confirm [off]
                        replaces --window/--report/--verify-seconds; S in (0,10]
+  --continuation-seconds S  experimental fresh checks; retains --window [off]
+                       replaces --report/--verify-seconds; S in (0,10]
+  --continuation-hypotheses N  trajectories per song, 1..3 [3]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
 
@@ -85,6 +90,8 @@ struct Options {
     verify_hold: f64,
     modal_fit: bool,
     sequence_seconds: Option<f64>,
+    continuation_seconds: Option<f64>,
+    continuation_hypotheses: usize,
     release: f64,
     jump: f64,
     report: f64,
@@ -120,6 +127,8 @@ impl Default for Options {
             verify_hold: 0.3,
             modal_fit: false,
             sequence_seconds: None,
+            continuation_seconds: None,
+            continuation_hypotheses: 3,
             release: 3.0,
             jump: 10.0,
             report: 0.25,
@@ -179,6 +188,8 @@ fn parse_args() -> Options {
             "--verify-bins" => opts.verify_bins = value(&arg, args.next()),
             "--verify-start" => opts.verify_start = value(&arg, args.next()),
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
+            "--continuation-seconds" => opts.continuation_seconds = Some(value(&arg, args.next())),
+            "--continuation-hypotheses" => opts.continuation_hypotheses = value(&arg, args.next()),
             "--modal-fit" => opts.modal_fit = true,
             "--sequence-seconds" => opts.sequence_seconds = Some(value(&arg, args.next())),
             "--release" => opts.release = value(&arg, args.next()),
@@ -206,6 +217,16 @@ fn parse_args() -> Options {
     {
         eprintln!("--sequence-seconds must be finite and in (0, 10]");
         exit(2);
+    }
+    if let Some(seconds) = opts.continuation_seconds {
+        if !seconds.is_finite() || seconds <= 0.0 || seconds > 10.0
+            || !opts.window.is_finite() || opts.window < seconds || opts.window > 60.0
+            || !(1..=3).contains(&opts.continuation_hypotheses)
+            || opts.sequence_seconds.is_some()
+        {
+            eprintln!("continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode");
+            exit(2);
+        }
     }
     opts
 }
@@ -385,7 +406,7 @@ fn main() {
         opts.half,
         opts.threshold,
         opts.fan_out,
-        opts.sequence_seconds.unwrap_or(opts.verify_seconds),
+        opts.sequence_seconds.or(opts.continuation_seconds).unwrap_or(opts.verify_seconds),
         opts.verify_start,
         opts.verify_hold
     )
@@ -407,13 +428,17 @@ fn main() {
         modal_fit: opts.modal_fit,
     };
     let mut sequence = opts
-        .sequence_seconds
+        .sequence_seconds.or(opts.continuation_seconds)
         .map(|_| sequence::Sequence::new(&opts, frames_per_second, index.names().len()));
     if let Some(seconds) = opts.sequence_seconds {
         writeln!(out,
             "{{\"event\":\"experiment\",\"sequence_seconds\":{},\"minimum_observations\":2,\"maximum_observations\":5,\"boundary_semantics\":\"supported interval edges, not audible ground truth\"}}",
             (seconds * frames_per_second).max(1.0) / frames_per_second,
         ).unwrap();
+    }
+    if let Some(seconds) = opts.continuation_seconds {
+        writeln!(out, "{{\"event\":\"experiment\",\"continuation_seconds\":{},\"retrieval_seconds\":{},\"hypotheses_per_song\":{},\"minimum_observations\":2,\"boundary_semantics\":\"supported interval edges, not audible ground truth\"}}",
+            seconds, opts.window, opts.continuation_hypotheses).unwrap();
     }
     let sequence_enabled = sequence.is_some();
     let mut pending_hashes = VecDeque::new();

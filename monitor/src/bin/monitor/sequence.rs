@@ -147,6 +147,7 @@ fn confidence(evidence: u32, half: f64) -> f64 {
 }
 
 pub(super) struct Sequence {
+    continuation: Option<super::continuation::Continuation>,
     frames_per_observation: f64,
     observation_number: u64,
     begin: u64,
@@ -158,9 +159,10 @@ pub(super) struct Sequence {
 
 impl Sequence {
     pub(super) fn new(opts: &Options, fps: f64, songs: usize) -> Self {
-        let frames_per_observation = (opts.sequence_seconds.unwrap() * fps).max(1.0);
+        let frames_per_observation = (opts.sequence_seconds.or(opts.continuation_seconds).unwrap() * fps).max(1.0);
         let width = frames_per_observation.ceil() as u64;
         Self {
+            continuation: opts.continuation_seconds.map(|_| super::continuation::Continuation::new(opts, fps, songs)),
             frames_per_observation,
             observation_number: 0,
             begin: 0,
@@ -198,6 +200,12 @@ impl Sequence {
         eof: bool,
         out: &mut W,
     ) {
+        if let Some(c) = &mut self.continuation {
+            c.drain(ctx, index, peaks, hashes, horizon, consumed, eof, out);
+            self.lookups = c.lookups();
+            self.matches = c.matches();
+            return;
+        }
         loop {
             // Round cumulative boundaries: five two-second observations must
             // fit a ten-second excerpt despite a nonintegral frame rate.

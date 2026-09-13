@@ -310,6 +310,52 @@ impl Matcher {
         self.best_per_song_with_fit(true)
     }
 
+    /// Experimental bounded list of distinct trajectories per song, strongest
+    /// first. `limit == 1` exactly preserves the existing single-result search.
+    /// Larger budgets scan occupied centres and suppress fitted trajectories
+    /// within two pitch bins, 0.05 tempo and one offset step at the latest
+    /// query frame. Evidence belongs to each neighbourhood separately: these
+    /// scores overlap and must never be added to each other or across calls.
+    /// This does not promise an index-search speed improvement.
+    pub fn hypotheses_per_song(&self, limit: usize, modal: bool) -> Vec<Candidate> {
+        if limit == 0 {
+            return Vec::new();
+        }
+        if limit == 1 {
+            return self.best_per_song_with_fit(modal);
+        }
+        let mut centres: Vec<_> = self.cells.iter().map(|(&key, cell)| {
+            let evidence = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
+            (evidence, cell.count, key)
+        }).collect();
+        centres.sort_unstable_by_key(|&(evidence, count, key)| {
+            (std::cmp::Reverse(evidence), std::cmp::Reverse(count), key)
+        });
+        let mut selected: HashMap<u16, Vec<Candidate>> = HashMap::new();
+        for (evidence, count, key) in centres {
+            let song = (key >> 48) as u16;
+            let choices = selected.entry(song).or_default();
+            if choices.len() >= limit {
+                continue;
+            }
+            let fitted = self.candidates(HashMap::from([(song, (evidence, count, key))]), modal);
+            let Some(&candidate) = fitted.first() else { continue; };
+            let at = self.latest_frame as f64;
+            if choices.iter().any(|c| {
+                (c.shift - candidate.shift).abs() <= 2
+                    && (c.tempo - candidate.tempo).abs() <= 0.05
+                    && ((c.tempo - candidate.tempo) * at + c.offset - candidate.offset).abs()
+                        <= self.config.offset_step
+            }) {
+                continue;
+            }
+            choices.push(candidate);
+        }
+        let mut out: Vec<_> = selected.into_iter().collect();
+        out.sort_unstable_by_key(|(song, _)| *song);
+        out.into_iter().flat_map(|(_, choices)| choices).collect()
+    }
+
     fn best_per_song_with_fit(&self, modal: bool) -> Vec<Candidate> {
         let mut slab_hist: FastMap<u64, u32> =
             FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
@@ -627,6 +673,29 @@ mod tests {
         matcher.advance(100_000);
         assert!(matcher.best_per_song_modal().is_empty());
         assert!(matcher.best_per_song().is_empty());
+    }
+
+    #[test]
+    fn multiple_positions_are_bounded_deterministic_and_preserve_the_winner() {
+        let mut matcher = Matcher::new(MatcherConfig::default());
+        for (offset, count) in [(10, 120), (30, 100), (50, 80), (70, 60)] {
+            for _ in 0..count {
+                inject(&mut matcher, 100, encode_cell_raw(0, 0, 15, offset), 1.0, f64::from(offset) * 86.0);
+            }
+        }
+        matcher.advance(100);
+        for modal in [false, true] {
+            let best = matcher.best_per_song_with_fit(modal);
+            assert_eq!(matcher.hypotheses_per_song(1, modal), best);
+            let multiple = matcher.hypotheses_per_song(3, modal);
+            assert_eq!(multiple.len(), 3);
+            assert_eq!(multiple[0], best[0]);
+            assert_eq!(multiple.iter().map(|c| c.evidence).collect::<Vec<_>>(), [120, 100, 80]);
+            assert_eq!(matcher.hypotheses_per_song(3, modal), multiple);
+        }
+        assert!(matcher.hypotheses_per_song(0, true).is_empty());
+        matcher.advance(5000);
+        assert!(matcher.hypotheses_per_song(3, true).is_empty());
     }
 
     #[test]
