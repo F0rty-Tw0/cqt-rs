@@ -1,5 +1,30 @@
 # Goal progress and evidence
 
+## E014 running — longer retrieval with fresh continuation
+
+Frozen protocol: [E014](experiments/E014-long-context.md). Candidate native
+source `748dcd0e4ed4d1431a39a6878e99f1ee7075ccae`, executable SHA-256
+`1b1c5968ce134bda1b559da9b8bdade829c30070c4960700da6015988c0ed9d7`.
+All 12 CI checks pass on that source. Eight new Rust behavior regressions
+pass; the final independent Python recount tests are being added separately.
+
+`--window 10 --continuation-seconds 2 --continuation-hypotheses 3 --modal-fit`
+retains continuous retrieval evidence, checks old trajectories on fresh peak
+intervals before refitting, and never sums overlapping rolling scores.
+Default and E013 semantics are preserved. Full-source decoding for t19/t22
+was repaired and matched to the frozen hashes before native evaluation.
+
+The 192 primary query comparisons and all controlled/robustness/parity runs
+are tracked in `target/continuation/runs`. Full-mix runs have completed.
+The [resource-only scheduling note](experiments/E014-scheduling.md) records
+reuse of the two full-mix slots, at a maximum of six native processes total.
+Do not retune gates on these results. `scripts/continuation_remaining.py`
+finishes the programmes and parity after the query stage. Next commands:
+`python3 scripts/continuation_report.py` and
+`python3 scripts/continuation_package.py`. Publish the independently audited
+results and preserve the raw evidence before marking E014 completed.
+The broad 100% transformation/voiceover goal remains unproved. No merge/release.
+
 ## E013 completed — two-second sequence experiment
 
 [Complete DJ-mix experiment record](experiments/DJ-mix-fingerprinting-complete.md)
