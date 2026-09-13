@@ -52,6 +52,7 @@ options (defaults in brackets):
   --jump S             song-position jump that counts as a new play of the
                        same song (a repeated section flips the vote by a
                        few seconds, a restarted track by much more) [10]
+  --modal-fit          experimental modal-cell position estimate [off]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
 
@@ -77,6 +78,7 @@ struct Options {
     verify_bins: u32,
     verify_start: f64,
     verify_hold: f64,
+    modal_fit: bool,
     release: f64,
     jump: f64,
     report: f64,
@@ -110,6 +112,7 @@ impl Default for Options {
             verify_bins: 1,
             verify_start: 0.4,
             verify_hold: 0.3,
+            modal_fit: false,
             release: 3.0,
             jump: 10.0,
             report: 0.25,
@@ -169,6 +172,7 @@ fn parse_args() -> Options {
             "--verify-bins" => opts.verify_bins = value(&arg, args.next()),
             "--verify-start" => opts.verify_start = value(&arg, args.next()),
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
+            "--modal-fit" => opts.modal_fit = true,
             "--release" => opts.release = value(&arg, args.next()),
             "--jump" => opts.jump = value(&arg, args.next()),
             "--report" => opts.report = value(&arg, args.next()),
@@ -372,6 +376,10 @@ fn main() {
     )
     .unwrap();
 
+    if opts.modal_fit {
+        writeln!(out, "{{\"event\":\"experiment\",\"modal_fit\":true}}").unwrap();
+    }
+
     let ctx = Context {
         names: index.names(),
         tracks: &tracks,
@@ -381,6 +389,7 @@ fn main() {
         verify_span: (opts.verify_seconds * frames_per_second).round() as u64,
         verify_frames: opts.verify_frames,
         verify_bins: opts.verify_bins,
+        modal_fit: opts.modal_fit,
     };
     let mut frames = 0u64;
     let mut consumed = 0u64;
@@ -525,6 +534,7 @@ struct Context<'a> {
     verify_span: u64,
     verify_frames: u32,
     verify_bins: u32,
+    modal_fit: bool,
 }
 
 impl Context<'_> {
@@ -554,8 +564,12 @@ impl Context<'_> {
             recent.pop_front();
         }
         let query = recent.make_contiguous();
-        let verified: Vec<(Scored, Verification)> = matcher
-            .best_per_song()
+        let candidates = if self.modal_fit {
+            matcher.best_per_song_modal()
+        } else {
+            matcher.best_per_song()
+        };
+        let verified: Vec<(Scored, Verification)> = candidates
             .into_iter()
             .map(|c| {
                 let v = self.tracks[usize::from(c.song)].verify(

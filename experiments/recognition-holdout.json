@@ -1,0 +1,167 @@
+{
+  "seed": 20260913,
+  "selection": "Eight named held-out recordings; eight seeded genre-7 negatives excluding held-out titles, sorted by title before sampling. Frozen before detector results.",
+  "reference": "ten seconds centered at original midpoint",
+  "tracks": [
+    {
+      "id": "h01",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Cipher",
+      "isrc": "USUAN1100844",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cipher2.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100844",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h02",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Electrodoodle",
+      "isrc": "USUAN1200079",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Electrodoodle.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1200079",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h03",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Cut and Run",
+      "isrc": "USUAN1100851",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cut%20and%20Run.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100851",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h04",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Wallpaper",
+      "isrc": "USUAN1100843",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Wallpaper.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100843",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h05",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Funkorama",
+      "isrc": "USUAN1100474",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Funkorama.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100474",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h06",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Carefree",
+      "isrc": "USUAN1400037",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Carefree.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400037",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h07",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Hyperfun",
+      "isrc": "USUAN1400038",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Hyperfun.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1400038",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "h08",
+      "split": "heldout",
+      "artist": "Kevin MacLeod",
+      "title": "Sneaky Snitch",
+      "isrc": "USUAN1100772",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Sneaky%20Snitch.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100772",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n01",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Cruising for Goblins",
+      "isrc": "USUAN1800002",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Cruising%20for%20Goblins.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1800002",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n02",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Go Cart",
+      "isrc": "USUAN1300006",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Go%20Cart.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300006",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n03",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Jerry Five",
+      "isrc": "USUAN1700066",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Jerry%20Five.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1700066",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n04",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Raving Energy (faster)",
+      "isrc": "USUAN1900012",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Raving%20Energy%20%28faster%29.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900012",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n05",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Reformat",
+      "isrc": "USUAN1500020",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Reformat.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1500020",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n06",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Shiny Tech II",
+      "isrc": "USUAN1100077",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Shiny%20Tech2.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1100077",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n07",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Pamgaea",
+      "isrc": "USUAN1300036",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Pamgaea.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300036",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "id": "n08",
+      "split": "negative",
+      "artist": "Kevin MacLeod",
+      "title": "Blippy Trance",
+      "isrc": "USUAN1900055",
+      "url": "https://incompetech.com/music/royalty-free/mp3-royaltyfree/Blippy%20Trance.mp3",
+      "source_page": "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1900055",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    }
+  ]
+}

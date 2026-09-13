@@ -296,6 +296,21 @@ impl Matcher {
     /// iteration order. The reported shift, tempo and offset are
     /// vote-weighted means over the winning neighbourhood.
     pub fn best_per_song(&self) -> Vec<Candidate> {
+        self.best_per_song_with_fit(false)
+    }
+
+    /// Experimental point estimates from the most occupied cell inside
+    /// each winning neighbourhood. Evidence and winning neighbourhoods
+    /// are unchanged; only shift, tempo and offset use the modal cell.
+    ///
+    /// This avoids averaging distinct repeated-pattern alignments into a
+    /// position supported by neither. Ties use the fixed neighbourhood
+    /// traversal order. The default method retains its existing semantics.
+    pub fn best_per_song_modal(&self) -> Vec<Candidate> {
+        self.best_per_song_with_fit(true)
+    }
+
+    fn best_per_song_with_fit(&self, modal: bool) -> Vec<Candidate> {
         let mut slab_hist: FastMap<u64, u32> =
             FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
         let mut seed: HashMap<u16, (u32, u64)> = HashMap::new();
@@ -336,7 +351,7 @@ impl Matcher {
                 *entry = (total, cell.count, key);
             }
         }
-        self.candidates(best)
+        self.candidates(best, modal)
     }
 
     /// The same search without the bound; the oracle for the tests.
@@ -353,10 +368,10 @@ impl Matcher {
                 *entry = (total, cell.count, key);
             }
         }
-        self.candidates(best)
+        self.candidates(best, false)
     }
 
-    fn candidates(&self, best: HashMap<u16, (u32, u32, u64)>) -> Vec<Candidate> {
+    fn candidates(&self, best: HashMap<u16, (u32, u32, u64)>, modal: bool) -> Vec<Candidate> {
         let mut out: Vec<Candidate> = best
             .into_iter()
             .filter(|(_, (evidence, _, _))| *evidence > 0)
@@ -365,7 +380,18 @@ impl Matcher {
                 let (mut n, mut shift_sum) = (0u32, 0i64);
                 let (mut tempo_sum, mut offset_sum, mut query_sum, mut quantized) =
                     (0.0, 0.0, 0.0, 0.0);
-                for (shift, tempo_idx, cell) in self.neighbourhood_with_shift(key) {
+                let modal_index = if modal {
+                    self.neighbourhood_with_shift(key)
+                        .enumerate()
+                        .max_by_key(|(i, (_, _, cell))| (cell.count, std::cmp::Reverse(*i)))
+                        .map(|(i, _)| i)
+                } else {
+                    None
+                };
+                for (i, (shift, tempo_idx, cell)) in self.neighbourhood_with_shift(key).enumerate() {
+                    if modal_index.is_some_and(|wanted| i != wanted) {
+                        continue;
+                    }
                     n += cell.count;
                     shift_sum += i64::from(shift) * i64::from(cell.count);
                     tempo_sum += cell.tempo_sum;
@@ -543,6 +569,57 @@ mod tests {
         }
         let noise = matcher.best().map_or(0, |c| c.evidence);
         assert!(noise < best.evidence / 10, "noise {noise}");
+    }
+
+    #[test]
+    fn modal_fit_does_not_average_two_supported_offsets_into_a_false_position() {
+        let mut matcher = Matcher::new(MatcherConfig::default());
+        for (offset_idx, count) in [(-1, 120), (0, 1), (1, 80)] {
+            for _ in 0..count {
+                inject(
+                    &mut matcher,
+                    1000,
+                    encode_cell_raw(0, 0, 15, offset_idx),
+                    1.0,
+                    f64::from(offset_idx) * 86.0,
+                );
+            }
+        }
+        let legacy = matcher.best_per_song()[0];
+        let modal = matcher.best_per_song_modal()[0];
+        assert_eq!(legacy.evidence, 201);
+        assert_eq!(modal.evidence, legacy.evidence);
+        assert!((modal.offset + 86.0).abs() < 1e-9);
+        let query = [Peak {
+            frame: 500,
+            bin: 20,
+        }];
+        let track = crate::PeakTrack::new(vec![Peak {
+            frame: 414,
+            bin: 20,
+        }]);
+        let verified = |c: Candidate| {
+            track
+                .verify(&query, c.shift, c.tempo, c.offset, 2, 0)
+                .query_matched
+        };
+        assert_eq!(verified(legacy), 0);
+        assert_eq!(verified(modal), 1);
+    }
+
+    #[test]
+    fn modal_fit_preserves_a_single_alignment_through_expiry_and_rebase() {
+        let mut matcher = Matcher::new(MatcherConfig::default());
+        for frame in 4200..4300 {
+            inject(&mut matcher, frame, encode_cell_raw(0, 0, 15, -1), 1.0, -86.0);
+        }
+        let original = matcher.best_per_song_modal();
+        assert_eq!(original, matcher.best_per_song());
+        matcher.advance(5 * matcher.config.window_frames);
+        assert_eq!(matcher.best_per_song_modal(), original);
+        matcher.advance(100_000);
+        assert!(matcher.best_per_song_modal().is_empty());
+        assert!(matcher.best_per_song().is_empty());
     }
 
     #[test]

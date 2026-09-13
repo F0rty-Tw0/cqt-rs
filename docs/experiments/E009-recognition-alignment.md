@@ -51,3 +51,30 @@ Resource budget: native build CI <=10 minutes per concrete candidate; local
 controlled-grid evaluation <=15 minutes plus full-mix transformation and
 comparison <=20 minutes. Preserve binary identity before processing and
 checkpoint per completed case. No merge or release is authorized.
+
+## Candidate A, frozen before evaluation
+
+The original snippet miss reproduces on both exported native baselines;
+its ten-second WAV hash exactly matches E007. An offline vote snapshot
+using the actual exported fingerprints shows a winning neighbourhood
+combining distinct offsets: for anchor-frame cutoff 1600 its mean offset
+is about -954 frames while the known original offset is -861.33 frames;
+the vote median is about -1027. A centre with one own vote combines large
+clusters in neighbouring offset cells. This is a multimodal fit, not a
+reason to lower the verifier threshold.
+
+Candidate A: preserve the neighbourhood search and evidence score, and
+optionally estimate shift/tempo/offset from its most occupied cell. Add an
+opt-in `--modal-fit`; default behavior and existing public method semantics
+stay intact. A constructed two-offset regression checks that the original
+mean predicts an unsupported position while the modal estimate aligns a
+real correspondence. Preserve exact coherent-mode behavior through rebase
+and expiry. This candidate might select a repeated passage at the wrong
+position; measure position errors and false starts, not identity alone.
+
+`experiments/recognition-holdout.json` freezes eight new Kevin MacLeod
+recordings and eight separate electronic-music negatives before any of
+their detector outputs. Original midpoint clips stay fixed. They are a
+small recording-disjoint test, not proof across all genres or artists.
+Sources and CC BY 4.0 attribution come from Incompetech's publisher
+catalogue. No held-out result may be used to choose the candidate.
