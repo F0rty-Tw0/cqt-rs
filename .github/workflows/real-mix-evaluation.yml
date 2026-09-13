@@ -1,0 +1,67 @@
+name: Real mix recognition experiment
+
+on:
+  pull_request:
+    paths:
+      - scripts/real_mix_eval.py
+      - experiments/toucan2020.json
+      - .github/workflows/real-mix-evaluation.yml
+
+permissions:
+  contents: read
+
+jobs:
+  real-mix:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      RAYON_NUM_THREADS: 1
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install audio tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg
+          python -m pip install numpy
+          ffmpeg -hide_banner -filters 2>/dev/null | grep -E 'rubberband|flite'
+      - name: Build pinned implementations with the same lockfile
+        run: |
+          cargo generate-lockfile
+          git worktree add --detach "$RUNNER_TEMP/mix-baseline" 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a
+          git worktree add --detach "$RUNNER_TEMP/mix-candidate" 176bce2fef1d1463ff7b815f4f0ee62a21deb435
+          cp Cargo.lock "$RUNNER_TEMP/mix-baseline/Cargo.lock"
+          cp Cargo.lock "$RUNNER_TEMP/mix-candidate/Cargo.lock"
+          cargo build --release --locked -p cqt-monitor --manifest-path "$RUNNER_TEMP/mix-baseline/Cargo.toml" --target-dir "$RUNNER_TEMP/mix-baseline-build"
+          cargo build --release --locked -p cqt-monitor --manifest-path "$RUNNER_TEMP/mix-candidate/Cargo.toml" --target-dir "$RUNNER_TEMP/mix-candidate-build"
+      - name: Evaluate the real mix and controls
+        run: |
+          python scripts/real_mix_eval.py --baseline "$RUNNER_TEMP/mix-baseline-build/release/monitor" --candidate "$RUNNER_TEMP/mix-candidate-build/release/monitor"
+      - name: Preserve source and host identities
+        if: always()
+        run: |
+          mkdir -p target/real-mix/evidence
+          git rev-parse HEAD > target/real-mix/evidence/harness-commit.txt
+          git -C "$RUNNER_TEMP/mix-baseline" rev-parse HEAD > target/real-mix/evidence/baseline-commit.txt
+          git -C "$RUNNER_TEMP/mix-candidate" rev-parse HEAD > target/real-mix/evidence/candidate-commit.txt
+          git -C "$RUNNER_TEMP/mix-baseline" status --porcelain > target/real-mix/evidence/baseline-status.txt
+          git -C "$RUNNER_TEMP/mix-candidate" status --porcelain > target/real-mix/evidence/candidate-status.txt
+          rustc -Vv > target/real-mix/evidence/rustc.txt
+          ffmpeg -version > target/real-mix/evidence/ffmpeg.txt
+          lscpu > target/real-mix/evidence/cpu.txt
+          cp Cargo.lock target/real-mix/evidence/Cargo.lock.txt
+          cat target/real-mix/evidence/metadata.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: real-mix-${{ github.event.pull_request.head.sha }}
+          path: target/real-mix/evidence
+          retention-days: 90

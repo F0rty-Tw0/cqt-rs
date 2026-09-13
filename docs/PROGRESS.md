@@ -34,30 +34,30 @@ The CI snapshot records observed GitHub metadata, not copies of compiler
 or test logs. Follow the run/job URLs for logs; preserve logs/artifacts
 needed for later acceptance decisions before they expire.
 
-## Next executable task: E006, real monitor stage profile
+## Active user-requested task: E007, real-mix recognition
 
-E002 and E005 are accepted with the scoped evidence above. The verifier
-optimization meets its predeclared exploratory rule, but its share of real
-monitor work is still unknown. No independent recognition gain is claimed.
+The user requested an actual royalty-free stream comparison with ten-second
+references, raised pitch, reduced BPM and voiceover. This supersedes the
+next profiling step. The frozen protocol is in
+[experiments/E007-real-mix.md](experiments/E007-real-mix.md).
 
-First command on continuation, in the PR #7 worktree:
+Random seed 20260913 selected Toucan Music 2005 to 2020: 22 listed tracks,
+about 90 minutes. References are clean ten-second midpoint clips; the full
+mix is tested clean, pitch-only +2 semitones, tempo-only 0.9, and combined
+with 12-second voiceovers every 30 seconds at equal local RMS. Full-track
+references, original-clip self-recognition and speech/silence are controls.
+No detector settings are tuned. Source licenses and all hashes are recorded.
 
-```sh
-git status --short
-rg -n 'verify|fingerprint|lookup|Instant' monitor/src/bin/monitor.rs monitor/src/matcher.rs
-```
+Local audio-transform validation passed: independent tempo/pitch on a known
+tone, equal-RMS speech and partial-block sample counts. Real-binary results
+are pending. CI builds pinned PR #3 and current PR #7 with one toolchain
+and lockfile, then runs the same audio through both. Inspect every miss,
+raw events and artifacts before claiming recognition coverage. Cue times
+are unavailable, so exact onset latency and in-mix false-start precision
+are not independently established.
 
-Check live PR #7 head before editing. Read E005's limits; design a bounded
-profile of fingerprint, lookup/voting and verification work on deterministic
-synthetic positive/negative streams. Keep clock sampling out of normal
-builds or explicitly measure instrumentation overhead. Record the metric
-and acceptance rule before execution. Use CI as an exploratory host while
-local Rust is unavailable; do not call it the representative-host gate.
-
-Then use real stage shares to select the next optimization, or extend the
-CQT direct-oracle parameter grid. Assemble the recording-disjoint corpus
-before claiming recognition improvement. Do not rerun accepted CLI tests
-or local rustup failure without a new concrete reason.
+Next: inspect the real-mix workflow and retrieve its evidence. Do not change
+reference excerpts or thresholds after opening the results.
 
 ## Remaining gates and unblock actions
 
