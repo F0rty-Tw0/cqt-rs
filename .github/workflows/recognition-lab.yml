@@ -1,0 +1,48 @@
+name: Recognition lab binaries
+on:
+  pull_request:
+    paths:
+      - monitor/**
+      - src/**
+      - .github/workflows/recognition-lab.yml
+permissions:
+  contents: read
+jobs:
+  binaries:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98.1"
+      - name: Build pinned baselines and candidate
+        run: |
+          set -eu
+          mkdir -p target/recognition-lab
+          cp docs/evidence/E007/Cargo.lock.txt Cargo.lock
+          git worktree add --detach "$RUNNER_TEMP/pr3" 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a
+          git worktree add --detach "$RUNNER_TEMP/pr7" cdf428e9d6a82127cf36aedd8ddea27f82de81ec
+          for side in pr3 pr7; do
+            cp Cargo.lock "$RUNNER_TEMP/$side/Cargo.lock"
+            cargo build --release --locked -p cqt-monitor --manifest-path "$RUNNER_TEMP/$side/Cargo.toml" --target-dir "$RUNNER_TEMP/$side-build"
+            cp "$RUNNER_TEMP/$side-build/release/monitor" "target/recognition-lab/$side"
+            git -C "$RUNNER_TEMP/$side" rev-parse HEAD > "target/recognition-lab/$side-commit.txt"
+            git -C "$RUNNER_TEMP/$side" status --porcelain > "target/recognition-lab/$side-status.txt"
+          done
+          cargo build --release --locked -p cqt-monitor
+          cp target/release/monitor target/recognition-lab/candidate
+          git rev-parse HEAD > target/recognition-lab/candidate-commit.txt
+          git status --porcelain > target/recognition-lab/candidate-status.txt
+          cp Cargo.lock target/recognition-lab/Cargo.lock.txt
+          rustc -Vv > target/recognition-lab/rustc.txt
+          sha256sum target/recognition-lab/pr3 target/recognition-lab/pr7 target/recognition-lab/candidate > target/recognition-lab/binaries.sha256
+          ldd target/recognition-lab/candidate > target/recognition-lab/linked-libraries.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: recognition-binaries-${{ github.event.pull_request.head.sha }}
+          path: target/recognition-lab
+          retention-days: 90
