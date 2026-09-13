@@ -6,25 +6,25 @@ The user requested the goal workflow directly in this chat on 2026-09-13.
 `AGENTS.md` is the standing work/proof protocol; `GOAL.md` defines the
 objective and acceptance criteria. No slash command is needed to use it.
 
-Overall goal: **incomplete**. Instruction setup is ready for use. The
-initial evaluator change is implemented in draft PR #5; it has not been
-merged. No algorithmic speedup or independent recognition gain is verified.
+Overall goal: **incomplete**. Evaluation safeguards are implemented in
+PR #5. Two Rust CLI defects are fixed and verified in PR #6. PR #7 is
+measuring a verifier optimization with exact oracle parity; do not infer
+an accuracy or throughput gain until its results have been reviewed.
 
 - Tracking issue: <https://github.com/F0rty-Tw0/cqt-rs/issues/4>
-- Working PR: <https://github.com/F0rty-Tw0/cqt-rs/pull/5>
-- Working branch: `codex/pr3-accuracy-performance`
+- CLI PR: <https://github.com/F0rty-Tw0/cqt-rs/pull/6>
+- Verifier experiment: <https://github.com/F0rty-Tw0/cqt-rs/pull/7>
 - Fixed baseline: `7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a`
-- Validated implementation: `938215eac9398e9e78f7ecda32c73e97ff7b3567`
-- The subsequent instruction/checkpoint edit changes documentation only.
-  Check its eventual commit separately; the CI evidence below belongs to
-  the explicitly named implementation commit, not automatically to HEAD.
+- Validated CLI implementation: `73d19401fb68b3b167814ec18466ae76cd7dfd41`
+- This checkpoint changes documentation/evidence only; evidence belongs
+  to the explicitly identified implementation commit, not automatically HEAD.
 
 ## Evidence register
 
 | ID | Status | Claim supported | Proof and limits |
 | --- | --- | --- | --- |
 | E001 | verified | Seven evaluator/provenance regressions pass; the existing Rust correctness/release gates pass at `938215e` | [CI run 34752565983](https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34752565983); [check snapshot](evidence/2026-09-13-pr5-ci.json). Nine checks re-read as completed/success for the exact SHA. Replayed events exercise evaluation behavior, not audio recognition quality. |
-| E002 | running | Fix truncated stream metadata and undefined empty-input timing JSON | The first real CI run exposed an additional `seconds:nu` formatting bug. Both Rust fixes are now in the candidate; eight real-binary before/after cases are pending. See [experiment record](experiments/E002-empty-stream.md). |
+| E002 | verified | Correct full stream durations and null empty-input timing ratio | Eight real-binary before/after cases and ten CI checks pass at `73d1940`. Downloaded artifact and input/log hashes verified. [Experiment and preserved evidence](experiments/E002-empty-stream.md). |
 | E003 | blocked | Fresh representative runtime benchmark baseline | Local Cargo/rustc unavailable; the prior rustup attempt failed because `/proc/self/exe` is absent. CI compiled bench targets, but did not measure throughput. |
 | E004 | planned | Independent recognition evaluation | Corpus/splits and executable run not yet prepared; existing radio results remain development validation. |
 
@@ -32,39 +32,28 @@ The CI snapshot records observed GitHub metadata, not copies of compiler
 or test logs. Follow the run/job URLs for logs; preserve logs/artifacts
 needed for later acceptance decisions before they expire.
 
-## Next executable task: E002
+## Next executable task: E005
 
-**Hypothesis:** the empty-stdin path completes with zero consumed audio but
-formats an infinite or non-finite realtime fraction, violating JSON syntax.
+Inspect the verifier experiment in PR #7 at
+`38d6e5bb8e9682b4c30092bd0b9ca8623fae953b`. The initial check found a
+rustfmt-only failure in benchmark printing; the revision applies its exact
+formatting diff. The optimization and predeclared thresholds are unchanged.
 
-**Acceptance rule, set before the run:** reproduce the JSON defect on the
-pinned baseline; choose and document an empty-duration representation; fix
-it with the smallest compatible change; prove every output line parses as
-strict JSON on empty input and remains valid with positive audio duration.
-Preserve event behavior and the existing finite-duration field semantics.
-Do not describe this as an accuracy or speed improvement.
+Read the PR's `docs/experiments/E005-verifier-window.md`, check exact-head
+CI status, inspect the baseline/candidate exhaustive-oracle results and
+all eight timing cases, and download the evidence. Recompute paired
+reductions from raw results, apply the predeclared rule, record the decision
+and limits, and fix any concrete CI failure before accepting the change.
 
-**First command on continuation:**
+First command in the verifier worktree:
 
 ```sh
 git status --short
-sed -n '482,510p' monitor/src/bin/monitor.rs
 ```
 
-Then inspect the argument parser and existing CLI tests. Create a small
-deterministic mono WAV fixture with the Python standard library and a
-strict JSON reproducer. Build the pinned baseline and candidate with the
-same supported Rust toolchain on a GitHub CI runner if local execution is
-still unavailable. Use `--watch fixture=<fixture.wav> --stream -` with an
-empty input pipe, then a nonempty PCM pipe. Capture commands, exit status,
-stdout, stderr, executable hashes and the expected failure. A build error,
-invalid fixture or network failure must not count as proof of the JSON bug.
-
-Verify the candidate against the same reproducer and applicable monitor
-gates. Record the actual baseline/candidate commits, run URLs and output
-before changing E002 from suspected to verified. Keep the change in a
-focused draft PR or clearly separate commit; avoid folding unrelated DSP
-tuning into this regression fix.
+Then fetch the PR #7 head and GitHub check runs; do not restart completed
+CLI proof or rerun the failed local Rust installation. No speedup or
+independent recognition gain is established by E002.
 
 ## Remaining gates and unblock actions
 

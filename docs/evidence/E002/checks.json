@@ -1,0 +1,75 @@
+{
+  "commit": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+  "checks": [
+    {
+      "name": "Library packages for crates.io",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747041"
+    },
+    {
+      "name": "Library test (1.98, )",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747038"
+    },
+    {
+      "name": "Library test (1.98, --no-default-features)",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747036"
+    },
+    {
+      "name": "Library format, lint, docs",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747025"
+    },
+    {
+      "name": "Evaluation provenance",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747023"
+    },
+    {
+      "name": "Library test (stable, --no-default-features)",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714747006"
+    },
+    {
+      "name": "Library test (stable, )",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714746993"
+    },
+    {
+      "name": "Monitor test and end-to-end detection",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714746989"
+    },
+    {
+      "name": "Monitor format, lint, docs",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834960/job/103714746949"
+    },
+    {
+      "name": "proof",
+      "status": "completed",
+      "conclusion": "success",
+      "head_sha": "73d19401fb68b3b167814ec18466ae76cd7dfd41",
+      "url": "https://github.com/F0rty-Tw0/cqt-rs/actions/runs/34753834958/job/103714746863"
+    }
+  ]
+}
