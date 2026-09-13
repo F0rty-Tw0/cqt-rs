@@ -26,7 +26,8 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.98"
-      - uses: Swatinem/rust-cache@v2
+      # Keep this two-worktree proof uncached: target caches can restore an
+      # obsolete baseline worktree or mix evidence from different commits.
       - name: Prepare baseline with identical test and timing harnesses
         run: |
           mkdir -p target/verifier-proof
