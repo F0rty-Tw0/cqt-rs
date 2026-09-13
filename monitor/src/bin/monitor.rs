@@ -218,21 +218,20 @@ fn parse_args() -> Options {
         eprintln!("--sequence-seconds must be finite and in (0, 10]");
         exit(2);
     }
-    if let Some(seconds) = opts.continuation_seconds {
-        if !seconds.is_finite()
+    if let Some(seconds) = opts.continuation_seconds
+        && (!seconds.is_finite()
             || seconds <= 0.0
             || seconds > 10.0
             || !opts.window.is_finite()
             || opts.window < seconds
             || opts.window > 60.0
             || !(1..=3).contains(&opts.continuation_hypotheses)
-            || opts.sequence_seconds.is_some()
-        {
-            eprintln!(
-                "continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode"
-            );
-            exit(2);
-        }
+            || opts.sequence_seconds.is_some())
+    {
+        eprintln!(
+            "continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode"
+        );
+        exit(2);
     }
     opts
 }

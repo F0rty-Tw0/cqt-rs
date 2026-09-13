@@ -31,16 +31,21 @@ def recover():
             with urllib.request.urlopen(request, timeout=120) as response:
                 atomic_bytes(media, response.read())
         assert e.sha(media) == record['source']['sha256'], ('source hash', key)
-        if not output.exists():
+        expected = record.get('original', {}).get('sha256')
+        if not output.exists() or (expected and e.sha(output) != expected):
+            temporary = output.with_name(key+'-decoding.wav')
             command = ['ffmpeg', '-hide_banner', '-loglevel', 'error', '-nostdin',
                        '-y', '-i', str(media), '-ac', '1', '-ar', '44100']
             if canonical:
                 command += ['-f', 's16le', '-']
             else:
-                command += ['-c:a', 'pcm_s16le', str(output)]
+                command += ['-c:a', 'pcm_s16le', str(temporary)]
             result = subprocess.run(command, capture_output=True, check=True)
             if canonical:
-                pcm_wav(output, result.stdout)
+                pcm_wav(temporary, result.stdout)
+            if expected:
+                assert e.sha(temporary) == expected, ('decoded temporary hash', key)
+            temporary.replace(output)
             e.save(ROOT/'preparation'/(key+'.json'), dict(command=command,
                    returncode=result.returncode, stderr=result.stderr.decode()))
         if 'original' in record:
