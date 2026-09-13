@@ -492,10 +492,16 @@ fn main() {
     );
     let cpu = started.elapsed().as_secs_f64();
     let audio = consumed as f64 / ctx.sample_rate;
+    // No duration means no defined ratio. Emit JSON null rather than inf
+    // (or NaN), while preserving the numeric field for nonempty input.
+    let realtime_fraction = if consumed == 0 {
+        "null".to_owned()
+    } else {
+        format!("{:.4}", cpu / audio)
+    };
     writeln!(
         out,
-        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
-        cpu / audio,
+        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{realtime_fraction},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
         fp.peaks(),
         matcher.lookups(),
         matcher.matches(),

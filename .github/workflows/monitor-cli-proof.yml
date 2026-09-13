@@ -1,0 +1,48 @@
+name: Monitor CLI before-after proof
+
+on:
+  pull_request:
+    paths:
+      - monitor/src/bin/monitor.rs
+      - scripts/prove_monitor_cli.py
+      - .github/workflows/monitor-cli-proof.yml
+
+permissions:
+  contents: read
+
+jobs:
+  proof:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: "1.98"
+      - uses: Swatinem/rust-cache@v2
+      - name: Build candidate and pinned PR3 baseline with the same lockfile
+        run: |
+          cargo build --release -p cqt-monitor
+          git worktree add --detach target/proof-baseline 7f7374e7ddfbf75a5d3e30c70d0d9076779e2c5a
+          cp Cargo.lock target/proof-baseline/Cargo.lock
+          cargo build --release --locked -p cqt-monitor --manifest-path target/proof-baseline/Cargo.toml --target-dir target/proof-baseline-build
+      - name: Reproduce baseline defect and verify candidate
+        run: |
+          python3 scripts/prove_monitor_cli.py --baseline target/proof-baseline-build/release/monitor --candidate target/release/monitor
+      - name: Record source and toolchain identities
+        if: always()
+        run: |
+          mkdir -p target/monitor-cli-proof
+          git rev-parse HEAD > target/monitor-cli-proof/candidate-commit.txt
+          git -C target/proof-baseline rev-parse HEAD > target/monitor-cli-proof/baseline-commit.txt
+          rustc -Vv > target/monitor-cli-proof/rustc.txt
+          cp Cargo.lock target/monitor-cli-proof/Cargo.lock
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: monitor-cli-proof-${{ github.event.pull_request.head.sha }}
+          path: target/monitor-cli-proof
+          retention-days: 90

@@ -456,6 +456,10 @@ earlier (median 2.3 s → 1.8 s), the null-stream ceiling drops from 50
 to 20 votes, the index halves and processing wall time drops from 0.9 % to
 0.4 % of audio duration.
 
+For empty WAV or stdin input, the CLI emits `realtime_fraction: null`
+because the ratio has no audio duration. Nonempty input retains a finite
+numeric ratio, including very short streams displayed as 0.00 seconds.
+
 <p align="center">
   <img src="./plots/radio_compare.png" width="98%" />
 </p>
