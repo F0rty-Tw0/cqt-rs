@@ -19,6 +19,14 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: "1.98.1"
+          components: rustfmt
+      - name: Export formatting assistance without changing tested source
+        run: |
+          mkdir -p target/recognition-lab
+          cargo fmt --all
+          git diff --binary > target/recognition-lab/formatting.patch
+          git restore .
+          cp "$(rustup which rustfmt)" target/recognition-lab/rustfmt
       - name: Build pinned baselines and candidate
         run: |
           set -eu

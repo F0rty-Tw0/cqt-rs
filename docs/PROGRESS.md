@@ -1,5 +1,19 @@
 # Goal progress and evidence
 
+## E013 running — two-second sequential confirmation
+
+User requested successive two-second observations and song start/end tracking.
+Protocol: [E013](experiments/E013-two-second-sequence.md). Opt-in native
+implementation uses disjoint anchor windows over continuous fingerprints,
+full-song identities, bounded trajectory-consistent accumulation, and coarse
+supported-boundary estimates separated from notification time. No measured
+acceptance yet. Local Cargo is unavailable; initial native build/tests and
+formatting assistance run on GitHub Actions. Defaults remain unchanged.
+
+Next command: `python3 scripts/sequence_eval.py --prepare`, then run the
+frozen protocol with the exported candidate and publish every regression.
+
+
 ## E011/E012 completed: coverage, alignment and source identity — 2026-09-13
 
 All **288 main native runs plus four matched-source diagnostics** completed.

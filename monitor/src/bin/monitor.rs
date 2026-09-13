@@ -17,6 +17,9 @@ use cqt_monitor::{
 };
 use cqt_rs::{Cqt, CqtParams, CqtStream};
 
+#[path = "monitor/sequence.rs"]
+mod sequence;
+
 const USAGE: &str = "usage:
   monitor --watch NAME=FILE.wav [--watch ...] --stream FILE.wav [options]
   monitor --watch NAME=FILE.wav [--watch ...] --stream - [--rate HZ] [options]
@@ -53,6 +56,8 @@ options (defaults in brackets):
                        same song (a repeated section flips the vote by a
                        few seconds, a restarted track by much more) [10]
   --modal-fit          experimental modal-cell position estimate [off]
+  --sequence-seconds S experimental disjoint observations, two to confirm [off]
+                       replaces --window/--report/--verify-seconds; S in (0,10]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
 
@@ -79,6 +84,7 @@ struct Options {
     verify_start: f64,
     verify_hold: f64,
     modal_fit: bool,
+    sequence_seconds: Option<f64>,
     release: f64,
     jump: f64,
     report: f64,
@@ -113,6 +119,7 @@ impl Default for Options {
             verify_start: 0.4,
             verify_hold: 0.3,
             modal_fit: false,
+            sequence_seconds: None,
             release: 3.0,
             jump: 10.0,
             report: 0.25,
@@ -173,6 +180,7 @@ fn parse_args() -> Options {
             "--verify-start" => opts.verify_start = value(&arg, args.next()),
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
             "--modal-fit" => opts.modal_fit = true,
+            "--sequence-seconds" => opts.sequence_seconds = Some(value(&arg, args.next())),
             "--release" => opts.release = value(&arg, args.next()),
             "--jump" => opts.jump = value(&arg, args.next()),
             "--report" => opts.report = value(&arg, args.next()),
@@ -190,6 +198,10 @@ fn parse_args() -> Options {
     }
     if opts.fingerprint.is_none() && (opts.watch.is_empty() || opts.stream.is_none()) {
         eprintln!("{USAGE}");
+        exit(2);
+    }
+    if opts.sequence_seconds.is_some_and(|s| !s.is_finite() || s <= 0.0 || s > 10.0) {
+        eprintln!("--sequence-seconds must be finite and in (0, 10]");
         exit(2);
     }
     opts
@@ -391,6 +403,17 @@ fn main() {
         verify_bins: opts.verify_bins,
         modal_fit: opts.modal_fit,
     };
+    let mut sequence = opts.sequence_seconds.map(|_| {
+        sequence::Sequence::new(&opts, frames_per_second, index.names().len())
+    });
+    if let Some(seconds) = opts.sequence_seconds {
+        writeln!(out,
+            "{{\"event\":\"experiment\",\"sequence_seconds\":{},\"minimum_observations\":2,\"maximum_observations\":5,\"boundary_semantics\":\"supported interval edges, not audible ground truth\"}}",
+            (seconds * frames_per_second).round().max(1.0) / frames_per_second,
+        ).unwrap();
+    }
+    let sequence_enabled = sequence.is_some();
+    let mut pending_hashes = VecDeque::new();
     let mut frames = 0u64;
     let mut consumed = 0u64;
     let mut delays = Histogram::new(delay as usize + 1);
@@ -408,7 +431,11 @@ fn main() {
                 |p| recent_ref.push_back(p),
                 |h| {
                     delays_ref.record(*frames_ref - h.frame);
-                    matcher_ref.push(&index, &h);
+                    if sequence_enabled {
+                        pending_hashes.push_back(h);
+                    } else {
+                        matcher_ref.push(&index, &h);
+                    }
                 },
             );
             *frames_ref += 1;
@@ -416,7 +443,13 @@ fn main() {
                 pending_report = true;
             }
         });
-        if pending_report {
+        if let Some(sequence) = &mut sequence {
+            sequence.drain(&ctx, &index, &mut recent, &mut pending_hashes,
+                frames.saturating_sub(delay), consumed, false, out);
+            if live {
+                out.flush().unwrap();
+            }
+        } else if pending_report {
             ctx.report(
                 &mut matcher,
                 &mut tracker,
@@ -480,16 +513,30 @@ fn main() {
                 |p| recent_ref.push_back(p),
                 |h| {
                     delays_ref.record(*frames_ref - h.frame);
-                    matcher_ref.push(&index, &h);
+                    if sequence_enabled {
+                        pending_hashes.push_back(h);
+                    } else {
+                        matcher_ref.push(&index, &h);
+                    }
                 },
             );
             *frames_ref += 1;
         });
         fp_ref.flush(
             |p| recent_ref.push_back(p),
-            |h| matcher_ref.push(&index, &h),
+            |h| {
+                if sequence_enabled {
+                    pending_hashes.push_back(h);
+                } else {
+                    matcher_ref.push(&index, &h);
+                }
+            },
         );
     }
+    if let Some(sequence) = &mut sequence {
+        sequence.drain(&ctx, &index, &mut recent, &mut pending_hashes,
+            frames, consumed, true, &mut out);
+    } else {
     ctx.report(
         &mut matcher,
         &mut tracker,
@@ -499,6 +546,7 @@ fn main() {
         &mut out,
         true,
     );
+    }
     let cpu = started.elapsed().as_secs_f64();
     let audio = consumed as f64 / ctx.sample_rate;
     // No duration means no defined ratio. Emit JSON null rather than inf
@@ -512,8 +560,8 @@ fn main() {
         out,
         "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{realtime_fraction},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
         fp.peaks(),
-        matcher.lookups(),
-        matcher.matches(),
+        sequence.as_ref().map_or_else(|| matcher.lookups(), |s| s.lookups),
+        sequence.as_ref().map_or_else(|| matcher.matches(), |s| s.matches),
         delays.quantile(0.5) as f64 * ctx.seconds_per_frame,
         delays.max() as f64 * ctx.seconds_per_frame,
     )
