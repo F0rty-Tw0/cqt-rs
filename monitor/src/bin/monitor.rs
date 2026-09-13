@@ -200,7 +200,10 @@ fn parse_args() -> Options {
         eprintln!("{USAGE}");
         exit(2);
     }
-    if opts.sequence_seconds.is_some_and(|s| !s.is_finite() || s <= 0.0 || s > 10.0) {
+    if opts
+        .sequence_seconds
+        .is_some_and(|s| !s.is_finite() || s <= 0.0 || s > 10.0)
+    {
         eprintln!("--sequence-seconds must be finite and in (0, 10]");
         exit(2);
     }
@@ -403,13 +406,13 @@ fn main() {
         verify_bins: opts.verify_bins,
         modal_fit: opts.modal_fit,
     };
-    let mut sequence = opts.sequence_seconds.map(|_| {
-        sequence::Sequence::new(&opts, frames_per_second, index.names().len())
-    });
+    let mut sequence = opts
+        .sequence_seconds
+        .map(|_| sequence::Sequence::new(&opts, frames_per_second, index.names().len()));
     if let Some(seconds) = opts.sequence_seconds {
         writeln!(out,
             "{{\"event\":\"experiment\",\"sequence_seconds\":{},\"minimum_observations\":2,\"maximum_observations\":5,\"boundary_semantics\":\"supported interval edges, not audible ground truth\"}}",
-            (seconds * frames_per_second).round().max(1.0) / frames_per_second,
+            (seconds * frames_per_second).max(1.0) / frames_per_second,
         ).unwrap();
     }
     let sequence_enabled = sequence.is_some();
@@ -444,8 +447,16 @@ fn main() {
             }
         });
         if let Some(sequence) = &mut sequence {
-            sequence.drain(&ctx, &index, &mut recent, &mut pending_hashes,
-                frames.saturating_sub(delay), consumed, false, out);
+            sequence.drain(
+                &ctx,
+                &index,
+                &mut recent,
+                &mut pending_hashes,
+                frames.saturating_sub(delay),
+                consumed,
+                false,
+                out,
+            );
             if live {
                 out.flush().unwrap();
             }
@@ -534,18 +545,26 @@ fn main() {
         );
     }
     if let Some(sequence) = &mut sequence {
-        sequence.drain(&ctx, &index, &mut recent, &mut pending_hashes,
-            frames, consumed, true, &mut out);
+        sequence.drain(
+            &ctx,
+            &index,
+            &mut recent,
+            &mut pending_hashes,
+            frames,
+            consumed,
+            true,
+            &mut out,
+        );
     } else {
-    ctx.report(
-        &mut matcher,
-        &mut tracker,
-        &mut recent,
-        frames,
-        consumed,
-        &mut out,
-        true,
-    );
+        ctx.report(
+            &mut matcher,
+            &mut tracker,
+            &mut recent,
+            frames,
+            consumed,
+            &mut out,
+            true,
+        );
     }
     let cpu = started.elapsed().as_secs_f64();
     let audio = consumed as f64 / ctx.sample_rate;

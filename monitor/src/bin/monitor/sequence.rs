@@ -25,8 +25,15 @@ struct Play {
 
 #[derive(Clone, Copy, Debug)]
 enum Change {
-    Start { play: Play, evidence: u32 },
-    End { song: u16, play: Play, reason: &'static str },
+    Start {
+        play: Play,
+        evidence: u32,
+    },
+    End {
+        song: u16,
+        play: Play,
+        reason: &'static str,
+    },
 }
 
 struct Decisions {
@@ -53,7 +60,9 @@ impl Decisions {
     fn update(&mut self, begin: u64, end: u64, scored: &[Scored]) -> Vec<Change> {
         let mut changes = Vec::new();
         for song in 0..self.states.len() {
-            let observation = scored.iter().find(|s| usize::from(s.candidate.song) == song)
+            let observation = scored
+                .iter()
+                .find(|s| usize::from(s.candidate.song) == song)
                 .map(|&scored| Observation { begin, end, scored });
             let mut state = std::mem::take(&mut self.states[song]);
             if let (Some(mut play), Some(o)) = (state.active, observation) {
@@ -80,14 +89,22 @@ impl Decisions {
                 if state.pending.len() > 5 {
                     state.pending.pop_front();
                 }
-                let evidence = state.pending.iter().fold(0u32, |n, o| {
-                    n.saturating_add(o.scored.candidate.evidence)
-                });
+                let evidence = state
+                    .pending
+                    .iter()
+                    .fold(0u32, |n, o| n.saturating_add(o.scored.candidate.evidence));
                 if state.pending.len() >= 2 && confidence(evidence, self.half) >= self.threshold {
                     if let Some(play) = state.active.take() {
-                        changes.push(Change::End { song: song as u16, play, reason: "trajectory" });
+                        changes.push(Change::End {
+                            song: song as u16,
+                            play,
+                            reason: "trajectory",
+                        });
                     }
-                    let play = Play { begin: state.pending[0].begin, last: o };
+                    let play = Play {
+                        begin: state.pending[0].begin,
+                        last: o,
+                    };
                     changes.push(Change::Start { play, evidence });
                     state.active = Some(play);
                     state.pending.clear();
@@ -97,7 +114,11 @@ impl Decisions {
             }
             if let Some(play) = state.active {
                 if end.saturating_sub(play.last.end) >= self.release {
-                    changes.push(Change::End { song: song as u16, play, reason: "release" });
+                    changes.push(Change::End {
+                        song: song as u16,
+                        play,
+                        reason: "release",
+                    });
                     state.active = None;
                 }
             }
@@ -107,12 +128,18 @@ impl Decisions {
     }
 
     fn finish(&mut self) -> Vec<Change> {
-        self.states.iter_mut().enumerate().filter_map(|(song, state)| {
-            state.pending.clear();
-            state.active.take().map(|play| Change::End {
-                song: song as u16, play, reason: "eof",
+        self.states
+            .iter_mut()
+            .enumerate()
+            .filter_map(|(song, state)| {
+                state.pending.clear();
+                state.active.take().map(|play| Change::End {
+                    song: song as u16,
+                    play,
+                    reason: "eof",
+                })
             })
-        }).collect()
+            .collect()
     }
 }
 
@@ -121,7 +148,8 @@ fn confidence(evidence: u32, half: f64) -> f64 {
 }
 
 pub(super) struct Sequence {
-    width: u64,
+    frames_per_observation: f64,
+    observation_number: u64,
     begin: u64,
     matcher_config: MatcherConfig,
     decisions: Decisions,
@@ -131,9 +159,11 @@ pub(super) struct Sequence {
 
 impl Sequence {
     pub(super) fn new(opts: &Options, fps: f64, songs: usize) -> Self {
-        let width = (opts.sequence_seconds.unwrap() * fps).round().max(1.0) as u64;
+        let frames_per_observation = (opts.sequence_seconds.unwrap() * fps).max(1.0);
+        let width = frames_per_observation.ceil() as u64;
         Self {
-            width,
+            frames_per_observation,
+            observation_number: 0,
             begin: 0,
             matcher_config: MatcherConfig {
                 window_frames: width,
@@ -159,16 +189,33 @@ impl Sequence {
     /// Queues may contain later anchors; those belong to subsequent windows.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn drain<W: Write>(
-        &mut self, ctx: &Context<'_>, index: &Index, peaks: &mut VecDeque<Peak>,
-        hashes: &mut VecDeque<Hash>, horizon: u64, consumed: u64, eof: bool, out: &mut W,
+        &mut self,
+        ctx: &Context<'_>,
+        index: &Index,
+        peaks: &mut VecDeque<Peak>,
+        hashes: &mut VecDeque<Hash>,
+        horizon: u64,
+        consumed: u64,
+        eof: bool,
+        out: &mut W,
     ) {
-        while self.begin + self.width <= horizon || (eof && self.begin < horizon) {
-            let end = (self.begin + self.width).min(horizon);
-            let complete = end - self.begin == self.width;
+        loop {
+            // Round cumulative boundaries: five two-second observations must
+            // fit a ten-second excerpt despite a nonintegral frame rate.
+            let next = ((self.observation_number + 1) as f64 * self.frames_per_observation)
+                .round() as u64;
+            if next > horizon && !(eof && self.begin < horizon) {
+                break;
+            }
+            let end = next.min(horizon);
+            let complete = end == next;
             let mut matcher = Matcher::new(self.matcher_config.clone());
             while hashes.front().is_some_and(|h| h.frame < end) {
                 let h = hashes.pop_front().unwrap();
-                assert!(h.frame >= self.begin, "hash arrived after its window closed");
+                assert!(
+                    h.frame >= self.begin,
+                    "hash arrived after its window closed"
+                );
                 matcher.push(index, &h);
             }
             matcher.advance(end - 1);
@@ -177,7 +224,10 @@ impl Sequence {
             let mut query = Vec::new();
             while peaks.front().is_some_and(|p| p.frame < end) {
                 let p = peaks.pop_front().unwrap();
-                assert!(p.frame >= self.begin, "peak arrived after its window closed");
+                assert!(
+                    p.frame >= self.begin,
+                    "peak arrived after its window closed"
+                );
                 query.push(p);
             }
             let candidates = if ctx.modal_fit {
@@ -188,10 +238,16 @@ impl Sequence {
             let mut scored = Vec::new();
             for c in candidates {
                 let v = ctx.tracks[usize::from(c.song)].verify(
-                    &query, c.shift, c.tempo, c.offset, ctx.verify_frames, ctx.verify_bins,
+                    &query,
+                    c.shift,
+                    c.tempo,
+                    c.offset,
+                    ctx.verify_frames,
+                    ctx.verify_bins,
                 );
                 scored.push(Scored {
-                    candidate: c, confidence: matcher.confidence(c.evidence),
+                    candidate: c,
+                    confidence: matcher.confidence(c.evidence),
                     alignment: v.query_fraction(),
                 });
                 writeln!(out,
@@ -215,6 +271,7 @@ impl Sequence {
                 }
             }
             self.begin = end;
+            self.observation_number += 1;
         }
         if eof {
             for change in self.decisions.finish() {
@@ -224,7 +281,12 @@ impl Sequence {
     }
 
     fn write_change<W: Write>(
-        &self, ctx: &Context<'_>, change: Change, end: u64, consumed: u64, out: &mut W,
+        &self,
+        ctx: &Context<'_>,
+        change: Change,
+        end: u64,
+        consumed: u64,
+        out: &mut W,
     ) {
         let t = end as f64 * ctx.seconds_per_frame;
         let consumed = consumed as f64 / ctx.sample_rate;
@@ -255,12 +317,28 @@ mod tests {
     use super::*;
 
     fn tracker() -> Decisions {
-        Decisions { states: vec![State::default(); 2], threshold: 70.0, half: 40.0,
-            start_alignment: 0.4, hold_alignment: 0.3, position_tolerance: 50.0, release: 300 }
+        Decisions {
+            states: vec![State::default(); 2],
+            threshold: 70.0,
+            half: 40.0,
+            start_alignment: 0.4,
+            hold_alignment: 0.3,
+            position_tolerance: 50.0,
+            release: 300,
+        }
     }
     fn score(song: u16, evidence: u32, offset: f64) -> Scored {
-        Scored { candidate: Candidate { song, evidence, shift: 0, tempo: 1.0, offset },
-            confidence: confidence(evidence, 40.0), alignment: 0.8 }
+        Scored {
+            candidate: Candidate {
+                song,
+                evidence,
+                shift: 0,
+                tempo: 1.0,
+                offset,
+            },
+            confidence: confidence(evidence, 40.0),
+            alignment: 0.8,
+        }
     }
 
     #[test]
@@ -268,7 +346,10 @@ mod tests {
         let mut d = tracker();
         assert!(d.update(0, 200, &[score(0, 50, 1000.0)]).is_empty());
         let changes = d.update(200, 400, &[score(0, 50, 1000.0)]);
-        assert!(matches!(changes.as_slice(), [Change::Start { evidence: 100, .. }]));
+        assert!(matches!(
+            changes.as_slice(),
+            [Change::Start { evidence: 100, .. }]
+        ));
         let mut d = tracker();
         assert!(d.update(0, 200, &[score(0, 10000, 1000.0)]).is_empty());
         assert!(d.finish().is_empty());
@@ -279,12 +360,21 @@ mod tests {
         for next_begin in [0, 400] {
             let mut d = tracker();
             d.update(0, 200, &[score(0, 60, 1000.0)]);
-            assert!(d.update(next_begin, next_begin + 200, &[score(0, 60, 1000.0)]).is_empty());
+            assert!(
+                d.update(next_begin, next_begin + 200, &[score(0, 60, 1000.0)])
+                    .is_empty()
+            );
         }
         let mut d = tracker();
         for i in 0..20 {
-            assert!(d.update(i * 200, (i + 1) * 200,
-                &[score(0, 60, if i % 2 == 0 { 1000.0 } else { 1100.0 })]).is_empty());
+            assert!(
+                d.update(
+                    i * 200,
+                    (i + 1) * 200,
+                    &[score(0, 60, if i % 2 == 0 { 1000.0 } else { 1100.0 })]
+                )
+                .is_empty()
+            );
         }
     }
 
@@ -308,7 +398,10 @@ mod tests {
     fn history_is_bounded_and_alignment_gates_every_observation() {
         let mut d = tracker();
         for i in 0..100 {
-            assert!(d.update(i * 200, (i + 1) * 200, &[score(0, 1, 0.0)]).is_empty());
+            assert!(
+                d.update(i * 200, (i + 1) * 200, &[score(0, 1, 0.0)])
+                    .is_empty()
+            );
             assert!(d.states[0].pending.len() <= 5);
         }
         let mut bad = score(0, 1000, 0.0);
@@ -319,18 +412,42 @@ mod tests {
     #[test]
     fn anchor_partition_preserves_cross_edge_hashes_and_partial_tail() {
         use cqt_monitor::{IndexBuilder, PeakTrack, encode_key};
-        let hashes: Vec<Hash> = [199, 200, 399, 400].into_iter().enumerate().map(|(i, frame)| {
-            Hash { key: encode_key(i as i32 * 20, 10, 16), frame, bin: 20, span: 320 }
-        }).collect();
-        let peaks: Vec<Peak> = hashes.iter().map(|h| Peak { frame: h.frame, bin: h.bin }).collect();
+        let hashes: Vec<Hash> = [199, 200, 399, 400]
+            .into_iter()
+            .enumerate()
+            .map(|(i, frame)| Hash {
+                key: encode_key(i as i32 * 20, 10, 16),
+                frame,
+                bin: 20,
+                span: 320,
+            })
+            .collect();
+        let peaks: Vec<Peak> = hashes
+            .iter()
+            .map(|h| Peak {
+                frame: h.frame,
+                bin: h.bin,
+            })
+            .collect();
         let mut builder = IndexBuilder::new();
         builder.add_song("a", 800, hashes.clone());
         let index = builder.build(8);
         let tracks = [PeakTrack::new(peaks.clone())];
-        let ctx = Context { names: index.names(), tracks: &tracks, seconds_per_frame: 0.01,
-            sample_rate: 100.0, delay: 344, verify_span: 200, verify_frames: 4,
-            verify_bins: 1, modal_fit: false };
-        let opts = Options { sequence_seconds: Some(2.0), ..Options::default() };
+        let ctx = Context {
+            names: index.names(),
+            tracks: &tracks,
+            seconds_per_frame: 0.01,
+            sample_rate: 100.0,
+            delay: 344,
+            verify_span: 200,
+            verify_frames: 4,
+            verify_bins: 1,
+            modal_fit: false,
+        };
+        let opts = Options {
+            sequence_seconds: Some(2.0),
+            ..Options::default()
+        };
         let run = |horizons: &[u64]| {
             let mut s = Sequence::new(&opts, 100.0, 1);
             let mut hp = VecDeque::from(hashes.clone());
@@ -351,14 +468,34 @@ mod tests {
     }
 
     #[test]
+    fn cumulative_rounding_keeps_five_observations_in_ten_seconds() {
+        let opts = Options {
+            sequence_seconds: Some(2.0),
+            ..Options::default()
+        };
+        let s = Sequence::new(&opts, 44100.0 / 256.0, 0);
+        let boundaries: Vec<u64> = (1..=5)
+            .map(|i| (f64::from(i) * s.frames_per_observation).round() as u64)
+            .collect();
+        assert_eq!(boundaries, [345, 689, 1034, 1378, 1723]);
+    }
+
+    #[test]
     fn changed_trajectory_requires_confirmation_before_replacing_play() {
         let mut d = tracker();
         d.update(0, 200, &[score(0, 60, 1000.0)]);
         d.update(200, 400, &[score(0, 60, 1000.0)]);
         assert!(d.update(400, 600, &[score(0, 60, 2000.0)]).is_empty());
         let changes = d.update(600, 800, &[score(0, 60, 2000.0)]);
-        assert!(matches!(changes.as_slice(),
-            [Change::End { reason: "trajectory", .. }, Change::Start { .. }]));
+        assert!(matches!(
+            changes.as_slice(),
+            [
+                Change::End {
+                    reason: "trajectory",
+                    ..
+                },
+                Change::Start { .. }
+            ]
+        ));
     }
-
 }
