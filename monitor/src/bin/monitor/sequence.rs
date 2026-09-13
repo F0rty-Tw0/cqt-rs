@@ -159,10 +159,13 @@ pub(super) struct Sequence {
 
 impl Sequence {
     pub(super) fn new(opts: &Options, fps: f64, songs: usize) -> Self {
-        let frames_per_observation = (opts.sequence_seconds.or(opts.continuation_seconds).unwrap() * fps).max(1.0);
+        let frames_per_observation =
+            (opts.sequence_seconds.or(opts.continuation_seconds).unwrap() * fps).max(1.0);
         let width = frames_per_observation.ceil() as u64;
         Self {
-            continuation: opts.continuation_seconds.map(|_| super::continuation::Continuation::new(opts, fps, songs)),
+            continuation: opts
+                .continuation_seconds
+                .map(|_| super::continuation::Continuation::new(opts, fps, songs)),
             frames_per_observation,
             observation_number: 0,
             begin: 0,

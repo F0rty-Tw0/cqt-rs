@@ -324,10 +324,14 @@ impl Matcher {
         if limit == 1 {
             return self.best_per_song_with_fit(modal);
         }
-        let mut centres: Vec<_> = self.cells.iter().map(|(&key, cell)| {
-            let evidence = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
-            (evidence, cell.count, key)
-        }).collect();
+        let mut centres: Vec<_> = self
+            .cells
+            .iter()
+            .map(|(&key, cell)| {
+                let evidence = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
+                (evidence, cell.count, key)
+            })
+            .collect();
         centres.sort_unstable_by_key(|&(evidence, count, key)| {
             (std::cmp::Reverse(evidence), std::cmp::Reverse(count), key)
         });
@@ -339,7 +343,9 @@ impl Matcher {
                 continue;
             }
             let fitted = self.candidates(HashMap::from([(song, (evidence, count, key))]), modal);
-            let Some(&candidate) = fitted.first() else { continue; };
+            let Some(&candidate) = fitted.first() else {
+                continue;
+            };
             let at = self.latest_frame as f64;
             if choices.iter().any(|c| {
                 (c.shift - candidate.shift).abs() <= 2
@@ -680,7 +686,13 @@ mod tests {
         let mut matcher = Matcher::new(MatcherConfig::default());
         for (offset, count) in [(10, 120), (30, 100), (50, 80), (70, 60)] {
             for _ in 0..count {
-                inject(&mut matcher, 100, encode_cell_raw(0, 0, 15, offset), 1.0, f64::from(offset) * 86.0);
+                inject(
+                    &mut matcher,
+                    100,
+                    encode_cell_raw(0, 0, 15, offset),
+                    1.0,
+                    f64::from(offset) * 86.0,
+                );
             }
         }
         matcher.advance(100);
@@ -690,7 +702,10 @@ mod tests {
             let multiple = matcher.hypotheses_per_song(3, modal);
             assert_eq!(multiple.len(), 3);
             assert_eq!(multiple[0], best[0]);
-            assert_eq!(multiple.iter().map(|c| c.evidence).collect::<Vec<_>>(), [120, 100, 80]);
+            assert_eq!(
+                multiple.iter().map(|c| c.evidence).collect::<Vec<_>>(),
+                [120, 100, 80]
+            );
             assert_eq!(matcher.hypotheses_per_song(3, modal), multiple);
         }
         assert!(matcher.hypotheses_per_song(0, true).is_empty());

@@ -17,10 +17,10 @@ use cqt_monitor::{
 };
 use cqt_rs::{Cqt, CqtParams, CqtStream};
 
-#[path = "monitor/sequence.rs"]
-mod sequence;
 #[path = "monitor/continuation.rs"]
 mod continuation;
+#[path = "monitor/sequence.rs"]
+mod sequence;
 
 const USAGE: &str = "usage:
   monitor --watch NAME=FILE.wav [--watch ...] --stream FILE.wav [options]
@@ -219,12 +219,18 @@ fn parse_args() -> Options {
         exit(2);
     }
     if let Some(seconds) = opts.continuation_seconds {
-        if !seconds.is_finite() || seconds <= 0.0 || seconds > 10.0
-            || !opts.window.is_finite() || opts.window < seconds || opts.window > 60.0
+        if !seconds.is_finite()
+            || seconds <= 0.0
+            || seconds > 10.0
+            || !opts.window.is_finite()
+            || opts.window < seconds
+            || opts.window > 60.0
             || !(1..=3).contains(&opts.continuation_hypotheses)
             || opts.sequence_seconds.is_some()
         {
-            eprintln!("continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode");
+            eprintln!(
+                "continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode"
+            );
             exit(2);
         }
     }
@@ -428,7 +434,8 @@ fn main() {
         modal_fit: opts.modal_fit,
     };
     let mut sequence = opts
-        .sequence_seconds.or(opts.continuation_seconds)
+        .sequence_seconds
+        .or(opts.continuation_seconds)
         .map(|_| sequence::Sequence::new(&opts, frames_per_second, index.names().len()));
     if let Some(seconds) = opts.sequence_seconds {
         writeln!(out,
