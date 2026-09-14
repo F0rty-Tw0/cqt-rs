@@ -298,6 +298,7 @@ impl Continuation {
                     );
                     scored.push(s);
                 }
+                prioritize_retrieval(&mut scored);
             }
             // Emit the actual carried predictions checked by the state machine,
             // including predictions with no remaining hash retrieval support.
@@ -402,6 +403,13 @@ impl Continuation {
     }
 }
 
+fn prioritize_retrieval(scored: &mut [Scored]) {
+    // The state machine selects the first compatible current trajectory.
+    // Preserve stable triplet ordering, but let an admitted pair supersede
+    // a below-threshold triplet for its eligible song.
+    scored.sort_by(|a, b| b.confidence.total_cmp(&a.confidence));
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -429,6 +437,29 @@ mod tests {
             alignment: 0.8,
         }
     }
+    #[test]
+    fn admitted_pair_outranks_a_weak_triplet_but_still_needs_fresh_checks() {
+        let weak = score(0, 20, 1000.0);
+        let mut pair = score(0, 6, 1000.0);
+        pair.confidence = 70.0;
+        let mut current = [weak, pair];
+        prioritize_retrieval(&mut current);
+        let mut t = tracker(3);
+        assert!(t.update(0, 200, &current, |_| 0.8).is_empty());
+        assert!(matches!(
+            t.update(200, 400, &current, |_| 0.8).as_slice(),
+            [Change::Start(_)]
+        ));
+        let mut t = tracker(3);
+        assert!(t.update(0, 200, &current, |_| 0.8).is_empty());
+        assert!(t.update(200, 400, &current, |_| 0.0).is_empty());
+        let mut strong = score(1, 200, 2000.0);
+        strong.alignment = 0.8;
+        let mut priority = [weak, pair, strong];
+        prioritize_retrieval(&mut priority);
+        assert_eq!(priority[0].candidate.song, 1);
+    }
+
     #[test]
     fn continuous_anchors_keep_long_context_across_partition_and_partial_tail() {
         use cqt_monitor::{IndexBuilder, PeakTrack, encode_key};
