@@ -169,6 +169,7 @@ pub(super) struct Continuation {
     begin: u64,
     matcher: Matcher,
     decisions: Decisions,
+    pairs: Option<super::pairs::Retrieval>,
 }
 
 impl Continuation {
@@ -176,6 +177,9 @@ impl Continuation {
         Self {
             frames_per_observation: (opts.continuation_seconds.unwrap() * fps).max(1.0),
             observation_number: 0,
+            pairs: opts
+                .pair_fallback
+                .then(|| super::pairs::Retrieval::new(fps)),
             begin: 0,
             matcher: Matcher::new(MatcherConfig {
                 window_frames: (opts.window * fps).round().max(1.0) as u64,
@@ -258,6 +262,42 @@ impl Continuation {
                 };
                 self.write_observation(ctx, s, v, "retrieval", end, consumed, complete, out);
                 scored.push(s);
+            }
+            if let (Some(pairs), Some(pair_index)) = (&mut self.pairs, ctx.pair_index) {
+                pairs.extend(&query, end);
+                let mut eligible = vec![true; ctx.names.len()];
+                for s in &scored {
+                    if s.confidence >= self.decisions.threshold {
+                        eligible[usize::from(s.candidate.song)] = false;
+                    }
+                }
+                let (proposals, stats) = pairs.retrieve(pair_index, end, &eligible);
+                writeln!(out, "{{\"event\":\"pair_budget\",\"t\":{:.6},\"peaks\":{},\"peak_overflow\":{},\"pairs\":{},\"pair_limit\":{},\"occurrences\":{},\"collision_ranges\":{},\"collision_entries\":{},\"votes\":{},\"vote_limit\":{},\"cells\":{},\"fits\":{},\"candidates\":{}}}",
+                    end as f64 * ctx.seconds_per_frame, stats.peaks, stats.peak_overflow,
+                    stats.pairs, stats.pair_limit, stats.occurrences, stats.collision_ranges,
+                    stats.collision_entries, stats.votes, stats.vote_limit, stats.cells,
+                    stats.fits, stats.candidates).unwrap();
+                for c in proposals {
+                    let v = verify(c);
+                    // Admission score after the independent anchor gate. Never
+                    // add pair counts to triplet evidence/confidence.
+                    let s = Scored {
+                        candidate: c,
+                        confidence: self.decisions.threshold,
+                        alignment: v.query_fraction(),
+                    };
+                    self.write_observation(
+                        ctx,
+                        s,
+                        v,
+                        "pair_retrieval",
+                        end,
+                        consumed,
+                        complete,
+                        out,
+                    );
+                    scored.push(s);
+                }
             }
             // Emit the actual carried predictions checked by the state machine,
             // including predictions with no remaining hash retrieval support.
@@ -416,6 +456,7 @@ mod tests {
         let ctx = Context {
             names: index.names(),
             tracks: &tracks,
+            pair_index: None,
             seconds_per_frame: 0.01,
             sample_rate: 100.0,
             delay: 344,

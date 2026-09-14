@@ -19,6 +19,8 @@ use cqt_rs::{Cqt, CqtParams, CqtStream};
 
 #[path = "monitor/continuation.rs"]
 mod continuation;
+#[path = "monitor/pairs.rs"]
+mod pairs;
 #[path = "monitor/sequence.rs"]
 mod sequence;
 
@@ -62,6 +64,7 @@ options (defaults in brackets):
                        replaces --window/--report/--verify-seconds; S in (0,10]
   --continuation-seconds S  experimental fresh checks; retains --window [off]
                        replaces --report/--verify-seconds; S in (0,10]
+  --pair-fallback  experimental bounded pairs; requires 10s context / 2s checks
   --continuation-hypotheses N  trajectories per song, 1..3 [3]
   --report S           seconds between report lines [0.25]
   --block N            samples pushed per call in the stream [4096]";
@@ -92,6 +95,7 @@ struct Options {
     sequence_seconds: Option<f64>,
     continuation_seconds: Option<f64>,
     continuation_hypotheses: usize,
+    pair_fallback: bool,
     release: f64,
     jump: f64,
     report: f64,
@@ -129,6 +133,7 @@ impl Default for Options {
             sequence_seconds: None,
             continuation_seconds: None,
             continuation_hypotheses: 3,
+            pair_fallback: false,
             release: 3.0,
             jump: 10.0,
             report: 0.25,
@@ -188,6 +193,7 @@ fn parse_args() -> Options {
             "--verify-bins" => opts.verify_bins = value(&arg, args.next()),
             "--verify-start" => opts.verify_start = value(&arg, args.next()),
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
+            "--pair-fallback" => opts.pair_fallback = true,
             "--continuation-seconds" => opts.continuation_seconds = Some(value(&arg, args.next())),
             "--continuation-hypotheses" => opts.continuation_hypotheses = value(&arg, args.next()),
             "--modal-fit" => opts.modal_fit = true,
@@ -231,6 +237,10 @@ fn parse_args() -> Options {
         eprintln!(
             "continuation requires S in (0,10], window in [S,60], hypotheses in 1..3, and no sequence mode"
         );
+        exit(2);
+    }
+    if opts.pair_fallback && (opts.continuation_seconds != Some(2.0) || opts.window != 10.0) {
+        eprintln!("--pair-fallback requires --window 10 --continuation-seconds 2");
         exit(2);
     }
     opts
@@ -313,6 +323,7 @@ fn main() {
     // Index the watched songs.
     let mut builder = IndexBuilder::new();
     let mut tracks: Vec<PeakTrack> = Vec::new();
+    let mut pair_index = opts.pair_fallback.then(pairs::PairIndex::default);
     let mut cqt: Option<(Cqt, u32)> = None;
     let index_start = Instant::now();
     for (name, path) in &opts.watch {
@@ -339,7 +350,25 @@ fn main() {
             peaks.len()
         )
         .unwrap();
+        if let Some(pairs) = &mut pair_index {
+            pairs.add_song(
+                (tracks.len()) as u16,
+                &peaks,
+                f64::from(sample_rate) / opts.hop as f64,
+            );
+        }
         tracks.push(PeakTrack::new(peaks));
+    }
+    if let Some(pairs) = &mut pair_index {
+        pairs.finish();
+        writeln!(
+            out,
+            "{{\"event\":\"pair_index\",\"entries\":{},\"entry_bytes\":{},\"rejected_songs\":{}}}",
+            pairs.len,
+            pairs.bytes(),
+            pairs.rejected_songs
+        )
+        .unwrap();
     }
     let index: Index = builder.build(8);
     let (cqt, sample_rate) = cqt.unwrap();
@@ -424,6 +453,7 @@ fn main() {
     let ctx = Context {
         names: index.names(),
         tracks: &tracks,
+        pair_index: pair_index.as_ref(),
         seconds_per_frame: opts.hop as f64 / f64::from(sample_rate),
         sample_rate: f64::from(sample_rate),
         delay,
@@ -624,6 +654,7 @@ type Out = BufWriter<std::io::StdoutLock<'static>>;
 struct Context<'a> {
     names: &'a [String],
     tracks: &'a [PeakTrack],
+    pair_index: Option<&'a pairs::PairIndex>,
     seconds_per_frame: f64,
     sample_rate: f64,
     /// Worst-case frames between a pushed frame and its hashes.

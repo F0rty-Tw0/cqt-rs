@@ -446,6 +446,7 @@ mod tests {
         let ctx = Context {
             names: index.names(),
             tracks: &tracks,
+            pair_index: None,
             seconds_per_frame: 0.01,
             sample_rate: 100.0,
             delay: 344,
