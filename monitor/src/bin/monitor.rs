@@ -38,7 +38,7 @@ options (defaults in brackets):
   --floor DB           absolute peak floor in dBFS [-80]
   --zone N             hash zone in frames [320]
   --fan-out N          [4]                    --ratio-steps N    [32]
-  --window S           evidence window in seconds [5]
+  --window S           evidence window in seconds [10]
   --half N             evidence count giving confidence 50 [40]
   --threshold C        detection threshold, 0..100 [70]
   --verify-seconds S   most recent query peaks aligned with the song's
@@ -50,9 +50,12 @@ options (defaults in brackets):
                        threshold, 0..1 [0.3]
   --release S          seconds below threshold that end a detection [3]
   --jump S             song-position jump that counts as a new play of the
-                       same song (a repeated section flips the vote by a
-                       few seconds, a restarted track by much more) [10]
-  --report S           seconds between report lines [0.25]
+                       same song; 0 disables position-jump splitting
+                       (default), a positive value restores the old
+                       behaviour (a restarted track counts as a new play) [0]
+  --min-play S         seconds a play must last before it is announced;
+                       shorter plays are dropped silently [0]
+  --report S           seconds between report lines [0.5]
   --block N            samples pushed per call in the stream [4096]";
 
 #[derive(Debug, Clone)]
@@ -79,6 +82,7 @@ struct Options {
     verify_hold: f64,
     release: f64,
     jump: f64,
+    min_play: f64,
     report: f64,
     block: usize,
     rate: Option<u32>,
@@ -102,7 +106,7 @@ impl Default for Options {
             zone: 320,
             fan_out: 4,
             ratio_steps: 32,
-            window: 5.0,
+            window: 10.0,
             half: 40.0,
             threshold: 70.0,
             verify_seconds: 2.0,
@@ -111,8 +115,9 @@ impl Default for Options {
             verify_start: 0.4,
             verify_hold: 0.3,
             release: 3.0,
-            jump: 10.0,
-            report: 0.25,
+            jump: 0.0,
+            min_play: 0.0,
+            report: 0.5,
             block: 4096,
             rate: None,
             watch: Vec::new(),
@@ -171,6 +176,7 @@ fn parse_args() -> Options {
             "--verify-hold" => opts.verify_hold = value(&arg, args.next()),
             "--release" => opts.release = value(&arg, args.next()),
             "--jump" => opts.jump = value(&arg, args.next()),
+            "--min-play" => opts.min_play = value(&arg, args.next()),
             "--report" => opts.report = value(&arg, args.next()),
             "--block" => opts.block = value(&arg, args.next()),
             "--rate" => opts.rate = Some(value(&arg, args.next())),
@@ -342,6 +348,7 @@ fn main() {
             start_alignment: opts.verify_start,
             hold_alignment: opts.verify_hold,
             hold_confidence: 0.5 * opts.threshold,
+            min_play_frames: (opts.min_play * frames_per_second).round() as u64,
         },
     );
     let mut fp = Fingerprinter::new(cqt.num_bins(), &fingerprint_config(&opts));
@@ -353,7 +360,7 @@ fn main() {
     });
     writeln!(
         out,
-        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{:.2},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
+        "{{\"event\":\"stream\",\"file\":{},\"seconds\":{},\"latency_seconds\":{:.3},\"fingerprint_delay_seconds\":{:.3},\"window_seconds\":{},\"half\":{},\"threshold\":{},\"fan_out\":{},\"verify_seconds\":{},\"verify_start\":{},\"verify_hold\":{}}}",
         json_string(stream_path),
         if live {
             "null".to_owned()
@@ -492,10 +499,16 @@ fn main() {
     );
     let cpu = started.elapsed().as_secs_f64();
     let audio = consumed as f64 / ctx.sample_rate;
+    // No duration means no defined ratio. Emit JSON null rather than inf
+    // (or NaN), while preserving the numeric field for nonempty input.
+    let realtime_fraction = if consumed == 0 {
+        "null".to_owned()
+    } else {
+        format!("{:.4}", cpu / audio)
+    };
     writeln!(
         out,
-        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{:.4},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
-        cpu / audio,
+        "{{\"event\":\"done\",\"audio_seconds\":{audio:.2},\"cpu_seconds\":{cpu:.3},\"realtime_fraction\":{realtime_fraction},\"frames\":{frames},\"peaks\":{},\"lookups\":{},\"matches\":{},\"hash_delay_median_seconds\":{:.3},\"hash_delay_max_seconds\":{:.3}}}",
         fp.peaks(),
         matcher.lookups(),
         matcher.matches(),
@@ -628,18 +641,19 @@ impl Context<'_> {
         match *event {
             Event::Start {
                 song,
+                frame: start_frame,
                 candidate: c,
                 confidence,
                 position,
-                ..
             } => writeln!(
                 out,
-                "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{:.2},{}}}",
+                "{{\"event\":\"start\",\"t\":{t:.3},\"consumed\":{consumed:.3},\"song\":{},\"evidence\":{},\"confidence\":{confidence:.1},\"shift\":{},\"tempo\":{:.4},\"position\":{:.2},\"since\":{:.3},{}}}",
                 json_string(&self.names[usize::from(song)]),
                 c.evidence,
                 c.shift,
                 c.tempo,
                 position * self.seconds_per_frame,
+                start_frame as f64 * self.seconds_per_frame,
                 verification_json(verification)
             ),
             Event::End {

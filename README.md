@@ -280,7 +280,7 @@ allocation per frame.
 | `PeakPicker` | local maxima 15 dB above the mean of a ±24 frame × ±9 bin neighbourhood | 0.14 s |
 | `TripletHasher` | pitch- and tempo-invariant triplet hashes, zone 320 frames, fan-out 4 | ≤ 1.86 s, median 0.7 s |
 | `Index` | hash table over the watched songs, ±1 bin and ±1 ratio-step lookups | |
-| `Matcher` | 5 s sliding vote over (song, pitch shift, tempo, position) | |
+| `Matcher` | 10 s sliding vote over (song, pitch shift, tempo, position) | |
 | `PeakTrack` | aligns the last 2 s of stream peaks with the song's peaks under the winning hypothesis | |
 
 An anchor's hashes are emitted as soon as its candidate peaks are known,
@@ -449,6 +449,41 @@ to 20 votes, the index halves and the CPU cost drops from 0.9 % to
 <p align="center">
   <img src="./plots/radio_compare.png" width="98%" />
 </p>
+
+### A real DJ mix
+
+`scripts/mix_eval.py` runs the monitor over a published mix instead of a
+rendered one: the 90-minute Toucan Music 2020 mix (CC BY-NC-SA 4.0) with
+the 22 tracks it is built from as the watch list, plus 16 tracks that are
+not in it (eight held-out recordings and eight seeded negatives,
+`experiments/recognition-holdout.json`). Nothing about the mix is
+synthetic: the pitch shifts, the tempo changes, the EQ and the overlaps
+are the ones the DJ made.
+
+```console
+python3 scripts/mix_eval.py --prepare && python3 scripts/mix_eval.py --run
+```
+
+`--prepare` downloads the mix and the 38 tracks and decodes them once
+(about 2 GB). The run scores the full mix, 22 frozen 10 s excerpts cut out
+of the mix itself at the automatic cue points (some of them inside a
+transition, all at the DJ's pitch and tempo), 22 clean 10 s excerpts from the original
+releases, and the negatives both as 10 s excerpts and as complete tracks.
+
+| Defaults | Full mix, songs found | Wrong starts | Frozen 10 s clips | Clean 10 s clips | Negatives |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 0.2.0 (mean-fitted position, 5 s window, jump splitting) | 21 / 22 | 0 | 14 / 22 | 22 / 22 | 0 |
+| current (modal position, 10 s window, no jump splitting) | 22 / 22 | 2 | 17 / 22 | 22 / 22 | 0 |
+
+Two caveats. The cue labels the mix is scored against come from an
+automatic alignment of every track against it, not from human annotation,
+and a DJ mix has no per-second truth about where one track stops and the
+next starts. And the mix layers t04 back in at about 2077 s and t21 at
+about 4005 s and 4222 s: aligning the peaks of the original tracks against
+the mix at those points matches 25 to 35 % of them, against about 5 %
+anywhere else, so these are real audio, not false matches. A start there
+is counted wrong because the labels leave no room for a track to return;
+the two wrong starts in the table are the two t21 returns.
 
 Resources: with two watched songs the whole chain runs at 0.4 % of
 one core on both streams (44.1 kHz mono, one thread), and the index

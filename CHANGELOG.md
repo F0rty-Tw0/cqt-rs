@@ -1,3 +1,61 @@
+# Unreleased
+
+## Fixed
+
+- `Matcher`: the candidate position and tempo were vote-weighted means over
+  a ±0.5 s cell neighbourhood. Beat-periodic self-matches of loop-based
+  music bias that mean by 4 to 18 frames, more than the ±4 frame verifier
+  tolerance, so a correct song verified at 0.00 alignment and never
+  started. The candidate is now refined from the raw votes: the modal
+  offset at frame resolution, then a tempo and offset refit on the votes
+  within ±8 frames of the mode.
+- `Tracker`: a position jump of the same song no longer ends the play by
+  default (`--jump 0`). Loop-based tracks have several equally valid
+  alignments, and the old behaviour split them into 2 to 10 s fragments:
+  126 plays for 22 songs on a 90-minute DJ mix, now 36.
+- `monitor`: the `stream` event's `seconds` field was truncated to two
+  characters by a `{:.2}` applied to an already formatted string
+  ("5436.51" printed as "54"). An empty stream wrote `inf` into the `done`
+  event's `realtime_fraction`, which is not JSON; it is now `null`.
+
+## Changed
+
+- Defaults: the evidence window is 10 s instead of 5 s, and the report
+  cadence 0.5 s instead of 0.25 s. A masked track in a DJ mix collects
+  votes at half the usual rate, and the longer window lets it cross the
+  threshold; `end` events follow the audio by up to 5 s more. The slower
+  cadence halves the per-report candidate scan, which is the dominant CPU
+  cost, and costs up to 0.25 s of detection latency.
+- `start` events carry a `since` field: the original start time of the
+  play.
+- New options `--min-play S` (seconds a play must last before it is
+  announced) and `--jump 0` (disable position-jump splitting).
+- The per-report scan keeps an incremental slab histogram and a per-slab
+  bound instead of rebuilding them, for the same results at about 20 %
+  less CPU at dense vote rates.
+- `PeakTrack::verify` searches only the aligned slice of the reference.
+
+## Added
+
+- `scripts/mix_eval.py` with `experiments/toucan2020.json` and
+  `experiments/recognition-holdout.json`: a reproducible evaluation on a
+  real 90-minute, 22-track DJ mix (Toucan Music 2020, CC BY-NC-SA) with 16
+  negative tracks. With the new defaults on that corpus: 22 of 22 songs
+  found in the full mix (21 of 22 before, t10 missed), 22 of 22 clean 10 s
+  clips, 17 of 22 frozen 10 s mix clips (14 of 22 before), and no start on
+  the 16 negatives, both as 10 s clips and as about 60 minutes of complete
+  tracks. The radio evaluation is unchanged: 16 of 16 plays, 9 of 9 in the
+  DJ set, no false alarm on the null streams, 7 on the hard-negative
+  loops.
+
+## Notes
+
+- `--time-radius 12 --bin-radius 5` (denser peaks) reaches 18 of 22 on the
+  frozen clips and 22 of 22 on the mix with a 5 s window, but costs about
+  five times the CPU, doubles the index, and loses one key-locked
+  time-stretch play in the radio DJ set. It is left as an option rather
+  than a default.
+
 # 0.2.0 - 2026-09-12
 
 Breaking rewrite of the transform.

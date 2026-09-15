@@ -27,6 +27,10 @@ pub struct MatcherConfig {
     /// Evidence count at which the confidence reaches 50; see
     /// [`Matcher::confidence`].
     pub half: f64,
+    /// Frames around the modal offset that count as the same alignment.
+    /// The alignment reported for a winning neighbourhood is fitted to
+    /// the votes whose offset lies within twice this of the modal one.
+    pub refine_frames: u32,
 }
 
 impl Default for MatcherConfig {
@@ -41,6 +45,7 @@ impl Default for MatcherConfig {
             bin_tolerance: 1,
             ratio_tolerance: 1,
             half: 40.0,
+            refine_frames: 4,
         }
     }
 }
@@ -84,6 +89,16 @@ struct Vote {
     offset: f64,
 }
 
+/// One vote of a winning neighbourhood as the refinement sees it: the
+/// query frame relative to the current origin and the reference frame it
+/// was matched to.
+#[derive(Debug, Clone, Copy)]
+struct RawVote {
+    query: f64,
+    reference: f64,
+    shift: i32,
+}
+
 /// Accumulates hash matches over a sliding window of the query and reports
 /// the best-supported `(song, shift, tempo, offset)` hypothesis.
 ///
@@ -102,6 +117,11 @@ struct Vote {
 pub struct Matcher {
     config: MatcherConfig,
     cells: FastMap<u64, Cell>,
+    /// Vote counts histogrammed over (song, shift, offset), ignoring the
+    /// tempo field (`key & MASK_NO_TEMPO`). Kept in lockstep with `cells`
+    /// by `push`, `expire` and `rebase` so that [`Matcher::best_per_song`]
+    /// never has to rebuild it.
+    slabs: FastMap<u64, u32>,
     votes: VecDeque<Vote>,
     origin: u64,
     latest_frame: u64,
@@ -115,6 +135,7 @@ impl Matcher {
         Self {
             config,
             cells: FastMap::default(),
+            slabs: FastMap::default(),
             votes: VecDeque::new(),
             origin: 0,
             latest_frame: 0,
@@ -141,6 +162,7 @@ impl Matcher {
     /// Forgets all evidence.
     pub fn reset(&mut self) {
         self.cells.clear();
+        self.slabs.clear();
         self.votes.clear();
         self.origin = 0;
         self.latest_frame = 0;
@@ -175,6 +197,7 @@ impl Matcher {
             cell.tempo_sum += tempo;
             cell.offset_sum += offset;
             cell.query_sum += query_frame;
+            *self.slabs.entry(key & MASK_NO_TEMPO).or_default() += 1;
             self.votes.push_back(Vote {
                 frame: hash.frame,
                 key,
@@ -228,7 +251,13 @@ impl Matcher {
             vote.key = new_key;
             vote.offset += delta;
         }
+        let mut slabs: FastMap<u64, u32> =
+            FastMap::with_capacity_and_hasher(rekeyed.len(), Default::default());
+        for (&key, cell) in &rekeyed {
+            *slabs.entry(key & MASK_NO_TEMPO).or_default() += cell.count;
+        }
         self.cells = rekeyed;
+        self.slabs = slabs;
         self.origin = new_origin;
     }
 
@@ -255,6 +284,14 @@ impl Matcher {
                     cell.tempo_sum -= vote.tempo;
                     cell.offset_sum -= vote.offset;
                     cell.query_sum -= vote.frame as f64 - self.origin as f64;
+                }
+                let slab_key = vote.key & MASK_NO_TEMPO;
+                if let Some(slab) = self.slabs.get_mut(&slab_key) {
+                    if *slab <= 1 {
+                        self.slabs.remove(&slab_key);
+                    } else {
+                        *slab -= 1;
+                    }
                 }
             }
         }
@@ -293,14 +330,13 @@ impl Matcher {
     ///
     /// Ties go to the centre with more votes of its own, then to the
     /// smallest cell key, which keeps the result independent of hash-map
-    /// iteration order. The reported shift, tempo and offset are
-    /// vote-weighted means over the winning neighbourhood.
+    /// iteration order. Evidence is that neighbourhood's vote count; the
+    /// reported shift, tempo and offset are fitted to the raw votes of
+    /// the neighbourhood around their modal offset, which a mean would
+    /// miss on a beat-periodic song.
     pub fn best_per_song(&self) -> Vec<Candidate> {
-        let mut slab_hist: FastMap<u64, u32> =
-            FastMap::with_capacity_and_hasher(self.cells.len(), Default::default());
         let mut seed: HashMap<u16, (u32, u64)> = HashMap::new();
         for (&key, cell) in &self.cells {
-            *slab_hist.entry(key & MASK_NO_TEMPO).or_default() += cell.count;
             let song = (key >> 48) as u16;
             let entry = seed.entry(song).or_insert((cell.count, key));
             if (cell.count, std::cmp::Reverse(key)) > (entry.0, std::cmp::Reverse(entry.1)) {
@@ -312,20 +348,30 @@ impl Matcher {
             let total = self.neighbourhood(key).map(|c| c.count).sum::<u32>();
             best.insert(song, (total, count, key));
         }
-        for (&key, cell) in &self.cells {
-            let song = (key >> 48) as u16;
-            let entry = best.get_mut(&song).expect("seeded");
-            let centre = key & MASK_NO_TEMPO;
+        // The 9-slab bound is the same for every cell that shares a slab
+        // (they differ only in tempo), so it is computed once per slab —
+        // fewer of those than cells — instead of once per cell.
+        let mut bound9: FastMap<u64, u32> =
+            FastMap::with_capacity_and_hasher(self.slabs.len(), Default::default());
+        for &centre in self.slabs.keys() {
             let mut bound = 0;
             for ds in [-1i64, 0, 1] {
                 let row = centre.wrapping_add((ds << 40) as u64);
                 for doff in [-1i64, 0, 1] {
-                    bound += slab_hist
+                    bound += self
+                        .slabs
                         .get(&row.wrapping_add(doff as u64))
                         .copied()
                         .unwrap_or(0);
                 }
             }
+            bound9.insert(centre, bound);
+        }
+        for (&key, cell) in &self.cells {
+            let song = (key >> 48) as u16;
+            let entry = best.get_mut(&song).expect("seeded");
+            let centre = key & MASK_NO_TEMPO;
+            let bound = bound9.get(&centre).copied().unwrap_or(0);
             if bound < entry.0 {
                 continue;
             }
@@ -357,46 +403,174 @@ impl Matcher {
     }
 
     fn candidates(&self, best: HashMap<u16, (u32, u32, u64)>) -> Vec<Candidate> {
-        let mut out: Vec<Candidate> = best
-            .into_iter()
-            .filter(|(_, (evidence, _, _))| *evidence > 0)
-            .map(|(song, (evidence, _, key))| {
-                let cfg = &self.config;
-                let (mut n, mut shift_sum) = (0u32, 0i64);
-                let (mut tempo_sum, mut offset_sum, mut query_sum, mut quantized) =
-                    (0.0, 0.0, 0.0, 0.0);
-                for (shift, tempo_idx, cell) in self.neighbourhood_with_shift(key) {
-                    n += cell.count;
-                    shift_sum += i64::from(shift) * i64::from(cell.count);
-                    tempo_sum += cell.tempo_sum;
-                    offset_sum += cell.offset_sum;
-                    query_sum += cell.query_sum;
-                    let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
-                    quantized += cell_tempo * cell.query_sum;
-                }
-                let n_f = f64::from(n.max(1));
-                let tempo = tempo_sum / n_f;
-                let shift = (shift_sum as f64 / n_f).round() as i32;
-                // Each vote's offset is `ref − cell_tempo · q` for its own
-                // cell's quantized tempo. The reported tempo is the votes'
-                // mean, so the offset is refitted through the same
-                // correspondences with that tempo: the mean of
-                // `ref − tempo · q` is the mean offset plus the mean of
-                // `(cell_tempo − tempo) · q`. Both describe one line,
-                // which is what the verifier and the position rely on.
-                let offset_rel = (offset_sum + quantized - tempo * query_sum) / n_f;
-                Candidate {
-                    song,
-                    evidence,
-                    shift,
-                    tempo,
-                    // Relative to the origin so far; express against frame 0.
-                    offset: offset_rel - tempo * self.origin as f64,
-                }
-            })
-            .collect();
+        let cfg = &self.config;
+        let mut out: Vec<Candidate> = Vec::with_capacity(best.len());
+        // Mean shift and tempo of each winning neighbourhood, the
+        // refinement's starting point, and its own raw votes.
+        let mut means: Vec<(i32, f64)> = Vec::with_capacity(best.len());
+        let mut buckets: Vec<Vec<RawVote>> = Vec::with_capacity(best.len());
+        // Every cell of every winning neighbourhood, mapped to its
+        // song's slot above, so that one pass over the votes fills all
+        // the buckets. A cell belongs to one song by construction.
+        let mut slot: FastMap<u64, usize> =
+            FastMap::with_capacity_and_hasher(27 * best.len(), Default::default());
+        for (song, (evidence, _, key)) in best {
+            if evidence == 0 {
+                continue;
+            }
+            let (mut n, mut shift_sum) = (0u32, 0i64);
+            let (mut tempo_sum, mut offset_sum, mut query_sum, mut quantized) =
+                (0.0, 0.0, 0.0, 0.0);
+            for (shift, tempo_idx, cell) in self.neighbourhood_with_shift(key) {
+                n += cell.count;
+                shift_sum += i64::from(shift) * i64::from(cell.count);
+                tempo_sum += cell.tempo_sum;
+                offset_sum += cell.offset_sum;
+                query_sum += cell.query_sum;
+                let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
+                quantized += cell_tempo * cell.query_sum;
+            }
+            let n_f = f64::from(n.max(1));
+            let tempo = tempo_sum / n_f;
+            let shift = (shift_sum as f64 / n_f).round() as i32;
+            // Each vote's offset is `ref − cell_tempo · q` for its own
+            // cell's quantized tempo. The reported tempo is the votes'
+            // mean, so the offset is refitted through the same
+            // correspondences with that tempo: the mean of
+            // `ref − tempo · q` is the mean offset plus the mean of
+            // `(cell_tempo − tempo) · q`. Both describe one line,
+            // which is what the verifier and the position rely on.
+            let offset_rel = (offset_sum + quantized - tempo * query_sum) / n_f;
+            for cell in neighbourhood_keys(key) {
+                slot.insert(cell, out.len());
+            }
+            means.push((shift, tempo));
+            buckets.push(Vec::new());
+            out.push(Candidate {
+                song,
+                evidence,
+                shift,
+                tempo,
+                // Relative to the origin so far; express against frame 0.
+                offset: offset_rel - tempo * self.origin as f64,
+            });
+        }
+        for vote in &self.votes {
+            let Some(&i) = slot.get(&vote.key) else {
+                continue;
+            };
+            let (_, shift, tempo_idx, _) = decode_cell_raw(vote.key);
+            let query = vote.frame as f64 - self.origin as f64;
+            let cell_tempo = cfg.tempo_min + f64::from(tempo_idx) * cfg.tempo_step;
+            buckets[i].push(RawVote {
+                query,
+                // The vote's offset was taken against its cell's tempo,
+                // so this recovers the reference frame it matched.
+                reference: vote.offset + cell_tempo * query,
+                shift,
+            });
+        }
+        for ((candidate, mean), bucket) in out.iter_mut().zip(means).zip(&buckets) {
+            if let Some((shift, tempo, offset_rel)) = self.refine(mean, bucket) {
+                candidate.shift = shift;
+                candidate.tempo = tempo;
+                candidate.offset = offset_rel - tempo * self.origin as f64;
+            }
+        }
         out.sort_by_key(|c| c.song);
         out
+    }
+
+    /// Refits `(shift, tempo, offset_rel)` on the raw votes of a winning
+    /// neighbourhood, around their modal offset instead of their mean.
+    /// `mean` is that neighbourhood's mean shift and tempo.
+    ///
+    /// Electronic music is beat-periodic, so a song also votes for its
+    /// own alignment displaced by whole beats. One offset cell is
+    /// [`MatcherConfig::offset_step`] frames wide, several beats, so
+    /// those votes fall inside the neighbourhood and a mean offset ends
+    /// up between the alignments instead of on any of them — far enough
+    /// for the verifier to reject every peak. The displaced votes sit a
+    /// beat away from the true ones, so the mode is unmoved: the offset
+    /// supported by the most votes within
+    /// [`MatcherConfig::refine_frames`] wins, and only votes within
+    /// twice that of it are fitted.
+    ///
+    /// Returns `None` when fewer than four votes agree on one alignment,
+    /// which leaves the neighbourhood means in place.
+    fn refine(&self, mean: (i32, f64), votes: &[RawVote]) -> Option<(i32, f64, f64)> {
+        let (mean_shift, mean_tempo) = mean;
+        let radius = i64::from(self.config.refine_frames);
+        let offset = |v: &RawVote| v.reference - mean_tempo * v.query;
+        let mut hist: FastMap<i64, u32> =
+            FastMap::with_capacity_and_hasher(votes.len(), Default::default());
+        for v in votes {
+            *hist.entry(offset(v).round() as i64).or_default() += 1;
+        }
+        // The mode is one of the observed offsets, scored by the votes
+        // within `radius` of it. Ties go to the smallest offset, which
+        // keeps the result independent of the map's iteration order.
+        let mode = hist
+            .keys()
+            .fold((0u32, i64::MAX), |best, &o| {
+                let support: u32 = (o - radius..=o + radius)
+                    .map(|n| hist.get(&n).copied().unwrap_or(0))
+                    .sum();
+                if (support, std::cmp::Reverse(o)) > (best.0, std::cmp::Reverse(best.1)) {
+                    (support, o)
+                } else {
+                    best
+                }
+            })
+            .1;
+        let tolerance = (2 * radius) as f64;
+        let selected = || {
+            votes
+                .iter()
+                .filter(|v| (offset(v) - mode as f64).abs() <= tolerance)
+        };
+        let n = selected().count();
+        if n < 4 {
+            return None;
+        }
+        let n_f = n as f64;
+        let mean_query = selected().map(|v| v.query).sum::<f64>() / n_f;
+        let mean_reference = selected().map(|v| v.reference).sum::<f64>() / n_f;
+        let (mut covariance, mut variance) = (0.0, 0.0);
+        for v in selected() {
+            let d = v.query - mean_query;
+            covariance += d * (v.reference - mean_reference);
+            variance += d * d;
+        }
+        // A window shorter than the tempo cell cannot resolve a tempo
+        // better than the votes' own quantization, so the slope stays
+        // inside one cell of the mean.
+        let step = self.config.tempo_step;
+        let tempo = if variance > 0.0 {
+            (covariance / variance).clamp(mean_tempo - step, mean_tempo + step)
+        } else {
+            mean_tempo
+        };
+        let mut shifts: FastMap<i32, u32> = FastMap::default();
+        for v in selected() {
+            *shifts.entry(v.shift).or_default() += 1;
+        }
+        // Most common shift among the selected votes. A cluster spread
+        // evenly over neighbouring shifts has no mode, so ties go to the
+        // shift nearest the mean, then to the smaller one.
+        let rank = |shift: i32, count: u32| {
+            (
+                count,
+                std::cmp::Reverse(((shift - mean_shift).abs(), shift)),
+            )
+        };
+        let mut chosen: Option<(i32, u32)> = None;
+        for (shift, count) in shifts {
+            if chosen.is_none_or(|(s, c)| rank(shift, count) > rank(s, c)) {
+                chosen = Some((shift, count));
+            }
+        }
+        Some((chosen?.0, tempo, mean_reference - tempo * mean_query))
     }
 
     fn neighbourhood(&self, key: u64) -> impl Iterator<Item = &Cell> {
@@ -406,23 +580,11 @@ impl Matcher {
     /// The occupied cells among the 27 around `key`, with their shift and
     /// tempo index.
     fn neighbourhood_with_shift(&self, key: u64) -> impl Iterator<Item = (i32, i32, &Cell)> {
-        let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
-        let mut keys = [(0i32, 0i32, 0u64); 27];
-        let mut i = 0;
-        for ds in -1..=1 {
-            for dt in -1..=1 {
-                for doff in -1..=1 {
-                    keys[i] = (
-                        shift + ds,
-                        tempo_idx + dt,
-                        encode_cell_raw(song, shift + ds, tempo_idx + dt, offset_idx + doff),
-                    );
-                    i += 1;
-                }
-            }
-        }
-        keys.into_iter().filter_map(|(shift, tempo_idx, k)| {
-            self.cells.get(&k).map(|cell| (shift, tempo_idx, cell))
+        neighbourhood_keys(key).into_iter().filter_map(|k| {
+            self.cells.get(&k).map(|cell| {
+                let (_, shift, tempo_idx, _) = decode_cell_raw(k);
+                (shift, tempo_idx, cell)
+            })
         })
     }
 
@@ -443,6 +605,22 @@ impl Matcher {
 /// `tempo_idx + 128` in bits 32–39 and `offset_idx + 2³¹` in bits 0–31.
 /// This mask drops the tempo field.
 const MASK_NO_TEMPO: u64 = 0xffff_ff00_ffff_ffff;
+
+/// The keys of the 27 cells around `key`, occupied or not.
+fn neighbourhood_keys(key: u64) -> [u64; 27] {
+    let (song, shift, tempo_idx, offset_idx) = decode_cell_raw(key);
+    let mut keys = [0u64; 27];
+    let mut i = 0;
+    for ds in -1..=1 {
+        for dt in -1..=1 {
+            for doff in -1..=1 {
+                keys[i] = encode_cell_raw(song, shift + ds, tempo_idx + dt, offset_idx + doff);
+                i += 1;
+            }
+        }
+    }
+    keys
+}
 
 fn encode_cell_raw(song: u16, shift: i32, tempo_idx: i32, offset_idx: i32) -> u64 {
     (u64::from(song) << 48)
@@ -528,11 +706,7 @@ mod tests {
             "tempo {}",
             best.tempo
         );
-        assert!(
-            (best.offset - 6000.0).abs() < 30.0,
-            "offset {}",
-            best.offset
-        );
+        assert!((best.offset - 6000.0).abs() < 1.0, "offset {}", best.offset);
         assert!(best.evidence > 200, "evidence {}", best.evidence);
         assert!(matcher.confidence(best.evidence) > 85.0);
 
@@ -615,6 +789,7 @@ mod tests {
         cell.tempo_sum += tempo;
         cell.offset_sum += offset;
         cell.query_sum += frame as f64 - matcher.origin as f64;
+        *matcher.slabs.entry(key & MASK_NO_TEMPO).or_default() += 1;
         matcher.votes.push_back(Vote {
             frame,
             key,
@@ -686,6 +861,47 @@ mod tests {
         );
         matcher.advance(300);
         assert!(matcher.best().is_none());
+    }
+
+    /// A beat-periodic song votes for its own alignment displaced by
+    /// whole beats too (about 80 frames at 170 BPM), and one offset cell
+    /// is 86 frames wide, so those votes land in the winning
+    /// neighbourhood. The vote-weighted mean then sits between the
+    /// alignments, further from the true one than the verifier's
+    /// tolerance of four frames; the refitted alignment must stay on it.
+    #[test]
+    fn beat_periodic_votes_do_not_drag_the_offset() {
+        // (query frame, reference frame) of 200 votes on the true
+        // alignment `ref = q + 5000`, 80 one beat late and 40 one early.
+        let mut votes: Vec<(u64, f64)> = Vec::new();
+        for i in 0..200u64 {
+            votes.push((i * 4, (i * 4) as f64 + 5000.0));
+        }
+        for i in 0..80u64 {
+            votes.push((i * 10, (i * 10) as f64 + 5080.0));
+        }
+        for i in 0..40u64 {
+            votes.push((i * 20, (i * 20) as f64 + 4920.0));
+        }
+        let mut matcher = Matcher::new(MatcherConfig::default());
+        for &(query, reference) in &votes {
+            // Tempo index 15 is exactly 1.0, so the vote's offset against
+            // its cell's tempo is `reference − query`.
+            let offset = reference - query as f64;
+            let key = encode_cell_raw(0, 0, 15, (offset / 86.0).round() as i32);
+            inject(&mut matcher, query, key, 1.0, offset);
+        }
+        // The three offset cells (57, 58, 59) lie in one neighbourhood,
+        // so every vote counts as evidence and the mean is dragged more
+        // than four frames off the true alignment.
+        let mean = votes.iter().map(|&(q, r)| r - q as f64).sum::<f64>() / votes.len() as f64;
+        assert!((mean - 5000.0).abs() > 4.0, "mean offset {mean}");
+
+        let best = matcher.best().expect("evidence");
+        assert_eq!(best.evidence, votes.len() as u32);
+        assert_eq!(best.shift, 0);
+        assert!((best.tempo - 1.0).abs() < 0.002, "tempo {}", best.tempo);
+        assert!((best.offset - 5000.0).abs() < 1.0, "offset {}", best.offset);
     }
 
     #[test]
@@ -808,6 +1024,40 @@ mod tests {
                 );
             }
         }
+    }
+
+    /// `slabs` is maintained incrementally by `push`, `expire` and
+    /// `rebase`; it must always equal a histogram rebuilt from `cells`
+    /// from scratch, through pushes (with lookups that both add and, via
+    /// tempo/shift/bin filtering, skip votes), an `advance` that expires
+    /// some of them, and a `rebase` triggered by a long-enough stream.
+    #[test]
+    fn slab_histogram_matches_a_fresh_rebuild() {
+        let song = pseudo_peaks(41, 20_000);
+        let mut builder = IndexBuilder::new();
+        builder.add_song("s", 20_000, hashes(&song));
+        let index = builder.build(8);
+        let mut matcher = Matcher::new(MatcherConfig {
+            window_frames: 2000,
+            ..MatcherConfig::default()
+        });
+        let check = |matcher: &Matcher| {
+            let mut rebuilt: FastMap<u64, u32> = FastMap::default();
+            for (&key, cell) in &matcher.cells {
+                *rebuilt.entry(key & MASK_NO_TEMPO).or_default() += cell.count;
+            }
+            assert_eq!(matcher.slabs, rebuilt);
+        };
+        for (i, h) in hashes(&song).into_iter().enumerate() {
+            matcher.push(&index, &h);
+            if i % 50 == 0 {
+                check(&matcher); // covers the state mid-stream, before rebases too
+            }
+        }
+        check(&matcher); // post-rebase, since 20_000 frames force at least one
+        matcher.advance(matcher.latest_frame() + 5000);
+        check(&matcher); // post-expiry, window fully drained
+        assert!(matcher.slabs.is_empty());
     }
 
     #[test]

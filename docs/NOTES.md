@@ -253,9 +253,11 @@ talk-over (or of the fade-in when there is none) 1.0, 1.5, 4.2 s
 without talk-over and −4.0 (during the talking), 2.2, 3.9, 5.6, 8.4,
 17.6 s with it; peak confidence 81–97. The two restarts this stream first produced were the
 song's own repeated section flipping the vote to the equivalent
-position 4 s away, so the position-jump tolerance of the tracker is now
-10 s (`--jump`, was 3 s): a restarted track jumps by far more, a
-repeated bar by far less. The programme, the eight-song run and the
+position 4 s away, so the position-jump tolerance of the tracker was
+raised from 3 s to 10 s: a restarted track jumps by far more, a repeated
+bar by far less. Position-jump splitting is off altogether by default
+now (`--jump 0`), because loop-based music has several equally valid
+alignments and a jump between them is not a new play. The programme, the eight-song run and the
 negatives are unchanged by it except that looped samples restart less
 (7 starts on the hard stream instead of 14).
 

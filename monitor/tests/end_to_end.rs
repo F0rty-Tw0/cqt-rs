@@ -132,6 +132,7 @@ fn detects_a_pitched_and_sped_up_play_and_nothing_else() {
             start_alignment: 0.4,
             hold_alignment: 0.3,
             hold_confidence: 35.0,
+            min_play_frames: 0,
         },
     );
     let mut fp = Fingerprinter::new(cqt.num_bins(), &fp_config);

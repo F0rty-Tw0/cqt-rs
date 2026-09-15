@@ -90,22 +90,23 @@ impl PeakTrack {
         if tempo <= 0.0 || !tempo.is_finite() || !offset.is_finite() {
             return v;
         }
-        v.query_peaks = query.len() as u32;
-        for q in query {
-            let frame = tempo * q.frame as f64 + offset;
-            let bin = q.bin as i64 - i64::from(shift);
-            if near(&self.peaks, frame, bin, frame_tolerance, bin_tolerance) {
-                v.query_matched += 1;
-            }
-        }
+        // Every possible query match lies in this interval. Restrict each
+        // lookup to it instead of searching the entire watched song.
         let tolerance = f64::from(frame_tolerance);
         let lo = tempo * first.frame as f64 + offset - tolerance;
         let hi = tempo * last.frame as f64 + offset + tolerance;
         let start = self.peaks.partition_point(|p| (p.frame as f64) < lo);
-        for r in self.peaks[start..]
-            .iter()
-            .take_while(|p| p.frame as f64 <= hi)
-        {
+        let end = self.peaks.partition_point(|p| p.frame as f64 <= hi);
+        let reference = &self.peaks[start..end];
+        v.query_peaks = query.len() as u32;
+        for q in query {
+            let frame = tempo * q.frame as f64 + offset;
+            let bin = q.bin as i64 - i64::from(shift);
+            if near(reference, frame, bin, frame_tolerance, bin_tolerance) {
+                v.query_matched += 1;
+            }
+        }
+        for r in reference {
             v.reference_peaks += 1;
             let frame = (r.frame as f64 - offset) / tempo;
             let bin = r.bin as i64 + i64::from(shift);

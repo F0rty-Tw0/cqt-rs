@@ -19,7 +19,9 @@ pub struct TrackerConfig {
     /// Tempo difference above which the hypothesis has jumped.
     pub jump_tempo: f64,
     /// Difference (frames) between the predicted and the reported song
-    /// position above which the hypothesis has jumped.
+    /// position above which the hypothesis has jumped. A value that is not
+    /// finite and positive (in particular `0.0`, the default) disables
+    /// position-jump splitting: a repeated section is not a new play.
     pub jump_frames: f64,
     /// Alignment (see [`Scored::alignment`]) a candidate needs, besides
     /// the confidence, to start a play. Zero disables the gate.
@@ -30,6 +32,10 @@ pub struct TrackerConfig {
     pub hold_alignment: f64,
     /// Confidence floor for the alignment hold.
     pub hold_confidence: f64,
+    /// Frames a play must stay active before it is announced (an
+    /// `Event::Start` is emitted). A play that ends first is dropped
+    /// silently, with no `Start` and no `End`.
+    pub min_play_frames: u64,
 }
 
 /// A song's candidate at one report with the scores the tracker decides
@@ -63,6 +69,15 @@ pub struct Active {
     /// A hypothesis that disagrees with this play and is waiting to be
     /// confirmed as a new play.
     pub pending: Option<Pending>,
+    /// Whether `Event::Start` has been emitted for this play yet.
+    pub announced: bool,
+    /// The candidate the play started with, kept to announce it later if
+    /// `min_play_frames` delays the `Start`.
+    pub start_candidate: Candidate,
+    /// Its confidence at the start.
+    pub start_confidence: f64,
+    /// Song position in reference frames at the start.
+    pub start_position: f64,
 }
 
 /// A disagreeing hypothesis under confirmation: it becomes a new play
@@ -166,11 +181,13 @@ impl Tracker {
                 (Some(mut a), Some(s)) if above || held => {
                     let (c, confidence) = (s.candidate, s.confidence);
                     let position = c.tempo * frame as f64 + c.offset;
+                    let jump_frames_active = cfg.jump_frames.is_finite() && cfg.jump_frames > 0.0;
                     let jumps = |shift: i32, tempo: f64, at: f64, at_frame: u64| {
                         let predicted = at + tempo * (frame - at_frame) as f64;
                         (c.shift - shift).abs() > cfg.jump_shift
                             || (c.tempo - tempo).abs() > cfg.jump_tempo
-                            || (position - predicted).abs() > cfg.jump_frames
+                            || (jump_frames_active
+                                && (position - predicted).abs() > cfg.jump_frames)
                     };
                     a.last_above = frame;
                     if !jumps(a.shift, a.tempo, a.position, a.frame) {
@@ -178,49 +195,51 @@ impl Tracker {
                         a.position = position;
                         a.frame = frame;
                         self.active[song] = Some(a);
-                        continue;
+                    } else {
+                        let pending = match a.pending {
+                            Some(p) if !jumps(p.shift, p.tempo, p.position, p.frame) => Pending {
+                                position,
+                                frame,
+                                ..p
+                            },
+                            _ => Pending {
+                                since: frame,
+                                shift: c.shift,
+                                tempo: c.tempo,
+                                position,
+                                frame,
+                            },
+                        };
+                        if frame - pending.since < cfg.confirm_frames {
+                            a.pending = Some(pending);
+                            self.active[song] = Some(a);
+                        } else {
+                            if a.announced {
+                                on_event(Event::End {
+                                    song: song as u16,
+                                    frame,
+                                    start_frame: a.start_frame,
+                                });
+                            }
+                            self.active[song] = starts.then(|| Self::start(frame, c, confidence));
+                        }
                     }
-                    let pending = match a.pending {
-                        Some(p) if !jumps(p.shift, p.tempo, p.position, p.frame) => Pending {
-                            position,
-                            frame,
-                            ..p
-                        },
-                        _ => Pending {
-                            since: frame,
-                            shift: c.shift,
-                            tempo: c.tempo,
-                            position,
-                            frame,
-                        },
-                    };
-                    if frame - pending.since < cfg.confirm_frames {
-                        a.pending = Some(pending);
-                        self.active[song] = Some(a);
-                        continue;
-                    }
-                    on_event(Event::End {
-                        song: song as u16,
-                        frame,
-                        start_frame: a.start_frame,
-                    });
-                    self.active[song] =
-                        starts.then(|| Self::start(frame, c, confidence, &mut on_event));
                 }
                 (None, Some(s)) if starts => {
-                    self.active[song] =
-                        Some(Self::start(frame, s.candidate, s.confidence, &mut on_event));
+                    self.active[song] = Some(Self::start(frame, s.candidate, s.confidence));
                 }
                 (Some(mut a), _) => {
                     // Neither strong nor held evidence: whatever hypothesis
                     // was under confirmation has lost its support.
                     a.pending = None;
                     if frame - a.last_above >= cfg.release_frames {
-                        on_event(Event::End {
-                            song: song as u16,
-                            frame,
-                            start_frame: a.start_frame,
-                        });
+                        if a.announced {
+                            on_event(Event::End {
+                                song: song as u16,
+                                frame,
+                                start_frame: a.start_frame,
+                            });
+                        }
                         self.active[song] = None;
                     } else {
                         self.active[song] = Some(a);
@@ -228,13 +247,29 @@ impl Tracker {
                 }
                 _ => {}
             }
+            if let Some(mut a) = self.active[song]
+                && !a.announced
+                && frame - a.start_frame >= cfg.min_play_frames
+            {
+                on_event(Event::Start {
+                    song: song as u16,
+                    frame: a.start_frame,
+                    candidate: a.start_candidate,
+                    confidence: a.start_confidence,
+                    position: a.start_position,
+                });
+                a.announced = true;
+                self.active[song] = Some(a);
+            }
         }
     }
 
     /// Ends every play in progress at query frame `frame` (end of stream).
     pub fn finish<F: FnMut(Event)>(&mut self, frame: u64, mut on_event: F) {
         for (song, slot) in self.active.iter_mut().enumerate() {
-            if let Some(a) = slot.take() {
+            if let Some(a) = slot.take()
+                && a.announced
+            {
                 on_event(Event::End {
                     song: song as u16,
                     frame,
@@ -244,20 +279,11 @@ impl Tracker {
         }
     }
 
-    fn start<F: FnMut(Event)>(
-        frame: u64,
-        c: Candidate,
-        confidence: f64,
-        on_event: &mut F,
-    ) -> Active {
+    /// Builds the play's initial state. Whether `Event::Start` is emitted
+    /// for it now or later (once `min_play_frames` old) is decided by the
+    /// caller in `update`.
+    fn start(frame: u64, c: Candidate, confidence: f64) -> Active {
         let position = c.tempo * frame as f64 + c.offset;
-        on_event(Event::Start {
-            song: c.song,
-            frame,
-            candidate: c,
-            confidence,
-            position,
-        });
         Active {
             start_frame: frame,
             shift: c.shift,
@@ -266,6 +292,10 @@ impl Tracker {
             frame,
             last_above: frame,
             pending: None,
+            announced: false,
+            start_candidate: c,
+            start_confidence: confidence,
+            start_position: position,
         }
     }
 }
@@ -285,6 +315,7 @@ mod tests {
             start_alignment: 0.4,
             hold_alignment: 0.3,
             hold_confidence: 35.0,
+            min_play_frames: 0,
         }
     }
 
@@ -544,5 +575,106 @@ mod tests {
                 .all(|e| matches!(e, Event::End { frame: 7, .. }))
         );
         assert!((0..3).all(|s| tracker.active(s).is_none()));
+    }
+
+    #[test]
+    fn disabled_jump_frames_ignores_position_jumps() {
+        let mut tracker = Tracker::new(
+            1,
+            TrackerConfig {
+                jump_frames: 0.0,
+                ..config()
+            },
+        );
+        let c = candidate(0, 0, 1.0, 500.0);
+        let events = run(&mut tracker, 0, &[(c, 90.0)]);
+        assert!(matches!(
+            events[..],
+            [Event::Start {
+                song: 0,
+                frame: 0,
+                ..
+            }]
+        ));
+        // A candidate 1000 frames off the prediction: with position-jump
+        // splitting disabled, this is not a jump, so the same play just
+        // continues (no End, no new Start), however long it persists.
+        let elsewhere = candidate(0, 0, 1.0, 1500.0);
+        for frame in 1..=20 {
+            assert!(run(&mut tracker, frame, &[(elsewhere, 90.0)]).is_empty());
+        }
+        assert_eq!(tracker.active(0).unwrap().start_frame, 0);
+    }
+
+    #[test]
+    fn min_play_frames_delays_announcement_and_drops_short_plays() {
+        let mut tracker = Tracker::new(
+            1,
+            TrackerConfig {
+                min_play_frames: 10,
+                release_frames: 5,
+                ..config()
+            },
+        );
+        let c = candidate(0, 0, 1.0, 0.0);
+        // Active for 5 frames (0..=4), then no evidence: release_frames(5)
+        // after the last one ends it at frame 9, before it ever reached
+        // min_play_frames. Dropped silently, no Start and no End.
+        for frame in 0..=4 {
+            assert!(run(&mut tracker, frame, &[(c, 90.0)]).is_empty());
+        }
+        for frame in 5..=8 {
+            assert!(run(&mut tracker, frame, &[]).is_empty());
+        }
+        assert!(run(&mut tracker, 9, &[]).is_empty());
+        assert!(tracker.active(0).is_none());
+
+        // A second play that stays active long enough: announced exactly
+        // once, at its original start frame, once it reaches age 10.
+        for frame in 20..=29 {
+            assert!(run(&mut tracker, frame, &[(c, 90.0)]).is_empty());
+        }
+        let events = run(&mut tracker, 30, &[(c, 90.0)]);
+        assert!(
+            matches!(
+                events[..],
+                [Event::Start {
+                    song: 0,
+                    frame: 20,
+                    ..
+                }]
+            ),
+            "{events:?}"
+        );
+        // Its later End references that same original start frame.
+        for frame in 31..=34 {
+            assert!(run(&mut tracker, frame, &[]).is_empty());
+        }
+        let events = run(&mut tracker, 35, &[]);
+        assert_eq!(
+            events,
+            [Event::End {
+                song: 0,
+                frame: 35,
+                start_frame: 20
+            }]
+        );
+    }
+
+    #[test]
+    fn finish_drops_an_unannounced_play_silently() {
+        let mut tracker = Tracker::new(
+            1,
+            TrackerConfig {
+                min_play_frames: 10,
+                ..config()
+            },
+        );
+        let c = candidate(0, 0, 1.0, 0.0);
+        assert!(run(&mut tracker, 0, &[(c, 90.0)]).is_empty());
+        let mut events = Vec::new();
+        tracker.finish(3, |e| events.push(e));
+        assert!(events.is_empty());
+        assert!(tracker.active(0).is_none());
     }
 }
