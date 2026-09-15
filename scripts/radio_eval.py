@@ -408,7 +408,7 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--half", type=float, default=40.0)
     parser.add_argument("--threshold", type=float, default=70.0)
-    parser.add_argument("--window", type=float, default=5.0)
+    parser.add_argument("--window", type=float, default=10.0)
     parser.add_argument("--monitor", help="monitor binary to run instead of building the current tree")
     parser.add_argument("--out", default="eval_summary", help="summary name under target/radio (default eval_summary)")
     parser.add_argument("--no-plots", action="store_true", help="skip the figures (for comparison runs)")
