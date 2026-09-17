@@ -1,0 +1,68 @@
+name: CI
+
+# The acceptance list of the published `cqt-rs` crate: a release is cut only
+# when every job passes on the tagged commit. `library-check` runs the
+# formatter, clippy with and without default features, and rustdoc, each with
+# warnings denied. `library-test` runs the test suite on stable and on the
+# 1.98 minimum supported toolchain, with and without default features.
+# `library-package` compiles the benches, proves the crate packages as it
+# will be published with `cargo publish --dry-run`, and checks that
+# CHANGELOG.md carries a heading for the crate version.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  RUSTFLAGS: -D warnings
+
+jobs:
+  library-check:
+    name: Library format, lint, docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo fmt --package cqt-rs --check
+      - run: cargo clippy --package cqt-rs --all-targets --all-features
+      - run: cargo clippy --package cqt-rs --all-targets --no-default-features
+      - run: cargo doc --package cqt-rs --no-deps
+        env:
+          RUSTDOCFLAGS: -D warnings
+
+  library-test:
+    name: Library test (${{ matrix.toolchain }}, ${{ matrix.features }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain: [stable, "1.98"]
+        features: ["", "--no-default-features"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: ${{ matrix.toolchain }}
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --package cqt-rs --release ${{ matrix.features }}
+
+  library-package:
+    name: Library packages for crates.io
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo bench --package cqt-rs --no-run
+      # The packaged crate must build on its own, from the published files.
+      - run: cargo publish --package cqt-rs --dry-run
+      - name: CHANGELOG covers the crate version
+        run: |
+          version=$(cargo pkgid --package cqt-rs | sed 's/.*[#@]//')
+          grep -q "^# $version " CHANGELOG.md || {
+            echo "CHANGELOG.md has no '# $version' heading"; exit 1; }
