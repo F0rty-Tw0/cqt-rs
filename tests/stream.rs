@@ -2,7 +2,7 @@ mod common;
 
 use cqt_rs::{Cqt, CqtError, CqtParams, CqtStream};
 
-use common::noise;
+use common::{chirp, noise};
 
 fn collect(cqt: &Cqt, signal: &[f32], hop: usize, chunk: usize) -> Vec<Vec<f32>> {
     let mut stream = CqtStream::new(cqt, hop).unwrap();
@@ -156,4 +156,176 @@ fn rejects_bad_hop() {
         CqtStream::new(&cqt, 0).unwrap_err(),
         CqtError::InvalidHopSize
     );
+}
+
+const SR: u32 = 44_100;
+const TEN_SECONDS: usize = 10 * SR as usize;
+
+fn fingerprint_cqt() -> Cqt {
+    Cqt::new(
+        CqtParams::builder(SR, 55.0, 7_040.0)
+            .bins_per_octave(24)
+            .build()
+            .unwrap(),
+    )
+}
+
+/// Pushes 20 s of chirp at hop 768 in 1 s chunks, checking the frames
+/// against the batch transform.
+fn coarse_stream(cqt: &Cqt, signal: &[f32], retain: bool) -> CqtStream {
+    let mut stream = CqtStream::new(cqt, 768).unwrap();
+    if retain {
+        stream.retain_samples(TEN_SECONDS);
+    }
+    let batch = cqt.process(signal, 768).unwrap();
+    let mut i = 0;
+    for chunk in signal.chunks(SR as usize) {
+        stream.push(cqt, chunk, |frame| {
+            assert_eq!(frame, batch.row(i).as_slice().unwrap(), "frame {i}");
+            i += 1;
+        });
+    }
+    assert_eq!(stream.next_centre(), 768 * i as i64);
+    stream
+}
+
+/// Pushes `signal` and checks every frame against `batch` at the centres
+/// the stream reports, which must lie on `hop`.
+fn push_checked(
+    cqt: &Cqt,
+    stream: &mut CqtStream,
+    signal: &[f32],
+    batch: &ndarray::Array2<f32>,
+    hop: usize,
+) -> usize {
+    let start = stream.next_centre();
+    assert_eq!(start % hop as i64, 0);
+    let mut n = 0;
+    stream.push(cqt, signal, |frame| {
+        let centre = start + (n * hop) as i64;
+        let row = (centre / hop as i64) as usize;
+        assert_eq!(frame, batch.row(row).as_slice().unwrap(), "centre {centre}");
+        n += 1;
+    });
+    assert_eq!(stream.next_centre(), start + (n * hop) as i64);
+    n
+}
+
+#[test]
+fn replay_re_analyses_retained_history_at_a_finer_hop() {
+    let cqt = fingerprint_cqt();
+    let signal = chirp(SR, 100.0, 5_000.0, 20.0);
+    let mut stream = coarse_stream(&cqt, &signal, true);
+    let fine = cqt.process(&signal, 256).unwrap();
+    let from = stream.samples_consumed() as i64 - TEN_SECONDS as i64;
+    let mut replayed = 0;
+    let mut last = None;
+    let first = stream
+        .replay(&cqt, from, 256, |centre, frame| {
+            assert_eq!(centre % 256, 0);
+            assert!(last.is_none_or(|last| centre > last));
+            let row = (centre / 256) as usize;
+            assert_eq!(frame, fine.row(row).as_slice().unwrap(), "centre {centre}");
+            last = Some(centre);
+            replayed += 1;
+        })
+        .unwrap()
+        .unwrap();
+    let grid_from = (from + 255) / 256 * 256;
+    assert!(
+        (grid_from..grid_from + 256).contains(&first),
+        "first {first} vs {grid_from}"
+    );
+    // Every centre from the first up to the next frame is covered.
+    let expected = (stream.next_centre() - first + 255) / 256;
+    assert_eq!(replayed, expected);
+    // Replay leaves the stream where it was.
+    assert_eq!(stream.hop_size(), 768);
+    assert_eq!(stream.next_centre(), 768 * stream.frames_emitted() as i64);
+}
+
+#[test]
+fn set_hop_keeps_centres_on_the_new_grid_and_increasing() {
+    let cqt = fingerprint_cqt();
+    let signal = chirp(SR, 100.0, 5_000.0, 30.0);
+    let twenty = 20 * SR as usize;
+    let twenty_five = 25 * SR as usize;
+    let mut stream = coarse_stream(&cqt, &signal[..twenty], true);
+    let emitted = stream.frames_emitted();
+
+    stream.set_hop(&cqt, 256).unwrap();
+    assert_eq!(stream.hop_size(), 256);
+    // 768 is a multiple of 256, so the next centre is unchanged.
+    assert_eq!(stream.next_centre(), 768 * emitted as i64);
+    let fine = cqt.process(&signal, 256).unwrap();
+    let n = push_checked(&cqt, &mut stream, &signal[twenty..twenty_five], &fine, 256);
+    assert_eq!(n, 5 * SR as usize / 256);
+    assert_eq!(stream.frames_emitted(), emitted + n as u64);
+
+    let before = stream.next_centre();
+    stream.set_hop(&cqt, 768).unwrap();
+    assert!(stream.next_centre() >= before);
+    assert!(stream.next_centre() < before + 768);
+    let coarse = cqt.process(&signal, 768).unwrap();
+    let n = push_checked(&cqt, &mut stream, &signal[twenty_five..], &coarse, 768);
+    assert!(n >= 5 * SR as usize / 768 - 1, "{n}");
+}
+
+#[test]
+fn replay_without_retention_finds_little_history() {
+    let cqt = fingerprint_cqt();
+    let signal = chirp(SR, 100.0, 5_000.0, 20.0);
+    let from = signal.len() as i64 - TEN_SECONDS as i64;
+
+    let mut retained = coarse_stream(&cqt, &signal, true);
+    let mut with = 0;
+    retained.replay(&cqt, from, 256, |_, _| with += 1).unwrap();
+
+    let mut dropped = coarse_stream(&cqt, &signal, false);
+    let mut without = 0;
+    let first = dropped
+        .replay(&cqt, from, 256, |_, _| without += 1)
+        .unwrap();
+    assert!(without < with, "{without} vs {with}");
+    if let Some(first) = first {
+        assert!(first > from + TEN_SECONDS as i64 / 2, "{first}");
+    }
+}
+
+#[test]
+fn set_hop_rejects_bad_hop() {
+    let cqt = fingerprint_cqt();
+    let mut stream = CqtStream::new(&cqt, 768).unwrap();
+    assert_eq!(
+        stream.set_hop(&cqt, 0).unwrap_err(),
+        CqtError::InvalidHopSize
+    );
+    assert_eq!(stream.hop_size(), 768);
+    assert_eq!(
+        stream.replay(&cqt, 0, 0, |_, _| {}).unwrap_err(),
+        CqtError::InvalidHopSize
+    );
+}
+
+/// The chirp's instantaneous frequency must track `start + (end - start) t / T`
+/// rather than run at twice the slope; the frame at t = 0 is skipped because
+/// its half-empty window smears the first 0.2 s.
+#[test]
+fn chirp_sweeps_from_start_to_end_frequency() {
+    let cqt = fingerprint_cqt();
+    let hop = 4_410;
+    let signal = chirp(SR, 100.0, 5_000.0, 20.0);
+    let frames = cqt.process(&signal, hop).unwrap();
+    let freqs = cqt.frequencies();
+    let nearest_bin =
+        |hz: f32| common::argmax(&freqs.iter().map(|f| -(f - hz).abs()).collect::<Vec<_>>());
+    for row in [1, frames.nrows() - 1] {
+        let t = (row * hop) as f32 / SR as f32;
+        let expected = nearest_bin(100.0 + (5_000.0 - 100.0) * t / 20.0);
+        let bin = common::argmax(frames.row(row).as_slice().unwrap());
+        assert!(
+            bin.abs_diff(expected) <= 1,
+            "row {row}: bin {bin}, expected {expected}"
+        );
+    }
 }

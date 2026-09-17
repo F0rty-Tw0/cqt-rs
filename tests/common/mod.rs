@@ -62,3 +62,15 @@ pub fn cosine_similarity(a: &[f32], b: &[f32]) -> f32 {
     let nb: f32 = b.iter().map(|x| x * x).sum::<f32>().sqrt();
     dot / (na * nb)
 }
+
+/// Linear chirp from `start_hz` to `end_hz` over `seconds`.
+pub fn chirp(sample_rate: u32, start_hz: f64, end_hz: f64, seconds: f64) -> Vec<f32> {
+    let n = (f64::from(sample_rate) * seconds) as usize;
+    (0..n)
+        .map(|i| {
+            let t = i as f64 / f64::from(sample_rate);
+            let phase = start_hz * t + (end_hz - start_hz) * t * t / (2.0 * seconds);
+            (TAU * phase).sin() as f32
+        })
+        .collect()
+}
