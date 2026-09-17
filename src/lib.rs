@@ -33,17 +33,32 @@
 //! assert_eq!(spectrogram.ncols(), cqt.num_bins());
 //! ```
 //!
+//! # Streaming
+//!
+//! ```
+//! use cqt_rs::{Cqt, CqtParams, CqtStream};
+//!
+//! let cqt = Cqt::new(CqtParams::new(16_000, 100.0, 4_000.0, 12).unwrap());
+//! let mut stream = CqtStream::new(&cqt, 160).unwrap();
+//! let block = vec![0.0f32; 320];
+//! stream.push(&cqt, &block, |magnitudes| {
+//!     assert_eq!(magnitudes.len(), cqt.num_bins());
+//! });
+//! ```
+
 #![warn(missing_docs)]
 
 mod cqt;
 mod kernel;
 mod params;
 mod plan;
+mod stream;
 
 pub use cqt::{Cqt, CqtError, CqtWorkspace};
 pub use kernel::Kernel;
 pub use params::{CqtParams, CqtParamsBuilder, CqtParamsError};
 pub use rustfft::num_complex::Complex;
+pub use stream::CqtStream;
 
 /// Converts magnitudes to decibels in place.
 ///
