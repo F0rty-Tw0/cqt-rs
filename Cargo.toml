@@ -33,6 +33,15 @@ thiserror = "2"
 
 [dev-dependencies]
 approx = "0.5"
+criterion = "0.8"
+plotters = { version = "0.3.7", default-features = false, features = [
+  "svg_backend",
+  "line_series",
+] }
+
+[[bench]]
+name = "bench"
+harness = false
 
 [lints.rust]
 unsafe_code = "forbid"
