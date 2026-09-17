@@ -1,34 +1,50 @@
 [package]
 name = "cqt-rs"
-version = "0.1.0"
-edition = "2021"
-authors = ["Artiom Tofan <artiomtofancv@gmailcom>"]
-description = "Blazingly fast Rust Constant-Q Transform"
+version = "0.2.0"
+edition = "2024"
+rust-version = "1.98"
+authors = ["Artiom Tofan <artiomtofancv@gmail.com>"]
+description = "Blazingly fast constant-Q and variable-Q transform for audio fingerprinting and real-time spectral analysis"
+documentation = "https://docs.rs/cqt-rs"
+readme = "README.md"
 license = "MIT"
 repository = "https://github.com/F0rty-Tw0/cqt-rs"
-readme = "README.md"
 keywords = ["cqt", "signal-processing", "dsp", "audio", "fft"]
-categories = ["audio", "science", "mathematics"]
+categories = ["multimedia::audio", "science", "mathematics"]
+exclude = ["/.github/**", "/.gitignore", "/plots/**", "/docs/**", "/scripts/**"]
 
 [lib]
 name = "cqt_rs"
 path = "src/lib.rs"
-crate-type = ["lib"]
+
+[features]
+default = ["parallel"]
+# Process batch frames on a rayon thread pool.
+parallel = ["dep:rayon", "halfband-rs/parallel"]
 
 [dependencies]
-lazy_static = "1.4"
-rustfft = "6.1"
-hann-rs = "0.1.0"
-ndarray = { version = "0.15.6", features = [
-  "rayon",
-  "matrixmultiply-threading",
-] }
-
+halfband-rs = "0.1"
+hann-rs = "0.2"
+ndarray = { version = "0.17", default-features = false, features = ["std"] }
+rayon = { version = "1.10", optional = true }
+realfft = "3.5"
+rustfft = "6.4"
+thiserror = "2"
 
 [dev-dependencies]
-criterion = "0.4"
-approx = "0.5.1"
+approx = "0.5"
+criterion = "0.8"
+plotters = { version = "0.3.7", default-features = false, features = [
+  "svg_backend",
+  "line_series",
+] }
 
 [[bench]]
 name = "bench"
 harness = false
+
+[lints.rust]
+unsafe_code = "forbid"
+
+[profile.bench]
+debug = false
