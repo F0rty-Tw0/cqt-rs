@@ -34,6 +34,7 @@ thiserror = "2"
 [dev-dependencies]
 approx = "0.5"
 criterion = "0.8"
+hound = "3.5"
 plotters = { version = "0.3.7", default-features = false, features = [
   "svg_backend",
   "line_series",
