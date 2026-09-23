@@ -1,15 +1,15 @@
 [package]
 name = "cqt-rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
-rust-version = "1.98"
+rust-version = "1.88"
 authors = ["Artiom Tofan <artiomtofancv@gmail.com>"]
-description = "Blazingly fast constant-Q and variable-Q transform for audio fingerprinting and real-time spectral analysis"
+description = "Pitch-aligned spectrogram: fast constant-Q and variable-Q transform for music analysis, audio fingerprinting and real-time audio"
 documentation = "https://docs.rs/cqt-rs"
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/F0rty-Tw0/cqt-rs"
-keywords = ["cqt", "signal-processing", "dsp", "audio", "fft"]
+keywords = ["cqt", "spectrogram", "music", "audio", "dsp"]
 categories = ["multimedia::audio", "science", "mathematics"]
 exclude = ["/.github/**", "/.gitignore", "/plots/**", "/docs/**", "/scripts/**"]
 
@@ -23,8 +23,8 @@ default = ["parallel"]
 parallel = ["dep:rayon", "halfband-rs/parallel"]
 
 [dependencies]
-halfband-rs = "0.1"
-hann-rs = "0.2"
+halfband-rs = "0.1.1"
+hann-rs = "0.2.1"
 ndarray = { version = "0.17", default-features = false, features = ["std"] }
 rayon = { version = "1.10", optional = true }
 realfft = "3.5"
@@ -34,6 +34,7 @@ thiserror = "2"
 [dev-dependencies]
 approx = "0.5"
 criterion = "0.8"
+hound = "3.5"
 plotters = { version = "0.3.7", default-features = false, features = [
   "svg_backend",
   "line_series",

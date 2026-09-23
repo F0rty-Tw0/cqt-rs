@@ -4,7 +4,7 @@ name: CI
 # when every job passes on the tagged commit. `library-check` runs the
 # formatter, clippy with and without default features, and rustdoc, each with
 # warnings denied. `library-test` runs the test suite on stable and on the
-# 1.98 minimum supported toolchain, with and without default features.
+# 1.88 minimum supported toolchain, with and without default features.
 # `library-package` compiles the benches, proves the crate packages as it
 # will be published with `cargo publish --dry-run`, and checks that
 # CHANGELOG.md carries a heading for the crate version.
@@ -41,7 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        toolchain: [stable, "1.98"]
+        toolchain: [stable, "1.88"]
         features: ["", "--no-default-features"]
     steps:
       - uses: actions/checkout@v4
