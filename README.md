@@ -45,7 +45,7 @@ for fingerprinting:
 cqt-rs = "0.2"
 ```
 
-cqt-rs 0.2 requires Rust 1.98 or newer. The `parallel` feature (enabled by
+cqt-rs 0.2 requires Rust 1.88 or newer. The `parallel` feature (enabled by
 default) processes batch frames on a rayon thread pool; disable default
 features for a single-threaded build.
 

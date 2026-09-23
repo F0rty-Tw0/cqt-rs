@@ -1,3 +1,28 @@
+# 0.2.1 - 2026-09-23
+
+## Added
+
+- `examples/spectrogram.rs` turns a WAV file into an SVG spectrogram
+  (`cargo run --release --example spectrogram -- song.wav`).
+- `scripts/compare/run.sh` reproduces the README comparison with librosa,
+  essentia, nnAudio, cicuetea, dasp-rs, qdft and spectrograms. The README
+  numbers are re-measured with it.
+
+## Changed
+
+- The README and crate description lead with what the transform is for
+  (music analysis, fingerprinting, real-time audio); crates.io keywords are
+  now `cqt`, `spectrogram`, `music`, `audio`, `dsp`.
+- Minimum supported Rust version lowered from 1.98 to 1.88, now that
+  `halfband-rs 0.1.1` and `hann-rs 0.2.1` support 1.85; 1.88 is the floor of
+  this crate's own code (`slice::as_chunks`).
+- Dependencies: `halfband-rs 0.1.1`, `hann-rs 0.2.1`.
+
+## Removed
+
+- The README claim of 0.2 dB agreement with librosa and the pointer to the
+  `cqt-monitor` repository that held its evidence, which is not public.
+
 # 0.2.0 - 2026-09-17
 
 Breaking rewrite of the transform.

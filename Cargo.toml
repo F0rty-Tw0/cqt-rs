@@ -1,8 +1,8 @@
 [package]
 name = "cqt-rs"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
-rust-version = "1.98"
+rust-version = "1.88"
 authors = ["Artiom Tofan <artiomtofancv@gmail.com>"]
 description = "Pitch-aligned spectrogram: fast constant-Q and variable-Q transform for music analysis, audio fingerprinting and real-time audio"
 documentation = "https://docs.rs/cqt-rs"
@@ -23,8 +23,8 @@ default = ["parallel"]
 parallel = ["dep:rayon", "halfband-rs/parallel"]
 
 [dependencies]
-halfband-rs = "0.1"
-hann-rs = "0.2"
+halfband-rs = "0.1.1"
+hann-rs = "0.2.1"
 ndarray = { version = "0.17", default-features = false, features = ["std"] }
 rayon = { version = "1.10", optional = true }
 realfft = "3.5"
