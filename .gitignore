@@ -16,3 +16,8 @@ Cargo.lock
 # IDE
 .vscode
 .editorconfig
+
+
+# Local secrets / agent config
+.env
+.claude/
