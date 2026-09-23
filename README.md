@@ -1,23 +1,28 @@
 # cqt-rs
 
-Blazingly fast constant-Q transform (CQT) for audio fingerprinting and
-real-time spectral analysis, in safe Rust.
+A pitch-aligned spectrogram for Rust. The constant-Q transform (CQT) gives
+every musical semitone the same number of frequency bins, so notes, chords
+and pitch shifts line up on a fixed grid. Use it as the front end for audio
+fingerprinting, music analysis and real-time visualisers, inside the audio
+callback and without Python.
 
 [API documentation](https://docs.rs/cqt-rs) · [Changelog](./CHANGELOG.md)
 
-The fastest CPU CQT we could find. On the same signal, grid and core it is
-6× faster than librosa, 7× faster than essentia, 2–3× faster than the
-nearest Rust crate, and the streaming path handles a frame in about 6 µs.
-Batch and streaming outputs are bit-identical, and the transform agrees
-with librosa's CQT on real music to 0.2 dB. Full tables, caveats and the
-harnesses that reproduce them are in [Benchmarks](#benchmarks).
+- **Real time:** the streaming path handles a frame in about 6 µs, and
+  `gamma` cuts the latency from hundreds of milliseconds to tens.
+- **Batch and streaming agree:** the output is bit-identical however the
+  audio is chunked.
+- **Fast:** the fastest CPU CQT we could find. On the same signal, grid and
+  core it is 7–10× faster than librosa, at least 7× faster than essentia and
+  at least 2× faster than the nearest Rust crate. Full tables, caveats and
+  the harness that reproduces them are in [Benchmarks](#benchmarks).
 
 | Library, one thread | Legacy grid, 30 s | Fingerprint grid, 10 s |
 | --- | ---: | ---: |
-| **cqt-rs 0.2** | **2.7 ms** | **3.8 ms** |
-| librosa 1.0 | 17.0 ms | 24.8 ms |
-| cicuetea 0.1 (Rust) | 30.5 ms | 9.1 ms |
-| essentia 2.1 | 68.9 ms | 28.1 ms |
+| **cqt-rs 0.2** | **1.7 ms** | **3.9 ms** |
+| librosa 1.0 | 18.0 ms | 28.5 ms |
+| cicuetea 0.1 (Rust) | 30.3 ms | 8.7 ms |
+| essentia 2.1 | 79.6 ms | 28.9 ms |
 
 The transform maps a signal onto a logarithmic frequency grid with a fixed
 number of bins per octave. Every bin has its own analysis window whose length
@@ -44,6 +49,18 @@ cqt-rs 0.2 requires Rust 1.98 or newer. The `parallel` feature (enabled by
 default) processes batch frames on a rayon thread pool; disable default
 features for a single-threaded build.
 
+## Try it on your own audio
+
+From a clone of this repository:
+
+```console
+cargo run --release --example spectrogram -- song.wav
+```
+
+It prints the duration, the output size and the transform time, and writes
+`spectrogram.svg`. The example reads WAV with `hound`; MP3 or FLAC need a
+decoder such as `symphonia` first.
+
 ## Usage
 
 ### Batch
@@ -56,6 +73,7 @@ let params = CqtParams::builder(44_100, 55.0, 7_040.0)
     .build()?;
 let cqt = Cqt::new(params);
 
+// Mono f32 samples at 44.1 kHz; examples/spectrogram.rs decodes a WAV file.
 let signal: Vec<f32> = load_audio();
 let hop = 512;
 let magnitudes = cqt.process(&signal, hop)?; // ndarray (frames, bins)
@@ -171,22 +189,29 @@ resolution, and the streaming path handles a frame in 9.3 µs, which at hop
 ### Compared with other libraries
 
 The same two grids and signals, timed on one thread of an Intel i7-13700H
-(Linux, Rust 1.98, Python 3.12). Every library runs its own default
-algorithm on the same signal; the table reports the median batch time.
-cqt-rs times are the single-threaded build (`--no-default-features`); with
-the rayon pool on the same machine the legacy batch takes 0.4 ms with a
-reused workspace and the fingerprint batch 0.8 ms.
+(Linux, Rust 1.98, Python 3.12), pinned to one performance core. Every
+library runs its own default algorithm on the same signal; the table reports
+the median batch time over two full runs of the harness. cqt-rs times are
+the single-threaded build (`--no-default-features`); with the rayon pool on
+the same machine the legacy batch takes 0.4 ms with a reused workspace and
+the fingerprint batch 0.8 ms.
 
 | Library | Legacy grid, 30 s | Fingerprint grid, 10 s | Notes |
 | --- | ---: | ---: | --- |
-| **cqt-rs 0.2** | **2.7 ms** | **3.8 ms** | 1.6 ms on the legacy grid with a reused workspace |
-| librosa 1.0 (`librosa.cqt`) | 17.0 ms | 24.8 ms | scipy FFT, `res_type` default |
-| cicuetea 0.1 (`NsgfCqtSparse`) | 30.5 ms | 9.1 ms | invertible NSGT, critically sampled output, needs a power-of-two buffer (30 s padded to 47.7 s); filterbank build 1.7 s / 1.2 s |
-| nnAudio 0.3 (`CQT1992v2`, CPU) | 55.3 ms | 167 ms | PyTorch, 1 thread; 22 ms / 53 ms on 14 threads. Built for GPUs |
-| essentia 2.1 (`NSGConstantQ`) | 68.9 ms | 28.1 ms | invertible NSGT over the whole signal, no hop |
-| dasp-rs 0.5 (`cqt`) | 108 ms | n/a | 12 bins per octave only |
-| qdft 0.1 (`QDFT32`) | 202 ms | 208 ms | sliding DFT: one spectrum per input sample, not per hop |
-| spectrograms 2.1 (`cqt`) | 358 ms | 1 658 ms | time-domain correlation per frame, kernels capped at 16384 samples |
+| **cqt-rs 0.2** | **1.7 ms** | **3.9 ms** | filterbank built outside the timed call; a reused workspace gives the same times |
+| librosa 1.0 (`librosa.cqt`) | 18.0 ms | 28.5 ms | builds its filters inside the call, `res_type` default |
+| cicuetea 0.1 (`NsgfCqtSparse`) | 30.3 ms | 8.7 ms | invertible NSGT, critically sampled output, needs a power-of-two buffer (30 s padded to 47.7 s); filterbank build 1.8 s / 1.3 s |
+| nnAudio 0.3 (`CQT1992v2`, CPU) | 56.2 ms | 189 ms | PyTorch 2.14 CPU, 1 thread. Built for GPUs |
+| essentia 2.1 (`NSGConstantQ`) | 79.6 ms | 28.9 ms | 2.1b6 dev build; invertible NSGT over the whole signal, no hop |
+| dasp-rs 0.5 (`cqt`) | 113 ms | n/a | 12 bins per octave only; builds its kernels inside the call |
+| qdft 0.1 (`QDFT32`) | 443 ms | 462 ms | sliding DFT with its default Hann window: one spectrum per input sample, not per hop |
+| spectrograms 2.1 (`cqt`) | 392 ms | 1 820 ms | time-domain correlation per frame, kernels capped at 16384 samples; whole octaves only (108 / 168 bins) |
+
+Reproduce the table (needs `cargo` and `uv`; about a minute once built):
+
+```console
+scripts/compare/run.sh
+```
 
 Not measured: GPU back ends (nnAudio, torchaudio on CUDA), the MATLAB CQT
 toolbox and other C++ libraries without Rust or Python bindings. The claim
@@ -198,16 +223,6 @@ Regenerate the figures with:
 ```console
 cargo run --release --example generate_plots
 ```
-
-## Built on cqt-rs
-
-The [`cqt-monitor`](https://github.com/F0rty-Tw0/cqt-monitor) repository uses
-the transform as the front end of a real-time watch-list audio fingerprinting
-monitor: peak picking, pitch- and tempo-invariant hashes and sliding-window
-matching. It also holds the validation of this transform against librosa's CQT
-on real music, which agrees to a mean 0.20 dB with a correlation of 0.9996
-after dividing out librosa's per-filter length scaling, and the fingerprint
-experiments.
 
 ## References
 

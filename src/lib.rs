@@ -1,5 +1,5 @@
-//! Constant-Q transform (CQT) for audio fingerprinting and real-time
-//! monitoring.
+//! Constant-Q transform (CQT), a pitch-aligned spectrogram for music
+//! analysis, audio fingerprinting and real-time audio.
 //!
 //! The transform maps a signal onto a logarithmic frequency grid with a
 //! configurable number of bins per octave. Each bin has its own analysis

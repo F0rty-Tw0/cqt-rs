@@ -1,0 +1,21 @@
+[package]
+name = "compare-rs"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+# Standalone: not a member of any workspace above it.
+[workspace]
+
+[features]
+# Time only cqt-rs, with its rayon pool enabled.
+parallel = ["cqt-rs/parallel"]
+
+[dependencies]
+cqt-rs = { path = "../../..", default-features = false }
+cicuetea = "0.1"
+dasp-rs = "0.5"
+non-empty-slice = "0.6"
+num-complex = "0.4"
+qdft = "0.1"
+spectrograms = "2.1"

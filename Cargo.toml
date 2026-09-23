@@ -4,12 +4,12 @@ version = "0.2.0"
 edition = "2024"
 rust-version = "1.98"
 authors = ["Artiom Tofan <artiomtofancv@gmail.com>"]
-description = "Blazingly fast constant-Q and variable-Q transform for audio fingerprinting and real-time spectral analysis"
+description = "Pitch-aligned spectrogram: fast constant-Q and variable-Q transform for music analysis, audio fingerprinting and real-time audio"
 documentation = "https://docs.rs/cqt-rs"
 readme = "README.md"
 license = "MIT"
 repository = "https://github.com/F0rty-Tw0/cqt-rs"
-keywords = ["cqt", "signal-processing", "dsp", "audio", "fft"]
+keywords = ["cqt", "spectrogram", "music", "audio", "dsp"]
 categories = ["multimedia::audio", "science", "mathematics"]
 exclude = ["/.github/**", "/.gitignore", "/plots/**", "/docs/**", "/scripts/**"]
 
