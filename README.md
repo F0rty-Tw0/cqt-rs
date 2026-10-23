@@ -1,5 +1,7 @@
 # cqt-rs
 
+[![BuyMeACoffee](https://raw.githubusercontent.com/pachadotdev/buymeacoffee-badges/main/bmc-donate-yellow.svg)](https://buymeacoffee.com/f0rty_tw0)
+
 A pitch-aligned spectrogram for Rust. The constant-Q transform (CQT) gives
 every musical semitone the same number of frequency bins, so notes, chords
 and pitch shifts line up on a fixed grid. Use it as the front end for audio
